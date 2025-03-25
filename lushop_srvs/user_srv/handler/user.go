@@ -55,10 +55,10 @@ func Paginate(ctx context.Context, page, pageSize int) func(db *gorm.DB) *gorm.D
 			page = 1
 		}
 		switch {
-		case pageSize > 100:
-			pageSize = 100
-		case pageSize <= 100:
+		case pageSize > 10:
 			pageSize = 10
+		case pageSize <= 10:
+			pageSize = 5
 		}
 		offset := (page - 1) * pageSize
 		return db.Offset(offset).Limit(pageSize)

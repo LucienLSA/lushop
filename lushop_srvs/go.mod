@@ -9,6 +9,7 @@ require (
 	google.golang.org/protobuf v1.36.5
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/gorm v1.25.12
+	gorm.io/plugin/dbresolver v1.5.3
 )
 
 require (

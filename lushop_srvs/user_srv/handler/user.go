@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"fmt"
 	"lushopsrvs/user_srv/global"
 	"lushopsrvs/user_srv/model"
 	"lushopsrvs/user_srv/proto"
@@ -49,7 +48,7 @@ func ModelToResponse(user *model.User) *proto.UserInfoResponse {
 // 	}
 // }
 
-func Paginate(ctx context.Context, pageNum, pageSize int) func(db *gorm.DB) *gorm.DB {
+func Paginate(pageNum, pageSize int) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		// db = global.DB
 		if pageNum == 0 {
@@ -76,7 +75,7 @@ func (s *UserServer) GetUserList(ctx context.Context, req *proto.PageInfo) (*pro
 	}
 	rsp := &proto.UserListResponse{}
 	rsp.Total = int32(result.RowsAffected)
-	global.DB.Scopes(Paginate(ctx, int(req.Pn), int(req.PSize))).Find(&users)
+	global.DB.Scopes(Paginate(int(req.Pn), int(req.PSize))).Find(&users)
 	for _, user := range users {
 		userInfoRsp := ModelToResponse(&user)
 		rsp.Data = append(rsp.Data, userInfoRsp)
@@ -165,8 +164,8 @@ func (s *UserServer) CheckPassWord(ctx context.Context, req *proto.PasswordCheck
 	var user model.User
 	// 将请求中输入用户的密码代入user模型中对比
 	user.Password = req.EncryptedPassWord
-	fmt.Println(user.Password)
-	fmt.Println(req.PassWord)
+	// fmt.Println(user.Password)
+	// fmt.Println(req.PassWord)
 	ok := user.CheckPassword(req.PassWord)
 	// if !ok {
 	// 	return nil, status.Errorf(codes.Internal, "用户密码错误")

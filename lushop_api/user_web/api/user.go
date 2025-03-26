@@ -85,6 +85,9 @@ func GetUserList(ctx *gin.Context) {
 			"msg", err.Error(),
 		)
 	}
+	claims, _ := ctx.Get("claims")
+	currentUser := claims.(*jwtClaims.CustomClaims)
+	zap.S().Infof("访问用户:%d", currentUser.ID)
 	// 生成grpc的client并调用接口
 	userSrvClient := proto.NewUserClient(userConn)
 	pn := ctx.DefaultQuery("pn", "0")
@@ -126,6 +129,13 @@ func PassWordLogin(ctx *gin.Context) {
 	if err := ctx.ShouldBind(&req); err != nil {
 		// 返回错误信息
 		HandlerValidatorError(ctx, err)
+		return
+	}
+
+	if !store.Verify(req.CaptchaId, req.CaptchaAns, true) {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"captcha": "验证码错误",
+		})
 		return
 	}
 
@@ -180,7 +190,7 @@ func PassWordLogin(ctx *gin.Context) {
 					ID:          uint(rsp.Id),
 					NickName:    rsp.NickName,
 					AuthorityId: uint(rsp.Role),
-					StandardClaims: jwt.StandardClaims{
+					StandardClaims: &jwt.StandardClaims{
 						NotBefore: time.Now().Unix(), // 签名的生效时间
 						ExpiresAt: time.Now().Unix() + global.ServerConfig.JwtInfo.ExpireTime,
 						Issuer:    "lucien",

@@ -1,6 +1,7 @@
 package initialize
 
 import (
+	"lushopapi/user_web/global"
 	"lushopapi/user_web/router"
 
 	"github.com/gin-gonic/gin"
@@ -8,7 +9,8 @@ import (
 
 func Routers() *gin.Engine {
 	Router := gin.Default()
-	ApiGroup := Router.Group("/u/v1")
+	// fmt.Println(global.ServerConfig.UserSrvInfo.Version)
+	ApiGroup := Router.Group("/u/" + global.ServerConfig.UserSrvInfo.Version)
 	router.InitUserRouter(ApiGroup)
 	return Router
 }

@@ -15,7 +15,7 @@ import (
 func main() {
 	initialize.MySQL()
 	IP := flag.String("ip", "127.0.0.1", "ip地址")
-	Port := flag.Int("port", 8083, "端口号")
+	Port := flag.Int("port", 8022, "端口号")
 	flag.Parse()
 	fmt.Println("ip:", *IP)
 	fmt.Println("port:", *Port)

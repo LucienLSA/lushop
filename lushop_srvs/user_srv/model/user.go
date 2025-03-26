@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -43,7 +44,7 @@ func (user *User) SetPassword(password string) error {
 // CheckPassword 校验密码
 func (user *User) CheckPassword(password string) bool {
 	// 第一个参数是hashed已经加密过的密码，第二个参数请求中输入的参数密码
-	// fmt.Println(user.Password)
+	fmt.Println(user.Password)
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
 		return false

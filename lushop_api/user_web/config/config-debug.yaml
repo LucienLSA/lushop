@@ -1,0 +1,14 @@
+name: 'user_web'
+port: 8023
+
+
+user_srv:
+  host: '127.0.0.1'
+  port: 8022
+  version: 'v1'
+  mode: 'debug'
+
+
+jwt:
+  key: 'lushop_secret_key'
+  expired_time: 2592000

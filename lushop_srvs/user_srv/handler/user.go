@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"lushopsrvs/user_srv/global"
 	"lushopsrvs/user_srv/model"
 	"lushopsrvs/user_srv/proto"
@@ -48,19 +49,19 @@ func ModelToResponse(user *model.User) *proto.UserInfoResponse {
 // 	}
 // }
 
-func Paginate(ctx context.Context, page, pageSize int) func(db *gorm.DB) *gorm.DB {
+func Paginate(ctx context.Context, pageNum, pageSize int) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		db = global.DB
-		if page == 0 {
-			page = 1
+		// db = global.DB
+		if pageNum == 0 {
+			pageNum = 1
 		}
 		switch {
 		case pageSize > 10:
 			pageSize = 10
-		case pageSize <= 10:
+		case pageSize <= 0:
 			pageSize = 5
 		}
-		offset := (page - 1) * pageSize
+		offset := (pageNum - 1) * pageSize
 		return db.Offset(offset).Limit(pageSize)
 	}
 }
@@ -87,6 +88,7 @@ func (s *UserServer) GetUserByMobile(ctx context.Context, req *proto.MobileReque
 	// 手机号码查询用户
 	var user model.User
 	// db := global.NewDBClient(ctx)
+	// fmt.Println(req.Mobile)
 	result := global.DB.Where(&model.User{Mobile: req.Mobile}).First(&user)
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "用户不存在")
@@ -163,6 +165,8 @@ func (s *UserServer) CheckPassWord(ctx context.Context, req *proto.PasswordCheck
 	var user model.User
 	// 将请求中输入用户的密码代入user模型中对比
 	user.Password = req.EncryptedPassWord
+	fmt.Println(user.Password)
+	fmt.Println(req.PassWord)
 	ok := user.CheckPassword(req.PassWord)
 	// if !ok {
 	// 	return nil, status.Errorf(codes.Internal, "用户密码错误")

@@ -15,5 +15,6 @@ func Routers() *gin.Engine {
 	ApiGroup := Router.Group("/u/" + global.ServerConfig.UserSrvInfo.Version)
 	router.InitUserRouter(ApiGroup)
 	router.InitBaseRouter(ApiGroup)
+	Router.GET("/health")
 	return Router
 }

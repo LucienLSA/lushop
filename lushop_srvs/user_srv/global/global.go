@@ -1,11 +1,14 @@
 package global
 
 import (
+	"lushopsrvs/user_srv/config"
+
 	"gorm.io/gorm"
 )
 
 var (
-	DB *gorm.DB
+	DB           *gorm.DB
+	ServerConfig config.ServerConfig
 )
 
 // 创建数据库客户端上下文

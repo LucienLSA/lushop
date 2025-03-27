@@ -3,7 +3,7 @@ port: 8023
 
 
 user_srv:
-  host: '127.0.0.1'
+  host: '10.99.192.85'
   port: 8022
   version: 'v1'
   mode: 'debug'

@@ -120,19 +120,24 @@ func (s *UserServer) CreateUser(ctx context.Context, req *proto.CreateUserInfo) 
 	var user model.User
 	// db := global.NewDBClient(ctx)
 	// db := global.DB
-	result := global.DB.Where(&model.User{Mobile: req.Mobile}).First(&user)
-	if result.RowsAffected == 1 {
+	var count int64
+	err := global.DB.Model(&model.User{}).Where("mobile=?", req.Mobile).Count(&count).Error
+	// if result.RowsAffected >= 1 {
+	// 	return nil, status.Errorf(codes.AlreadyExists, "用户已存在")
+	// }
+	if count > 0 {
 		return nil, status.Errorf(codes.AlreadyExists, "用户已存在")
 	}
+
 	user.Mobile = req.Mobile
 	user.NickName = req.NickName
 	// 密码加密
-	err := user.SetPassword(req.PassWord)
+	err = user.SetPassword(req.PassWord)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 	// 保存到数据库
-	result = global.DB.Create(&user)
+	result := global.DB.Create(&user)
 	if result.Error != nil {
 		return nil, status.Errorf(codes.Internal, result.Error.Error())
 	}

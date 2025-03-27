@@ -18,6 +18,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -219,4 +220,84 @@ func PassWordLogin(ctx *gin.Context) {
 			}
 		}
 	}
+}
+
+// 用户注册
+func Register(ctx *gin.Context) {
+	var req forms.RegisterForm
+	if err := ctx.ShouldBind(&req); err != nil {
+		HandlerValidatorError(ctx, err)
+		return
+	}
+
+	// 从redis中获取验证码
+	value, err := global.Rdb.Get(global.Rctx, req.Mobile).Result()
+	if err == redis.Nil {
+		zap.S().Errorw("验证码错误",
+			"msg", err.Error(),
+		)
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": "验证码错误",
+		})
+	} else {
+		if value != req.Code {
+			zap.S().Errorw("验证码错误",
+				"msg", err.Error(),
+			)
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"code": "验证码错误",
+			})
+		}
+	}
+
+	// 拨号连接grpc服务
+	ip := global.ServerConfig.UserSrvInfo.Host
+	port := global.ServerConfig.UserSrvInfo.Port
+	userConn, err := grpc.Dial(fmt.Sprintf("%s:%d", ip, port), grpc.WithInsecure())
+	if err != nil {
+		zap.S().Errorw("[GetUserList] 连接【用户服务失败】",
+			"msg", err.Error(),
+		)
+	}
+	// 生成grpc的client并调用接口
+	userSrvClient := proto.NewUserClient(userConn)
+
+	user, err := userSrvClient.CreateUser(context.Background(), &proto.CreateUserInfo{
+		NickName: req.Mobile,
+		PassWord: req.PassWord,
+		Mobile:   req.Mobile,
+	})
+	if err != nil {
+		zap.S().Errorf("[CreateUser] 创建【注册用户失败:%s】", err.Error())
+		HandleGrpcErrorToHttp(err, ctx)
+		return
+	}
+	// 创建用户成功，直接进入登录后的状态
+	// 生成token
+	j := middlewares.NewJWT()
+	claims := jwtClaims.CustomClaims{
+		ID:          uint(user.Id),
+		NickName:    user.NickName,
+		AuthorityId: uint(user.Role),
+		StandardClaims: &jwt.StandardClaims{
+			NotBefore: time.Now().Unix(), // 签名的生效时间
+			ExpiresAt: time.Now().Unix() + global.ServerConfig.JwtInfo.ExpireTime,
+			Issuer:    "lucien",
+		},
+	}
+	token, err := j.CreateToken(claims)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"msg": "生成token失败",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"msg":        "登录成功",
+		"id":         user.Id,
+		"nick_name":  user.NickName,
+		"token":      token,
+		"expired_at": (time.Now().Unix() + global.ServerConfig.JwtInfo.ExpireTime) * 1000,
+	})
 }

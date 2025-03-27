@@ -12,3 +12,18 @@ user_srv:
 jwt:
   key: 'lushop_secret_key'
   expired_time: 2592000
+
+ali_sms:
+
+  sign_name: '阿里云短信测试'
+  template_code: 'SMS_154950909'
+  phone_number: '19821216806'
+  region_id: 'cn-hangzhou'
+  expire: 600
+
+redis:
+  host: '127.0.0.1'
+  port: '6379'
+  db: 4
+  password: ''
+  pool_size: 10

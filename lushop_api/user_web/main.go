@@ -38,6 +38,10 @@ func main() {
 	zap.S().Info("init redis success")
 	defer global.Rdb.Close()
 
+	// 7. 初始化srv的连接
+	initialize.SrcConn()
+	zap.S().Info("init SrcConn success")
+
 	if err := Router.Run(fmt.Sprintf(":%v", global.ServerConfig.Port)); err != nil {
 		zap.S().Panic("用户web服务器启动失败", err.Error())
 	}

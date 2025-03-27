@@ -9,13 +9,8 @@ import (
 	"go.uber.org/zap"
 )
 
-func GetEnvInfo(env string) bool {
-	viper.AutomaticEnv()
-	return viper.GetBool(env)
-}
-
 func Config() {
-	mode := GetEnvInfo("LUSHOP_DEBUG")
+	mode := global.GetEnvInfoBool("LUSHOP_DEBUG")
 	configFilePrefix := "config"
 	configFileName := fmt.Sprintf("%s/%s-pro.yaml", configFilePrefix, configFilePrefix)
 	if mode {

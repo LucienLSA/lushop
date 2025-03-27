@@ -29,6 +29,10 @@ func GenerateSmsCode(witdh int) string {
 	return sb.String()
 }
 
+// 通过系统的环境变量获取
+// 获取AccessKey ID
+// 获取AccessKey Secret
+
 func SendSmsAli(ctx *gin.Context) {
 	var req forms.SendSmsForm
 	if err := ctx.ShouldBind(&req); err != nil {
@@ -37,9 +41,11 @@ func SendSmsAli(ctx *gin.Context) {
 	}
 	config := &openapi.Config{
 		// 您的AccessKey ID
-		AccessKeyId: tea.String(global.ServerConfig.AliSmsInfo.ApiKey),
+		// AccessKeyId: tea.String(global.ServerConfig.AliSmsInfo.ApiKey),
+		AccessKeyId: tea.String(global.GetEnvInfoStr("Ali_ApiKey")),
 		// 您的AccessKey Secret
-		AccessKeySecret: tea.String(global.ServerConfig.AliSmsInfo.ApiSecrect),
+		// AccessKeySecret: tea.String(global.ServerConfig.AliSmsInfo.ApiSecrect),
+		AccessKeySecret: tea.String(global.GetEnvInfoStr("Ali_ApiSecret")),
 		RegionId:        tea.String(global.ServerConfig.AliSmsInfo.RegionId),
 	}
 	// 访问的域名

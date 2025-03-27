@@ -3,6 +3,7 @@ port: 8023
 
 
 user_srv:
+  name: 'user_srv'
   host: '10.99.192.85'
   port: 8022
   version: 'v1'
@@ -14,7 +15,12 @@ jwt:
   expired_time: 2592000
 
 ali_sms:
+<<<<<<< HEAD
 
+=======
+  api_key: ''
+  api_secret: ''
+>>>>>>> c7b9935 (修改了sms密钥)
   sign_name: '阿里云短信测试'
   template_code: 'SMS_154950909'
   phone_number: '19821216806'
@@ -27,3 +33,7 @@ redis:
   db: 4
   password: ''
   pool_size: 10
+
+consul:
+  host: '192.168.226.140'
+  port: '8500'

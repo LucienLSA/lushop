@@ -5,6 +5,7 @@ type UserSrvConfig struct {
 	Port    int    `mapstructure:"port"`
 	Mode    string `mapstructure:"mode"`
 	Version string `mapstructure:"version"`
+	Name    string `mapstructure:"name"`
 }
 
 type JwtConfig struct {
@@ -30,6 +31,11 @@ type RedisConfig struct {
 	DB       int    `mapstructure:"db"`
 }
 
+type ConsulConfig struct {
+	Host string `mapstructure:"host"`
+	Port string `mapstructure:"port"`
+}
+
 type ServerConfig struct {
 	Name        string        `mapstructure:"name"`
 	Port        int           `mapstructure:"port"`
@@ -37,4 +43,5 @@ type ServerConfig struct {
 	JwtInfo     JwtConfig     `mapstructure:"jwt"`
 	AliSmsInfo  AliSmsConfig  `mapstructure:"ali_sms"`
 	RedisInfo   RedisConfig   `mapstructure:"redis"`
+	ConsulInfo  ConsulConfig  `mapstructure:"consul"`
 }

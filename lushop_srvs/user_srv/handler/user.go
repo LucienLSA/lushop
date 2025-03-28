@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"lushopsrvs/user_srv/global"
 	"lushopsrvs/user_srv/model"
 	"lushopsrvs/user_srv/proto"
@@ -67,6 +68,7 @@ func Paginate(pageNum, pageSize int) func(db *gorm.DB) *gorm.DB {
 
 func (s *UserServer) GetUserList(ctx context.Context, req *proto.PageInfo) (*proto.UserListResponse, error) {
 	// 获取用户列表
+	fmt.Println("获取用户列表")
 	var users []model.User
 	// db := global.NewDBClient(ctx)
 	// result := global.DB.Find(&users)

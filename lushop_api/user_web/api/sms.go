@@ -42,10 +42,10 @@ func SendSmsAli(ctx *gin.Context) {
 	config := &openapi.Config{
 		// 您的AccessKey ID
 		// AccessKeyId: tea.String(global.ServerConfig.AliSmsInfo.ApiKey),
-		AccessKeyId: tea.String(global.GetEnvInfoStr("Ali_ApiKey")),
+		AccessKeyId: tea.String(global.GetEnvInfoStr(global.ServerConfig.AliSmsInfo.ApiKey)),
 		// 您的AccessKey Secret
 		// AccessKeySecret: tea.String(global.ServerConfig.AliSmsInfo.ApiSecrect),
-		AccessKeySecret: tea.String(global.GetEnvInfoStr("Ali_ApiSecret")),
+		AccessKeySecret: tea.String(global.GetEnvInfoStr(global.ServerConfig.AliSmsInfo.ApiSecrect)),
 		RegionId:        tea.String(global.ServerConfig.AliSmsInfo.RegionId),
 	}
 	// 访问的域名

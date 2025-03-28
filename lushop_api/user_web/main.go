@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"lushopapi/user_web/global"
 	"lushopapi/user_web/initialize"
+	"lushopapi/user_web/utils/addr"
 
 	"go.uber.org/zap"
 )
@@ -39,8 +40,18 @@ func main() {
 	defer global.Rdb.Close()
 
 	// 7. 初始化srv的连接
-	initialize.SrcConn()
+	initialize.SrvConn()
 	zap.S().Info("init SrcConn success")
+
+	// 8. 初始化可用端口，debug模式则指定端口
+	mode := global.GetEnvInfoBool(global.ServerConfig.Mode)
+	if !mode {
+		port, err := addr.GetFreeport()
+		if err == nil {
+			global.ServerConfig.Port = port
+		}
+	}
+	zap.S().Info("init mode success")
 
 	if err := Router.Run(fmt.Sprintf(":%v", global.ServerConfig.Port)); err != nil {
 		zap.S().Panic("用户web服务器启动失败", err.Error())

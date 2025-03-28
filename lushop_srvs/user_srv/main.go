@@ -3,13 +3,18 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"lushopsrvs/user_srv/global"
 	"lushopsrvs/user_srv/handler"
 	"lushopsrvs/user_srv/initialize"
 	"lushopsrvs/user_srv/proto"
+	"lushopsrvs/user_srv/utils/addr"
 	"net"
 
+	"github.com/google/uuid"
 	"github.com/hashicorp/consul/api"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -24,10 +29,14 @@ func main() {
 	initialize.MySQL()
 	// 初始化日志
 	initialize.Logger()
+	zap.S().Info(global.ServerConfig)
 	IP := flag.String("ip", "0.0.0.0", "ip地址")
-	Port := flag.Int("port", 8022, "端口号")
+	Port := flag.Int("port", 0, "端口号")
 	flag.Parse()
 	zap.S().Info("ip:", *IP)
+	if *Port == 0 {
+		*Port, _ = addr.GetFreeport()
+	}
 	zap.S().Info("port:", *Port)
 	server := grpc.NewServer()
 	proto.RegisterUserServer(server, &handler.UserServer{})
@@ -52,7 +61,7 @@ func main() {
 	// 生成对应的检查对象
 	check := &api.AgentServiceCheck{
 		// 后续从配置中心nacos中获取
-		GRPC:                           fmt.Sprintf("10.99.192.85:8022"),
+		GRPC:                           fmt.Sprintf("10.99.192.85:%d", *Port),
 		Timeout:                        "5s",
 		Interval:                       "5s",
 		DeregisterCriticalServiceAfter: "15s",
@@ -60,7 +69,8 @@ func main() {
 	// 生成注册对象
 	registeration := new(api.AgentServiceRegistration)
 	registeration.Name = global.ServerConfig.Name
-	registeration.ID = global.ServerConfig.Name
+	serviceID := fmt.Sprintf("%s", uuid.New())
+	registeration.ID = serviceID
 	registeration.Port = *Port
 	registeration.Tags = []string{"user_srv", "lushop_srv", "grpc", "lucien"}
 	registeration.Address = "10.99.192.85"
@@ -69,9 +79,19 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	go func() {
+		err = server.Serve(lis)
+		if err != nil {
+			zap.S().Errorf("failed to start grpc:" + err.Error())
+		}
+	}()
 
-	err = server.Serve(lis)
-	if err != nil {
-		zap.S().Errorf("failed to start grpc:" + err.Error())
+	// 接收终止信号，优雅退出
+	quit := make(chan os.Signal)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	if err = client.Agent().ServiceDeregister(serviceID); err != nil {
+		zap.S().Info("注销失败")
 	}
+	zap.S().Info("注销成功")
 }

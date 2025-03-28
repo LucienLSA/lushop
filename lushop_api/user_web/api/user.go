@@ -76,7 +76,6 @@ func HandlerValidatorError(ctx *gin.Context, err error) {
 }
 
 func GetUserList(ctx *gin.Context) {
-
 	claims, _ := ctx.Get("claims")
 	currentUser := claims.(*jwtClaims.CustomClaims)
 	zap.S().Infof("访问用户:%d", currentUser.ID)
@@ -124,8 +123,7 @@ func PassWordLogin(ctx *gin.Context) {
 		return
 	}
 
-	// 设为false是为了保持验证码不变，方便调试
-	if !store.Verify(req.CaptchaId, req.CaptchaAns, false) {
+	if !store.Verify(req.CaptchaId, req.CaptchaAns, true) {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"captcha": "验证码错误",
 		})
@@ -151,7 +149,7 @@ func PassWordLogin(ctx *gin.Context) {
 			return
 		}
 	} else {
-		// 只是查询到用户，未检验密码
+		// 以上只是查询到用户，未检验密码
 		passRsp, err := global.UserSrvClient.CheckPassWord(ctx, &proto.PasswordCheckInfo{
 			PassWord:          req.PassWord, // 请求参数输入的密码
 			EncryptedPassWord: rsp.PassWord, // 调用grpc的服务返回的查询到的密码

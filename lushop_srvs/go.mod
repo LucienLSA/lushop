@@ -5,6 +5,7 @@ go 1.23.1
 require (
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/golang/protobuf v1.5.4
+	github.com/google/uuid v1.6.0
 	github.com/hashicorp/consul/api v1.31.2
 	github.com/spf13/viper v1.20.1
 	go.uber.org/zap v1.27.0

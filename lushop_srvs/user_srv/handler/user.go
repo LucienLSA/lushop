@@ -27,7 +27,7 @@ func ModelToResponse(user *model.User) *proto.UserInfoResponse {
 		Role:     int32(user.Role),
 	}
 	if user.Birthday != nil {
-		userInfoRsp.BirthDay = uint64(user.Birthday.Unix())
+		userInfoRsp.BirthDay = uint64(user.Birthday.UTC().Unix())
 	}
 	return userInfoRsp
 }
@@ -51,13 +51,13 @@ func ModelToResponse(user *model.User) *proto.UserInfoResponse {
 func Paginate(pageNum, pageSize int) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		// db = global.DB
-		if pageNum == 0 {
+		if pageNum < 1 {
 			pageNum = 1
 		}
 		switch {
 		case pageSize > 10:
 			pageSize = 10
-		case pageSize <= 0:
+		case pageSize < 1:
 			pageSize = 5
 		}
 		offset := (pageNum - 1) * pageSize
@@ -69,12 +69,19 @@ func (s *UserServer) GetUserList(ctx context.Context, req *proto.PageInfo) (*pro
 	// 获取用户列表
 	var users []model.User
 	// db := global.NewDBClient(ctx)
-	result := global.DB.Find(&users)
-	if result.Error != nil {
-		return nil, result.Error
-	}
+	// result := global.DB.Find(&users)
+	// if result.Error != nil {
+	// 	return nil, result.Error
+	// }
 	rsp := &proto.UserListResponse{}
-	rsp.Total = int32(result.RowsAffected)
+	// rsp.Total = int32(result.RowsAffected)
+	// global.DB.Scopes(Paginate(int(req.Pn), int(req.PSize))).Find(&users)
+	var total int64
+	err := global.DB.Model(&model.User{}).Count(&total).Error
+	if err != nil {
+		return nil, status.Errorf(codes.NotFound, "用户不存在")
+	}
+	rsp.Total = int32(total)
 	global.DB.Scopes(Paginate(int(req.Pn), int(req.PSize))).Find(&users)
 	for _, user := range users {
 		userInfoRsp := ModelToResponse(&user)

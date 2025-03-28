@@ -15,12 +15,8 @@ jwt:
   expired_time: 2592000
 
 ali_sms:
-<<<<<<< HEAD
-
-=======
   api_key: ''
   api_secret: ''
->>>>>>> c7b9935 (修改了sms密钥)
   sign_name: '阿里云短信测试'
   template_code: 'SMS_154950909'
   phone_number: '19821216806'

@@ -1,12 +1,22 @@
-name: 'user_srv'
+# name: 'user_srv'
+# mode: 'LUSHOP_DEBUG'
 
-mysql:
-  host: '127.0.0.1'
-  port: 3306
-  user: "root"
-  password: "123456"
-  db_name: 'lushop_user_srv'
+# mysql:
+#   host: '127.0.0.1'
+#   port: '3306'
+#   user: "root"
+#   password: "123456"
+#   db_name: 'lushop_user_srv'
 
-consul:
+# consul:
+#   host: '192.168.226.140'
+#   port: '8500'
+
+nacos:
   host: '192.168.226.140'
-  port: 8500
+  port: '8848'
+  namespace: '97b453ea-69de-46f4-a691-7a0e14977f2a'
+  user: 'nacos'
+  password: 'nacos'
+  dataid: 'user_srv.json'
+  group: 'dev'

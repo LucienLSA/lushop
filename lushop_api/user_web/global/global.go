@@ -17,6 +17,7 @@ var (
 	Rdb           *redis.Client
 	Rctx          = context.Background()
 	UserSrvClient proto.UserClient
+	NacosConfig   *config.NacosConfig = &config.NacosConfig{}
 )
 
 // var ServerConfig = new(config.ServerConfig)

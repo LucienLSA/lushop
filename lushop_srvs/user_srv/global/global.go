@@ -3,12 +3,14 @@ package global
 import (
 	"lushopsrvs/user_srv/config"
 
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
 var (
 	DB           *gorm.DB
 	ServerConfig config.ServerConfig
+	NacosConfig  config.NacosConfig
 )
 
 // 创建数据库客户端上下文
@@ -17,3 +19,13 @@ var (
 // 	db := _db
 // 	return db.WithContext(ctx)
 // }
+
+func GetEnvInfoBool(env string) bool {
+	viper.AutomaticEnv()
+	return viper.GetBool(env)
+}
+
+func GetEnvInfoStr(env string) string {
+	viper.AutomaticEnv()
+	return viper.GetString(env)
+}

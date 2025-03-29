@@ -3,7 +3,8 @@ package initialize
 import (
 	"encoding/json"
 	"fmt"
-	"lushopapi/user_web/global"
+	"lushopsrvs/goods_srv/global"
+
 	"time"
 
 	"github.com/nacos-group/nacos-sdk-go/clients"
@@ -14,20 +15,26 @@ import (
 )
 
 func Config() {
+	// 从配置文件中读取配置
 	mode := global.GetEnvInfoBool(global.ServerConfig.Mode)
 	configFilePrefix := "config"
-	configFileName := fmt.Sprintf("%s-pro.yaml", configFilePrefix)
+	configFileName := fmt.Sprintf("%s/%s-pro.yaml", configFilePrefix, configFilePrefix)
 	if mode {
-		configFileName = fmt.Sprintf("%s-debug.yaml", configFilePrefix)
+		configFileName = fmt.Sprintf("%s/%s-debug.yaml", configFilePrefix, configFilePrefix)
 	}
 	v := viper.New()
 	v.SetConfigFile(configFileName)
 	if err := v.ReadInConfig(); err != nil {
 		panic(err)
 	}
-	// 对象如何在其他文件中使用，因为它是一个局部变量，初始化全局变量
 	// serverConfig := config.ServerConfig{}
-	if err := v.Unmarshal(global.NacosConfig); err != nil {
+	// if err := v.Unmarshal(global.ServerConfig); err != nil {
+	// 	panic(err)
+	// }
+	// zap.S().Info("配置信息:%v", global.ServerConfig)
+	// fmt.Printf("配置信息:%v", global.ServerConfig)
+	// 对象如何在其他文件中使用，因为它是一个局部变量，初始化全局变量
+	if err := v.Unmarshal(&global.NacosConfig); err != nil {
 		panic(err)
 	}
 	zap.S().Info("配置信息:%v", global.NacosConfig)
@@ -56,7 +63,6 @@ func Config() {
 		CacheDir:            "./temp/nacos/cache",
 		LogLevel:            "debug",
 	}
-	// fmt.Println(cc.LogDir)
 	clientConfig, err := clients.CreateConfigClient(map[string]interface{}{
 		"serverConfigs": sc,
 		"clientConfig":  cc,
@@ -70,7 +76,7 @@ func Config() {
 	if err != nil {
 		panic(err)
 	}
-	// fmt.Println(content)
+	fmt.Println(content)
 	// serverConfig := config.ServerConfig{} // 局部变量
 	err = json.Unmarshal([]byte(content), &global.ServerConfig)
 	if err != nil {
@@ -78,7 +84,7 @@ func Config() {
 	}
 	fmt.Println(&global.ServerConfig)
 	err = clientConfig.ListenConfig(vo.ConfigParam{
-		DataId: "user_web.json",
+		DataId: "user_srv.json",
 		Group:  "dev",
 		OnChange: func(namespace, group, dataId, data string) {
 			fmt.Println("配置文件产生变化")

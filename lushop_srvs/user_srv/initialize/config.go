@@ -17,9 +17,9 @@ func Config() {
 	// 从配置文件中读取配置
 	mode := global.GetEnvInfoBool(global.ServerConfig.Mode)
 	configFilePrefix := "config"
-	configFileName := fmt.Sprintf("%s/%s-pro.yaml", configFilePrefix, configFilePrefix)
+	configFileName := fmt.Sprintf("%s-pro.yaml", configFilePrefix)
 	if mode {
-		configFileName = fmt.Sprintf("%s/%s-debug.yaml", configFilePrefix, configFilePrefix)
+		configFileName = fmt.Sprintf("%s-debug.yaml", configFilePrefix)
 	}
 	v := viper.New()
 	v.SetConfigFile(configFileName)

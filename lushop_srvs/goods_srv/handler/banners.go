@@ -47,8 +47,8 @@ func (s *GoodsServer) DeleteBanner(ctx context.Context, req *proto.BannerRequest
 func (s *GoodsServer) UpdateBanner(ctx context.Context, req *proto.BannerRequest) (*emptypb.Empty, error) {
 	banners := model.Banner{}
 	result := global.DB.First(&banners)
-	if result.RowsAffected == 1 {
-		return nil, status.Errorf(codes.InvalidArgument, "轮播图已存在")
+	if result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "轮播图不存在")
 	}
 	if req.Url != "" {
 		banners.Url = req.Url

@@ -16,7 +16,7 @@
 nacos:
   host: '192.168.226.140'
   port: '8848'
-  namespace: '28a85e9f-c9c8-49b9-b51c-9d252af474e1'
+  namespace: 'd44bc5b3-42e3-4aa1-9ea7-14d6a747880c'
   user: 'nacos'
   password: 'nacos'
   dataid: 'goods_srv.json'

@@ -13,15 +13,14 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
-	"gorm.io/plugin/dbresolver"
 )
 
 func MySQL() {
 	mysqlCfg := global.ServerConfig.MySQLInfo
 	pathRead := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		mysqlCfg.User, mysqlCfg.PassWord, mysqlCfg.Host, mysqlCfg.Port, mysqlCfg.DbName)
-	pathWrite := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		mysqlCfg.User, mysqlCfg.PassWord, mysqlCfg.Host, mysqlCfg.Port, mysqlCfg.DbName)
+	// pathWrite := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+	// 	mysqlCfg.User, mysqlCfg.PassWord, mysqlCfg.Host, mysqlCfg.Port, mysqlCfg.DbName)
 	ormLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags),
 		logger.Config{
@@ -52,13 +51,13 @@ func MySQL() {
 	sqlDB.SetMaxOpenConns(100) // 打开
 	sqlDB.SetConnMaxLifetime(time.Second * 30)
 	global.DB = db
-	_ = global.DB.Use(dbresolver.
-		Register(dbresolver.Config{
-			// `db2` 作为 sources，`db3`、`db4` 作为 replicas
-			Sources:  []gorm.Dialector{mysql.Open(pathRead)},                         // 读操作
-			Replicas: []gorm.Dialector{mysql.Open(pathWrite), mysql.Open(pathWrite)}, // 写操作
-			Policy:   dbresolver.RandomPolicy{},                                      // sources/replicas 负载均衡策略
-		}))
+	// _ = global.DB.Use(dbresolver.
+	// 	Register(dbresolver.Config{
+	// 		// `db2` 作为 sources，`db3`、`db4` 作为 replicas
+	// 		Sources:  []gorm.Dialector{mysql.Open(pathRead)},                         // 读操作
+	// 		Replicas: []gorm.Dialector{mysql.Open(pathWrite), mysql.Open(pathWrite)}, // 写操作
+	// 		Policy:   dbresolver.RandomPolicy{},                                      // sources/replicas 负载均衡策略
+	// 	}))
 	global.DB = global.DB.Set("gorm:table_options", "charset=utf8mb4")
 	err = global.DB.AutoMigrate(&model.Category{},
 		&model.Brands{}, &model.GoodsCategroyBrand{},

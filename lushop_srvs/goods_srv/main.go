@@ -22,15 +22,19 @@ import (
 )
 
 func main() {
-	// 初始化Config
-	initialize.Config()
-	// 初始化Mysql
-	initialize.MySQL()
 	// 初始化日志
 	initialize.Logger()
+	zap.S().Info("init Logger sucess")
+	// 初始化Config
+	initialize.Config()
+	zap.S().Info("init config sucess")
+	// 初始化Mysql
+	initialize.MySQL()
+	zap.S().Info("init MySQL sucess")
+
 	zap.S().Info(global.ServerConfig)
 	IP := flag.String("ip", "0.0.0.0", "ip地址")
-	Port := flag.Int("port", 0, "端口号")
+	Port := flag.Int("port", 8022, "端口号")
 	flag.Parse()
 	zap.S().Info("ip:", *IP)
 	if *Port == 0 {
@@ -72,7 +76,7 @@ func main() {
 	registeration.ID = serviceID
 	registeration.Port = *Port
 	// 这里修改为配置中心所定义的Tags
-	// registeration.Tags = []string{"user_srv", "lushop_srv", "grpc", "lucien"}
+	// registeration.Tags = []string{"goods_srv", "lushop_srv", "grpc", "lucien"}
 	registeration.Tags = global.ServerConfig.Tags
 	registeration.Address = global.ServerConfig.Host
 	registeration.Check = check

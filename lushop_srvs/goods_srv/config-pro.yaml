@@ -3,7 +3,7 @@
 #   port: 3306
 #   user: "root"
 #   password: "123456"
-#   db: 'lushop_user_srv'
+#   db: 'lushop_goods_srv'
 
 nacos:
   host: '192.168.226.140'
@@ -11,5 +11,5 @@ nacos:
   namespace: '97b453ea-69de-46f4-a691-7a0e14977f2a'
   user: 'nacos'
   password: 'nacos'
-  dataid: 'user_srv.json'
+  dataid: 'goods_srv.json'
   group: 'pro'

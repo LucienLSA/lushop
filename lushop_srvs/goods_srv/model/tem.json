@@ -1,0 +1,1014 @@
+[
+    {
+        "id": 135200,
+        "name": "精选肉类",
+        "level": 1,
+        "ParentCategory": null,
+        "sub_category": [
+            {
+                "id": 136678,
+                "name": "猪肉",
+                "level": 2,
+                "ParentCategory": null,
+                "sub_category": [
+                    {
+                        "id": 136679,
+                        "name": "肋排",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136680,
+                        "name": "五花肉",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136681,
+                        "name": "里脊",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136682,
+                        "name": "猪排/猪扒",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136683,
+                        "name": "梅花肉片",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136684,
+                        "name": "猪肘",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136685,
+                        "name": "汤骨/棒骨",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136686,
+                        "name": "猪腿肉",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 140948,
+                        "name": "猪肉馅",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 173118,
+                        "name": "猪蹄",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 237438,
+                        "name": "aute aliqua",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": true
+                    }
+                ],
+                "is_tab": false
+            },
+            {
+                "id": 136688,
+                "name": "牛肉",
+                "level": 2,
+                "ParentCategory": null,
+                "sub_category": [
+                    {
+                        "id": 136689,
+                        "name": "牛排",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136690,
+                        "name": "牛腩",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136691,
+                        "name": "牛腱子",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136692,
+                        "name": "牛里脊",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136693,
+                        "name": "牛肉片/卷",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136694,
+                        "name": "牛尾",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136695,
+                        "name": "牛肋条",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136696,
+                        "name": "牛蹄筋",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 140950,
+                        "name": "牛骨",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 140951,
+                        "name": "筋头巴脑",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 140952,
+                        "name": "牛肉串",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    }
+                ],
+                "is_tab": false
+            },
+            {
+                "id": 136698,
+                "name": "羊肉",
+                "level": 2,
+                "ParentCategory": null,
+                "sub_category": [
+                    {
+                        "id": 136699,
+                        "name": "羊肋排",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136700,
+                        "name": "羊肉片/卷",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136701,
+                        "name": "羊腿",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136702,
+                        "name": "羊蝎子",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136703,
+                        "name": "羊肉块",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136704,
+                        "name": "羊肉串",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136705,
+                        "name": "整羊",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136706,
+                        "name": "羊杂",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 141093,
+                        "name": "西式羊排",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 141121,
+                        "name": "羊肉馅",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    }
+                ],
+                "is_tab": false
+            },
+            {
+                "id": 136708,
+                "name": "鸡肉",
+                "level": 2,
+                "ParentCategory": null,
+                "sub_category": [
+                    {
+                        "id": 136709,
+                        "name": "鸡翅",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136710,
+                        "name": "整鸡",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136711,
+                        "name": "鸡胸肉",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136712,
+                        "name": "鸡腿",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136713,
+                        "name": "鸡爪",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136714,
+                        "name": "鸡肉块",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136716,
+                        "name": "鸡胗/鸡肫",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136717,
+                        "name": "鸡柳",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 147325,
+                        "name": "鸡排",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 147331,
+                        "name": "老母鸡",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 147332,
+                        "name": "大公鸡",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 147333,
+                        "name": "柴鸡",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    }
+                ],
+                "is_tab": false
+            },
+            {
+                "id": 136719,
+                "name": "鸭肉",
+                "level": 2,
+                "ParentCategory": null,
+                "sub_category": [
+                    {
+                        "id": 136720,
+                        "name": "鸭腿",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136721,
+                        "name": "鸭胸",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136722,
+                        "name": "鸭胗/鸭肫",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136723,
+                        "name": "鸭掌",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136724,
+                        "name": "鸭脖",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136725,
+                        "name": " 鸭舌",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136726,
+                        "name": "鸭翅",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 147334,
+                        "name": "老鸭",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    }
+                ],
+                "is_tab": false
+            },
+            {
+                "id": 136728,
+                "name": "安心工艺",
+                "level": 2,
+                "ParentCategory": null,
+                "sub_category": [
+                    {
+                        "id": 136729,
+                        "name": "原切肉",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136730,
+                        "name": "调理肉",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136731,
+                        "name": "冷鲜肉",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 172147,
+                        "name": "有机肉",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    }
+                ],
+                "is_tab": false
+            },
+            {
+                "id": 136733,
+                "name": "知名品牌",
+                "level": 2,
+                "ParentCategory": null,
+                "sub_category": [],
+                "is_tab": false
+            },
+            {
+                "id": 136742,
+                "name": "地标产品",
+                "level": 2,
+                "ParentCategory": null,
+                "sub_category": [
+                    {
+                        "id": 136743,
+                        "name": "内蒙古牛羊 肉",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    }
+                ],
+                "is_tab": false
+            },
+            {
+                "id": 136751,
+                "name": "新奇特",
+                "level": 2,
+                "ParentCategory": null,
+                "sub_category": [
+                    {
+                        "id": 136752,
+                        "name": "鹅肉",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136753,
+                        "name": "鸽肉",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136754,
+                        "name": "知了猴",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    }
+                ],
+                "is_tab": false
+            },
+            {
+                "id": 146239,
+                "name": "内脏类",
+                "level": 2,
+                "ParentCategory": null,
+                "sub_category": [
+                    {
+                        "id": 146240,
+                        "name": "肝",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 146241,
+                        "name": "肚",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 146243,
+                        "name": "肺",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 146245,
+                        "name": "腰子",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 146259,
+                        "name": "肠",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 146261,
+                        "name": "鞭宝",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 146264,
+                        "name": "心",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    }
+                ],
+                "is_tab": false
+            }
+        ],
+        "is_tab": true
+    },
+    {
+        "id": 135201,
+        "name": "冷饮冻食",
+        "level": 1,
+        "ParentCategory": null,
+        "sub_category": [
+            {
+                "id": 136760,
+                "name": "面点",
+                "level": 2,
+                "ParentCategory": null,
+                "sub_category": [
+                    {
+                        "id": 136761,
+                        "name": "水饺",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136762,
+                        "name": "云吞",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136763,
+                        "name": "汤圆/元宵",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136764,
+                        "name": "手抓饼",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136766,
+                        "name": "面条",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 141288,
+                        "name": "年糕",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 141289,
+                        "name": "肠粉",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 141290,
+                        "name": "烧 麦",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 237435,
+                        "name": "月饼",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    }
+                ],
+                "is_tab": false
+            },
+            {
+                "id": 136770,
+                "name": "饮品甜品",
+                "level": 2,
+                "ParentCategory": null,
+                "sub_category": [
+                    {
+                        "id": 136771,
+                        "name": "冰激凌",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136773,
+                        "name": "酸奶",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 136778,
+                        "name": "乳酸菌",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    }
+                ],
+                "is_tab": false
+            },
+            {
+                "id": 136781,
+                "name": "方便速食",
+                "level": 2,
+                "ParentCategory": null,
+                "sub_category": [
+                    {
+                        "id": 136782,
+                        "name": "方便菜",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    }
+                ],
+                "is_tab": false
+            },
+            {
+                "id": 136789,
+                "name": "火锅丸料",
+                "level": 2,
+                "ParentCategory": null,
+                "sub_category": [
+                    {
+                        "id": 136796,
+                        "name": "火锅饺",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    }
+                ],
+                "is_tab": false
+            },
+            {
+                "id": 136800,
+                "name": "烘焙食材",
+                "level": 2,
+                "ParentCategory": null,
+                "sub_category": [
+                    {
+                        "id": 150576,
+                        "name": "蛋挞",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 150578,
+                        "name": "披萨",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 150580,
+                        "name": "早餐面包",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    }
+                ],
+                "is_tab": false
+            },
+            {
+                "id": 136805,
+                "name": "知名品牌",
+                "level": 2,
+                "ParentCategory": null,
+                "sub_category": [
+                    {
+                        "id": 136806,
+                        "name": "正大食品",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    }
+                ],
+                "is_tab": false
+            },
+            {
+                "id": 150564,
+                "name": "舌尖美食",
+                "level": 2,
+                "ParentCategory": null,
+                "sub_category": [
+                    {
+                        "id": 150572,
+                        "name": "东北酸菜",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 150573,
+                        "name": "串串香",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 185274,
+                        "name": "松茸",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 185275,
+                        "name": "石屏豆腐",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 191801,
+                        "name": "冬笋",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    }
+                ],
+                "is_tab": false
+            },
+            {
+                "id": 164593,
+                "name": "烧烤季",
+                "level": 2,
+                "ParentCategory": null,
+                "sub_category": [
+                    {
+                        "id": 164595,
+                        "name": "猪肉",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 164596,
+                        "name": "主食",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 164597,
+                        "name": "鸽肉/蚕蛹",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 164598,
+                        "name": "蔬菜",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 164599,
+                        "name": "海鲜",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 164600,
+                        "name": "牛肉",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 164601,
+                        "name": "鸡肉",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 164602,
+                        "name": "羊肉",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    }
+                ],
+                "is_tab": false
+            },
+            {
+                "id": 169166,
+                "name": "方便菜单",
+                "level": 2,
+                "ParentCategory": null,
+                "sub_category": [
+                    {
+                        "id": 169169,
+                        "name": "佛跳墙",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    },
+                    {
+                        "id": 169171,
+                        "name": "小南国",
+                        "level": 3,
+                        "ParentCategory": null,
+                        "sub_category": null,
+                        "is_tab": false
+                    }
+                ],
+                "is_tab": false
+            }
+        ],
+        "is_tab": true
+    },
+    {
+        "id": 135202,
+        "name": "新鲜水果",
+        "level": 1,
+        "ParentCategory": null,
+        "sub_category": [],
+        "is_tab": true
+    },
+    {
+        "id": 135203,
+        "name": "海鲜水产",
+        "level": 1,
+        "ParentCategory": null,
+        "sub_category": [],
+        "is_tab": true
+    },
+    {
+        "id": 135204,
+        "name": "蔬菜蛋品",
+        "level": 1,
+        "ParentCategory": null,
+        "sub_category": [],
+        "is_tab": true
+    }
+]

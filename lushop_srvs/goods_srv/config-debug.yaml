@@ -1,6 +1,5 @@
 # name: 'goods_srv'
 # host: '10.99.192.85'
-# mode: 'LUSHOP_DEBUG'
 # tags: ['goods_srv','grpc','lushop_srv','lucien']
 
 # mysql:
@@ -17,8 +16,8 @@
 nacos:
   host: '192.168.226.140'
   port: '8848'
-  namespace: '97b453ea-69de-46f4-a691-7a0e14977f2a'
+  namespace: '28a85e9f-c9c8-49b9-b51c-9d252af474e1'
   user: 'nacos'
   password: 'nacos'
-  dataid: 'user_srv.json'
+  dataid: 'goods_srv.json'
   group: 'dev'

@@ -320,3 +320,15 @@
 2025-03-28T22:14:50.955+0800	[31mERROR[0m	config_client/config_client.go:424	[client.ListenConfig] listen config error: Post "http://192.168.226.140:8848/nacos/v1/cs/configs/listener": dial tcp 192.168.226.140:8848: connectex: No connection could be made because the target machine actively refused it.
 2025-03-28T22:14:55.955+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:user_srv.jsondev88c9f06fdb809e749cc113bd3c07eac197b453ea-69de-46f4-a691-7a0e14977f2a tenant:97b453ea-69de-46f4-a691-7a0e14977f2a] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
 
+2025-03-30T10:57:55.406+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<./temp/nacos/log>   cacheDir:<./temp/nacos/cache>
+2025-03-30T10:57:55.909+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:user_srv.jsonpro5edb12dda55b0f1ffcf64d62b9447f6b97b453ea-69de-46f4-a691-7a0e14977f2a tenant:97b453ea-69de-46f4-a691-7a0e14977f2a] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 Long-Pulling-Timeout-No-Hangup:true accessKey: secretKey:] 
+
+2025-03-30T10:57:55.919+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-03-30T10:57:55.930+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:user_srv.jsonpro5edb12dda55b0f1ffcf64d62b9447f6b97b453ea-69de-46f4-a691-7a0e14977f2a tenant:97b453ea-69de-46f4-a691-7a0e14977f2a] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-03-30T11:25:11.555+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<./temp/nacos/log>   cacheDir:<./temp/nacos/cache>
+2025-03-30T11:25:12.059+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:user_srv.jsondev5edb12dda55b0f1ffcf64d62b9447f6b97b453ea-69de-46f4-a691-7a0e14977f2a tenant:97b453ea-69de-46f4-a691-7a0e14977f2a] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 Long-Pulling-Timeout-No-Hangup:true accessKey: secretKey:] 
+
+2025-03-30T11:25:12.077+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-03-30T11:25:12.087+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:user_srv.jsondev5edb12dda55b0f1ffcf64d62b9447f6b97b453ea-69de-46f4-a691-7a0e14977f2a tenant:97b453ea-69de-46f4-a691-7a0e14977f2a] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+

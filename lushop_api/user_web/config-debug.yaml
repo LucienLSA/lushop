@@ -1,6 +1,5 @@
 # name: 'user_web'
 # port: 8023
-# mode: 'LUSHOP_DEBUG'
 
 nacos:
   host: '192.168.226.140'

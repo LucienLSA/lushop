@@ -1,6 +1,7 @@
 package initialize
 
 import (
+	"context"
 	"lushopapi/user_web/global"
 	"strings"
 
@@ -25,7 +26,7 @@ func Redis() (err error) {
 		PoolSize: cfg.PoolSize,
 	})
 
-	_, err = global.Rdb.Ping(global.Rctx).Result()
+	_, err = global.Rdb.Ping(context.Background()).Result()
 	if err != nil {
 		zap.L().Error("connect redis failed, err:%v\n", zap.Error(err))
 		return

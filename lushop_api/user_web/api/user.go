@@ -209,7 +209,7 @@ func Register(ctx *gin.Context) {
 	}
 
 	// 从redis中获取验证码
-	value, err := global.Rdb.Get(global.Rctx, req.Mobile).Result()
+	value, err := global.Rdb.Get(context.Background(), req.Mobile).Result()
 	if err == redis.Nil {
 		zap.S().Errorw("验证码错误",
 			"msg", err.Error(),

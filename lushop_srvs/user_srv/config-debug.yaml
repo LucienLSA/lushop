@@ -1,5 +1,6 @@
 # name: 'user_srv'
-# mode: 'LUSHOP_DEBUG'
+# host: '10.99.192.85'
+# tags: ['user_srv','grpc','lushop_srv','lucien']
 
 # mysql:
 #   host: '127.0.0.1'

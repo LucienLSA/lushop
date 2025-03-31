@@ -14,9 +14,11 @@ import (
 )
 
 func Config() {
-	mode := global.GetEnvInfoBool(global.ServerConfig.Mode)
+	mode := global.GetEnvInfoBool(global.Mode)
+	// mode := global.GetEnvInfoBool("LUSHOP_DEBUG")
 	configFilePrefix := "config"
 	configFileName := fmt.Sprintf("%s-pro.yaml", configFilePrefix)
+	fmt.Println(mode)
 	if mode {
 		configFileName = fmt.Sprintf("%s-debug.yaml", configFilePrefix)
 	}
@@ -70,13 +72,13 @@ func Config() {
 	if err != nil {
 		panic(err)
 	}
-	// fmt.Println(content)
+	fmt.Println(content)
 	// serverConfig := config.ServerConfig{} // 局部变量
 	err = json.Unmarshal([]byte(content), &global.ServerConfig)
 	if err != nil {
 		zap.S().Fatalf("读取nacos配置失败:%s", err.Error())
 	}
-	fmt.Println(&global.ServerConfig)
+	fmt.Println(global.ServerConfig)
 	err = clientConfig.ListenConfig(vo.ConfigParam{
 		DataId: "user_web.json",
 		Group:  "dev",

@@ -25,10 +25,13 @@ import (
 func main() {
 	// 初始化Config
 	initialize.Config()
+	zap.S().Info("init Config sucess")
 	// 初始化Mysql
 	initialize.MySQL()
+	zap.S().Info("init MySQL sucess")
 	// 初始化日志
 	initialize.Logger()
+	zap.S().Info("init Logger sucess")
 	zap.S().Info(global.ServerConfig)
 	IP := flag.String("ip", "0.0.0.0", "ip地址")
 	Port := flag.Int("port", 0, "端口号")
@@ -61,7 +64,7 @@ func main() {
 	// 生成对应的检查对象
 	check := &api.AgentServiceCheck{
 		// 后续从配置中心nacos中获取
-		GRPC:                           fmt.Sprintf("10.99.192.85:%d", *Port),
+		GRPC:                           fmt.Sprintf("%s:%d", global.ServerConfig.Host, *Port),
 		Timeout:                        "5s",
 		Interval:                       "5s",
 		DeregisterCriticalServiceAfter: "15s",
@@ -72,8 +75,8 @@ func main() {
 	serviceID := fmt.Sprintf("%s", uuid.New())
 	registeration.ID = serviceID
 	registeration.Port = *Port
-	registeration.Tags = []string{"user_srv", "lushop_srv", "grpc", "lucien"}
-	registeration.Address = "10.99.192.85"
+	registeration.Tags = global.ServerConfig.Tags
+	registeration.Address = global.ServerConfig.Host
 	registeration.Check = check
 	err = client.Agent().ServiceRegister(registeration)
 	if err != nil {

@@ -38,7 +38,6 @@ type ConsulConfig struct {
 type ServerConfig struct {
 	Name        string        `mapstructure:"name" json:"name"`
 	Port        int           `mapstructure:"port" json:"port"`
-	Mode        string        `mapstructure:"mode" json:"mode"`
 	UserSrvInfo UserSrvConfig `mapstructure:"user_srv" json:"user_srv"`
 	JwtInfo     JwtConfig     `mapstructure:"jwt" json:"jwt"`
 	AliSmsInfo  AliSmsConfig  `mapstructure:"ali_sms" json:"ali_sms"`

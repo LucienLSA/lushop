@@ -16,11 +16,12 @@ import (
 
 func Config() {
 	// 从配置文件中读取配置
-	mode := global.GetEnvInfoBool(global.ServerConfig.Mode)
+	mode := global.GetEnvInfoBool(global.Mode)
 	configFilePrefix := "config"
-	configFileName := fmt.Sprintf("%s/%s-pro.yaml", configFilePrefix, configFilePrefix)
+	configFileName := fmt.Sprintf("%s-pro.yaml", configFilePrefix)
+	fmt.Println(mode)
 	if mode {
-		configFileName = fmt.Sprintf("%s/%s-debug.yaml", configFilePrefix, configFilePrefix)
+		configFileName = fmt.Sprintf("%s-debug.yaml", configFilePrefix)
 	}
 	v := viper.New()
 	v.SetConfigFile(configFileName)
@@ -76,6 +77,7 @@ func Config() {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(global.NacosConfig.NacosInfo.DataId, global.NacosConfig.NacosInfo.Group)
 	fmt.Println(content)
 	// serverConfig := config.ServerConfig{} // 局部变量
 	err = json.Unmarshal([]byte(content), &global.ServerConfig)
@@ -84,12 +86,12 @@ func Config() {
 	}
 	fmt.Println(&global.ServerConfig)
 	err = clientConfig.ListenConfig(vo.ConfigParam{
-		DataId: "user_srv.json",
-		Group:  "dev",
+		DataId: global.NacosConfig.NacosInfo.DataId,
+		Group:  global.NacosConfig.NacosInfo.Group,
 		OnChange: func(namespace, group, dataId, data string) {
 			fmt.Println("配置文件产生变化")
 			fmt.Println("group:" + group + ", dataId:" + dataId + ", data:" + data)
 		},
 	})
-	time.Sleep(3 * time.Second)
+	time.Sleep(1 * time.Second)
 }

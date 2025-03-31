@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"lushopapi/user_web/forms"
 	"lushopapi/user_web/global"
@@ -70,7 +71,7 @@ func SendSmsAli(ctx *gin.Context) {
 		return
 	}
 	// 将验证码保存起来，将手机号码作为redis的变量保存起来
-	global.Rdb.Set(global.Rctx, req.Mobile, smsCode, time.Duration(global.ServerConfig.AliSmsInfo.Expire)*time.Second)
+	global.Rdb.Set(context.Background(), req.Mobile, smsCode, time.Duration(global.ServerConfig.AliSmsInfo.Expire)*time.Second)
 	// 后面注册时会将短信验证码带回来注册
 	ctx.JSON(http.StatusOK, gin.H{
 		"msg": "发送成功",

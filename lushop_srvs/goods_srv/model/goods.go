@@ -2,11 +2,12 @@ package model
 
 type Category struct {
 	BaseModel
-	Name             string `gorm:"type:varchar(20);not null;comment:'商品分类名称'"`
-	Level            int32  `gorm:"type:int;not null;default:1;comment:'1表示商品分类的等级'"`
-	ParentCategroy   *Category
-	ParentCategroyID int32
-	IsTab            bool `gorm:"default:false;not null;comment:'是否Tap栏显示'"`
+	Name             string `gorm:"type:varchar(20);not null;comment:'商品分类名称'" json:"name"`
+	Level            int32  `gorm:"type:int;not null;default:1;comment:'1表示商品分类的等级'" json:"level"`
+	ParentCategoryID int32  `json:"-"`
+	ParentCategory   *Category
+	SubCategory      []*Category `gorm:"foreignKey:ParentCategoryID;references:ID" json:"sub_category"`
+	IsTab            bool        `gorm:"default:false;not null;comment:'是否Tap栏显示'" json:"is_tab"`
 }
 
 type Brands struct {
@@ -53,6 +54,6 @@ type Goods struct {
 	ShopPrice       float32  `gorm:"not null;comment:'商品实际价'"`
 	GoodsBrief      string   `gorm:"type:varchar(100);not null;comment:'商品简介'"`
 	Images          GormList `gorm:"type:varchar(1000);not null;comment:'商品图片'"`
-	DescImages      GormList `gorm:"type:varchar(1000);not null;comment:'商品详情图片'"`
+	DescImages      GormList `gorm:"type:varchar(5000);not null;comment:'商品详情图片'"`
 	GoodsFrontImage string   `gorm:"type:varchar(200);not null;comment:'商品封面图'"`
 }

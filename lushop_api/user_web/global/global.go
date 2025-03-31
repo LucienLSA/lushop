@@ -1,7 +1,6 @@
 package global
 
 import (
-	"context"
 	"lushopapi/user_web/config"
 	"lushopapi/user_web/proto"
 
@@ -15,10 +14,20 @@ var (
 	Trans        ut.Translator
 	// var 声明全局的rdb变量
 	Rdb           *redis.Client
-	Rctx          = context.Background()
 	UserSrvClient proto.UserClient
 	NacosConfig   *config.NacosConfig = &config.NacosConfig{}
 )
+
+// var (
+// 	ServerConfig config.ServerConfig
+// 	Trans        ut.Translator
+// 	// var 声明全局的rdb变量
+// 	Rdb           *redis.Client
+// 	UserSrvClient proto.UserClient
+// 	NacosConfig   config.NacosConfig
+// )
+
+const Mode = "LUSHOP_DEBUG"
 
 // var ServerConfig = new(config.ServerConfig)
 

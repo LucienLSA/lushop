@@ -1,6 +1,13 @@
 {
     "name": "user_srv",
+    "host": "10.99.192.85",
     "mode": "LUSHOP_DEBUG",
+    "tags": [
+        "user_srv",
+        "grpc",
+        "lushop_srv",
+        "lucien"
+    ],
     "mysql": {
         "host": "127.0.0.1",
         "port": "3306",

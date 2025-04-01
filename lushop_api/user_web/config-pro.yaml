@@ -2,14 +2,6 @@
 # port: 8023
 
 
-nacos:
-  host: '192.168.226.140'
-  port: '8848'
-  namespace: '97b453ea-69de-46f4-a691-7a0e14977f2a'
-  user: 'nacos'
-  password: 'nacos'
-  dataid: 'user_web.json'
-  group: 'pro'
 
 # user_srv:
 #   name: 'user_srv'
@@ -41,3 +33,12 @@ nacos:
 # consul:
 #   host: '192.168.226.140'
 #   port: '8500'
+
+nacos:
+  host: '192.168.226.140'
+  port: '8848'
+  namespace: '97b453ea-69de-46f4-a691-7a0e14977f2a'
+  user: 'nacos'
+  password: 'nacos'
+  dataid: 'user_web.json'
+  group: 'pro'

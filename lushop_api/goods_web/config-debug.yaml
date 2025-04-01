@@ -1,19 +1,9 @@
-# name: 'user_web'
-# port: 8023
+# name: 'goods_web'
+# port: 8033
 
-nacos:
-  host: '192.168.226.140'
-  port: '8848'
-  namespace: '97b453ea-69de-46f4-a691-7a0e14977f2a'
-  user: 'nacos'
-  password: 'nacos'
-  dataid: 'goods_web.json'
-  group: 'dev'
 
-# user_srv:
-#   name: 'user_srv'
-#   host: '10.99.192.85'
-#   port: 8022
+# goods_srv:
+#   name: 'goods_srv'
 #   version: 'v1'
 
 
@@ -40,3 +30,15 @@ nacos:
 # consul:
 #   host: '192.168.226.140'
 #   port: '8500'
+
+
+nacos:
+  host: '192.168.226.140'
+  port: '8848'
+  namespace: 'd44bc5b3-42e3-4aa1-9ea7-14d6a747880c'
+  user: 'nacos'
+  password: 'nacos'
+  dataid: 'goods_web.json'
+  group: 'dev'
+
+

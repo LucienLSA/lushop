@@ -47,7 +47,7 @@ func main() {
 	global.DB = db
 	global.DB = global.DB.Set("gorm:table_options", "charset=utf8mb4")
 	err = global.DB.AutoMigrate(&model.Category{},
-		&model.Brands{}, &model.GoodsCategroyBrand{},
+		&model.Brand{}, &model.GoodsCategoryBrand{},
 		&model.Banner{}, &model.Goods{})
 	if err != nil {
 		// Todo log

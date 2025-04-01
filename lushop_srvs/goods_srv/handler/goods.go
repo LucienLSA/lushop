@@ -9,7 +9,7 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"gorm.io/gorm"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type GoodsServer struct {
@@ -40,9 +40,9 @@ func ModelToResponse(goods model.Goods) proto.GoodsInfoResponse {
 			Name: goods.Category.Name,
 		},
 		Brand: &proto.BrandInfoResponse{
-			Id:   goods.Brands.ID,
-			Name: goods.Brands.Name,
-			Logo: goods.Brands.Logo,
+			Id:   goods.Brand.ID,
+			Name: goods.Brand.Name,
+			Logo: goods.Brand.Logo,
 		},
 	}
 }
@@ -54,7 +54,8 @@ func (s *GoodsServer) GoodsList(ctx context.Context, req *proto.GoodsFilterReque
 	goodsListRsp := &proto.GoodsListResponse{}
 	var goods []model.Goods
 	// localDB := global.DB.Session(&gorm.Session{SkipDefaultTransaction: true})
-	localDB := global.DB.Model(model.Goods{}).Session(&gorm.Session{})
+	// localDB := global.DB.Model(&model.Goods{}).Session(&gorm.Session{})
+	localDB := global.DB.Model(model.Goods{})
 	if req.KeyWords != "" {
 		localDB = localDB.Where("name LIKE ?", "%"+req.KeyWords+"%")
 	}
@@ -75,40 +76,41 @@ func (s *GoodsServer) GoodsList(ctx context.Context, req *proto.GoodsFilterReque
 		localDB = localDB.Where("brand_id=?", req.Brand)
 	}
 	fmt.Println(req)
+	// var sqlQuery string
 	// 通过category查询商品
 	if req.TopCategory > 0 {
 		var category model.Category
-		result := global.DB.Model(&model.Category{}).First(&category, req.TopCategory)
+		result := global.DB.First(&category, req.TopCategory)
 		if result.RowsAffected == 0 {
 			return nil, status.Errorf(codes.NotFound, "商品分类不存在")
 		}
-		// subQuery := global.DB.Model(&model.Category{})
+		subQuery := global.DB.Model(&model.Category{})
 		if category.Level == 1 {
-			// sqlQuery = `SELECT id FROM category WHERE parent_category_id IN (SELECT id FROM category WHERE parent_category_id
-			// 	=?)`
+			// sqlQuery = fmt.Sprintf("SELECT id FROM category WHERE parent_category_id IN (SELECT id FROM category WHERE parent_category_id=%d)",
+			// 	req.TopCategory)
 			// 查询二级分类ID（一级分类的子分类）
-			// subQuery = subQuery.Where(
-			// 	"parent_category_id IN (?)",
-			// 	global.DB.Model(&model.Category{}).Select("id").Where("parent_category_id = ?", req.TopCategory))
-			localDB = localDB.Joins(
-				"JOIN category c3 ON goods.category_id = c3.id "+
-					"JOIN category c2 ON c3.parent_category_id = c2.id "+
-					"JOIN category c1 ON c2.parent_category_id = c1.id "+
-					"WHERE c1.id = ?", req.TopCategory)
+			subQuery = subQuery.Select("id").
+				Where("parent_category_id IN (?)",
+					global.DB.Model(&model.Category{}).
+						Select("id").
+						Where("parent_category_id = ?", req.TopCategory))
 		} else if category.Level == 2 {
-			// sqlQuery = `SELECT id FROM category WHERE parent_category_id =?`
+			// sqlQuery = fmt.Sprintf("SELECT id FROM category WHERE parent_category_id =%d",
+			// 	req.TopCategory)
 			// 查询三级分类ID（二级分类的子分类）
-			// subQuery = subQuery.Where("parent_category_id = ?", req.TopCategory)
-			localDB = localDB.Joins(
-				"JOIN category c3 ON goods.category_id = c3.id "+
-					"JOIN category c2 ON c3.parent_category_id = c2.id "+
-					"WHERE c2.id = ?", req.TopCategory)
+			subQuery = subQuery.Select("id").
+				Where("parent_category_id = ?", req.TopCategory)
+			// localDB = localDB.Joins(
+			// 	"JOIN category c3 ON goods.category_id = c3.id "+
+			// 		"JOIN category c2 ON c3.parent_category_id = c2.id "+
+			// 		"WHERE c2.id = ?", req.TopCategory)
 		} else if category.Level == 3 {
-			// sqlQuery = `SELECT id FROM category WHERE id =?`
-			// subQuery = subQuery.Where("id = ?", req.TopCategory)
-			localDB = localDB.Where("goods.category_id = ?", req.TopCategory)
+			// sqlQuery = fmt.Sprintf("SELECT id FROM category WHERE id =%d", req.TopCategory)
+			subQuery = subQuery.Select("id").
+				Where("id = ?", req.TopCategory)
 		}
-		// localDB = localDB.Where("category_id IN (?)", subQuery.Select("id"))
+		// localDB.Where("category_id IN (%s)", sqlQuery)
+		localDB = localDB.Where("category_id IN (?)", subQuery)
 	}
 	var count int64
 	if err := localDB.Count(&count).Error; err != nil {
@@ -116,7 +118,7 @@ func (s *GoodsServer) GoodsList(ctx context.Context, req *proto.GoodsFilterReque
 	}
 	goodsListRsp.Total = int32(count)
 	fmt.Println(count)
-	result := localDB.Preload("Category").Preload("Brands").Scopes(Paginate(int(req.Pages), int(req.PagePerNums))).Find(&goods)
+	result := localDB.Preload("Category").Preload("Brand").Scopes(Paginate(int(req.Pages), int(req.PagePerNums))).Find(&goods)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -140,10 +142,6 @@ func (s *GoodsServer) BatchGetGoods(ctx context.Context, req *proto.BatchGoodsId
 	return goodsListRsp, nil
 }
 
-// func (s *GoodsServer) CreateGoods(ctx context.Context,req *proto.CreateGoodsInfo) (*proto.GoodsInfoResponse, error) {
-// }
-// func (s *GoodsServer) DeleteGoods(ctx context.Context,req *proto.DeleteGoodsInfo) (*emptypb.Empty, error) {}
-// func (s *GoodsServer) UpdateGoods(ctx context.Context,req *proto.CreateGoodsInfo) (*emptypb.Empty, error) {}
 func (s *GoodsServer) GetGoodsDetail(ctx context.Context, req *proto.GoodInfoRequest) (*proto.GoodsInfoResponse, error) {
 	var goods model.Goods
 	result := global.DB.First(&goods, req.Id)
@@ -152,4 +150,79 @@ func (s *GoodsServer) GetGoodsDetail(ctx context.Context, req *proto.GoodInfoReq
 	}
 	goodsInfoRsp := ModelToResponse(goods)
 	return &goodsInfoRsp, nil
+}
+
+func (s *GoodsServer) CreateGoods(ctx context.Context, req *proto.CreateGoodsInfo) (*proto.GoodsInfoResponse, error) {
+	var category model.Category
+	result := global.DB.First(&category, req.CategoryId)
+	if result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "商品分类不存在")
+	}
+	var brand model.Brand
+	result = global.DB.First(&brand, req.BrandId)
+	if result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "品牌不存在")
+	}
+	goods := model.Goods{
+		Brand:           brand,
+		BrandID:         brand.ID,
+		Category:        category,
+		CategoryID:      category.ID,
+		Name:            req.Name,
+		GoodsSn:         req.GoodsSn,
+		MarketPrice:     req.MarketPrice,
+		ShopPrice:       req.ShopPrice,
+		GoodsBrief:      req.GoodsBrief,
+		ShipFree:        req.ShipFree,
+		Images:          req.Images,
+		DescImages:      req.DescImages,
+		GoodsFrontImage: req.GoodsFrontImage,
+		IsNew:           req.IsNew,
+		IsHot:           req.IsHot,
+		OnSale:          req.OnSale,
+	}
+	global.DB.Save(&goods)
+	return &proto.GoodsInfoResponse{
+		Id: goods.ID,
+	}, nil
+}
+
+func (s *GoodsServer) DeleteGoods(ctx context.Context, req *proto.DeleteGoodsInfo) (*emptypb.Empty, error) {
+	result := global.DB.First(&model.Goods{}, req.Id)
+	if result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "商品不存在")
+	}
+	return &emptypb.Empty{}, nil
+}
+
+func (s *GoodsServer) UpdateGoods(ctx context.Context, req *proto.CreateGoodsInfo) (*emptypb.Empty, error) {
+	var category model.Category
+	result := global.DB.First(&category, req.CategoryId)
+	if result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "商品分类不存在")
+	}
+	var brand model.Brand
+	result = global.DB.First(&brand, req.BrandId)
+	if result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "品牌不存在")
+	}
+	var goods model.Goods
+	goods.Brand = brand
+	goods.BrandID = brand.ID
+	goods.Category = category
+	goods.CategoryID = category.ID
+	goods.Name = req.Name
+	goods.GoodsSn = req.GoodsSn
+	goods.MarketPrice = req.MarketPrice
+	goods.ShopPrice = req.ShopPrice
+	goods.GoodsBrief = req.GoodsBrief
+	goods.ShipFree = req.ShipFree
+	goods.Images = req.Images
+	goods.DescImages = req.DescImages
+	goods.GoodsFrontImage = req.GoodsFrontImage
+	goods.IsNew = req.IsNew
+	goods.IsHot = req.IsHot
+	goods.OnSale = req.OnSale
+	global.DB.Save(&goods)
+	return &emptypb.Empty{}, nil
 }

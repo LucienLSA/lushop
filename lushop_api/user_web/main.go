@@ -44,7 +44,7 @@ func main() {
 	zap.S().Info("init SrcConn success")
 
 	// 8. 初始化可用端口，debug模式则指定端口
-	mode := global.GetEnvInfoBool(global.ServerConfig.Mode)
+	mode := global.GetEnvInfoBool(global.Mode)
 	if !mode {
 		port, err := addr.GetFreeport()
 		if err == nil {

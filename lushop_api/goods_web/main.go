@@ -5,7 +5,10 @@ import (
 	"lushopapi/goods_web/global"
 	"lushopapi/goods_web/initialize"
 	"lushopapi/goods_web/utils/addr"
+	"lushopapi/goods_web/utils/register/consul"
+	"strconv"
 
+	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
 
@@ -32,9 +35,9 @@ func main() {
 	initialize.SignUpMobile()
 	zap.S().Info("init SignUpMobile success")
 
-	// 7. 初始化srv的连接
+	// 7. 初始化srv的连接、包括nacos配置中心
 	initialize.SrvConn()
-	zap.S().Info("init SrcConn success")
+	zap.S().Info("init SrcConn and nacos success")
 
 	// 8. 初始化可用端口，debug模式则指定端口
 	mode := global.GetEnvInfoBool(global.Mode)
@@ -45,6 +48,16 @@ func main() {
 		}
 	}
 	zap.S().Info("init mode success")
+
+	// 9. 初始化服务注册
+	consulPortInt, _ := strconv.Atoi(global.ServerConfig.ConsulInfo.Port)
+	serviceId := fmt.Sprintf("%s", uuid.New())
+	register_client := consul.NewRegistryClient(global.ServerConfig.ConsulInfo.Host, consulPortInt)
+	err := register_client.Register(global.ServerConfig.Host, global.ServerConfig.Port, global.ServerConfig.Name, global.ServerConfig.Tags, serviceId)
+	if err != nil {
+		zap.S().Panic("服务注册失败", err.Error())
+	}
+	zap.S().Info("init gin service success")
 
 	if err := Router.Run(fmt.Sprintf(":%v", global.ServerConfig.Port)); err != nil {
 		zap.S().Panic("商品web服务器启动失败", err.Error())

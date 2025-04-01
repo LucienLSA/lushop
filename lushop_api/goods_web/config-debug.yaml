@@ -1,4 +1,6 @@
 # name: 'goods_web'
+# host: '10.99.192.85'
+# tags: ['goods_web','gin','lushop_web','lucien']
 # port: 8033
 
 

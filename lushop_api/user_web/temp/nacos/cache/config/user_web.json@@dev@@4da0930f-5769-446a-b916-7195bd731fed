@@ -1,5 +1,12 @@
 {
     "name": "user_web",
+    "host": "10.99.192.85",
+    "tags": [
+        "user_web",
+        "gin",
+        "lushop_web",
+        "lucien"
+    ],
     "port": 8023,
     "user_srv": {
         "name": "user_srv",

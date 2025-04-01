@@ -5,7 +5,10 @@ import (
 	"lushopapi/user_web/global"
 	"lushopapi/user_web/initialize"
 	"lushopapi/user_web/utils/addr"
+	"lushopapi/user_web/utils/register/consul"
+	"strconv"
 
+	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
 
@@ -52,6 +55,16 @@ func main() {
 		}
 	}
 	zap.S().Info("init mode success")
+
+	// 9. 初始化服务注册
+	consulPortInt, _ := strconv.Atoi(global.ServerConfig.ConsulInfo.Port)
+	serviceId := fmt.Sprintf("%s", uuid.New())
+	register_client := consul.NewRegistryClient(global.ServerConfig.ConsulInfo.Host, consulPortInt)
+	err := register_client.Register(global.ServerConfig.Host, global.ServerConfig.Port, global.ServerConfig.Name, global.ServerConfig.Tags, serviceId)
+	if err != nil {
+		zap.S().Panic("服务注册失败", err.Error())
+	}
+	zap.S().Info("init gin service success")
 
 	if err := Router.Run(fmt.Sprintf(":%v", global.ServerConfig.Port)); err != nil {
 		zap.S().Panic("用户web服务器启动失败", err.Error())

@@ -53,7 +53,7 @@ func (s *GoodsServer) GoodsList(ctx context.Context, req *proto.GoodsFilterReque
 	// 各种条件查询
 	goodsListRsp := &proto.GoodsListResponse{}
 	var goods []model.Goods
-	// localDB := global.DB.Session(&gorm.Session{SkipDefaultTransaction: true})
+	// localDB := global.DB.Model(&model.Goods{}).Session(&gorm.Session{SkipDefaultTransaction: true})
 	// localDB := global.DB.Model(&model.Goods{}).Session(&gorm.Session{})
 	localDB := global.DB.Model(model.Goods{})
 	if req.KeyWords != "" {
@@ -75,41 +75,38 @@ func (s *GoodsServer) GoodsList(ctx context.Context, req *proto.GoodsFilterReque
 	if req.Brand > 0 {
 		localDB = localDB.Where("brand_id=?", req.Brand)
 	}
-	fmt.Println(req)
+	fmt.Println(req.TopCategory)
 	// var sqlQuery string
 	// 通过category查询商品
 	if req.TopCategory > 0 {
 		var category model.Category
-		result := global.DB.First(&category, req.TopCategory)
+		result := global.DB.Where("id=?", req.TopCategory).First(&category)
 		if result.RowsAffected == 0 {
 			return nil, status.Errorf(codes.NotFound, "商品分类不存在")
 		}
-		subQuery := global.DB.Model(&model.Category{})
+		subQuery := global.DB.Model(&model.Category{}).Select("id")
 		if category.Level == 1 {
 			// sqlQuery = fmt.Sprintf("SELECT id FROM category WHERE parent_category_id IN (SELECT id FROM category WHERE parent_category_id=%d)",
 			// 	req.TopCategory)
 			// 查询二级分类ID（一级分类的子分类）
-			subQuery = subQuery.Select("id").
-				Where("parent_category_id IN (?)",
-					global.DB.Model(&model.Category{}).
-						Select("id").
-						Where("parent_category_id = ?", req.TopCategory))
+			subQuery = subQuery.Where("parent_category_id IN (?)",
+				global.DB.Model(&model.Category{}).
+					Select("id").
+					Where("parent_category_id = ?", req.TopCategory))
 		} else if category.Level == 2 {
 			// sqlQuery = fmt.Sprintf("SELECT id FROM category WHERE parent_category_id =%d",
 			// 	req.TopCategory)
 			// 查询三级分类ID（二级分类的子分类）
-			subQuery = subQuery.Select("id").
-				Where("parent_category_id = ?", req.TopCategory)
+			subQuery = subQuery.Where("parent_category_id = ?", req.TopCategory)
 			// localDB = localDB.Joins(
 			// 	"JOIN category c3 ON goods.category_id = c3.id "+
 			// 		"JOIN category c2 ON c3.parent_category_id = c2.id "+
 			// 		"WHERE c2.id = ?", req.TopCategory)
 		} else if category.Level == 3 {
 			// sqlQuery = fmt.Sprintf("SELECT id FROM category WHERE id =%d", req.TopCategory)
-			subQuery = subQuery.Select("id").
-				Where("id = ?", req.TopCategory)
+			subQuery = subQuery.Where("id = ?", req.TopCategory)
 		}
-		// localDB.Where("category_id IN (%s)", sqlQuery)
+		// localDB = localDB.Where(fmt.Sprintf("category_id IN (%s)", sqlQuery))
 		localDB = localDB.Where("category_id IN (?)", subQuery)
 	}
 	var count int64

@@ -11,7 +11,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"gorm.io/gorm"
 )
 
 // 商品分类
@@ -47,12 +46,12 @@ func (s *GoodsServer) GetAllCategorysList(ctx context.Context, req *emptypb.Empt
 // 获取子分类
 func (s *GoodsServer) GetSubCategory(ctx context.Context, req *proto.CategoryListRequest) (*proto.SubCategoryListResponse, error) {
 	// 在需要的地方创建无事务的会话
-	db := global.DB.Session(&gorm.Session{SkipDefaultTransaction: true})
+	// db := global.DB.Session(&gorm.Session{SkipDefaultTransaction: true})
 	// 父分类和子分类的信息都需要获取
 	categoryListRsp := proto.SubCategoryListResponse{}
 	var category model.Category
 	// 1. 传入请求查询的Id，作为父分类的id
-	result := db.First(&category, req.Id)
+	result := global.DB.First(&category, req.Id)
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "商品分类不存在")
 	}
@@ -65,11 +64,11 @@ func (s *GoodsServer) GetSubCategory(ctx context.Context, req *proto.CategoryLis
 		ParentCategory: category.ParentCategoryID,
 	}
 	// 检查数据库连接是否正常
-	if err := db.Exec("SELECT 1").Error; err != nil {
+	if err := global.DB.Exec("SELECT 1").Error; err != nil {
 		fmt.Println("DB connection error:", err)
 	}
 	// 检查数据库的事务是否开启
-	fmt.Println("Is DB in transaction?", db.Statement.ConnPool != db.ConnPool)
+	fmt.Println("Is DB in transaction?", global.DB.Statement.ConnPool != global.DB.ConnPool)
 	// // 2. 单独查询子分类（不带预加载）
 	// if err := db.Where("parent_category_id = ?", req.Id).Find(&subCategorys).Error; err != nil {
 	// 	return nil, err

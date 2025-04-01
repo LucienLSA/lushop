@@ -3,11 +3,16 @@ package model
 type Category struct {
 	BaseModel
 	Name             string      `gorm:"type:varchar(20);not null;comment:'商品分类名称'" json:"name"`
-	ParentCategoryID int32       `gorm:"type:int;index;comment:'父分类ID'" json:"parent_category_id"`
+	ParentCategoryID int32       `json:"parent_category_id"`
 	Level            int32       `gorm:"type:int;not null;default:1;comment:'1表示商品分类的等级'" json:"level"`
 	IsTab            bool        `gorm:"default:false;not null;comment:'是否Tap栏显示'" json:"is_tab"`
-	ParentCategory   *Category   `gorm:"foreignKey:ParentCategoryID;references:ID" json:"-"`
+	ParentCategory   *Category   `json:"-"`
 	SubCategory      []*Category `gorm:"foreignKey:ParentCategoryID;references:ID" json:"sub_category"`
+}
+
+// 强制指定表名为 "category"
+func (Category) TableName() string {
+	return "category"
 }
 
 type Brand struct {
@@ -37,10 +42,10 @@ type Banner struct {
 
 type Goods struct {
 	BaseModel
-	CategoryID      int32    `gorm:"type:int;not null;comment:'商品分类ID'"`
-	Category        Category `gorm:"foreignKey:CategoryID;references:ID"`
-	BrandID         int32    `gorm:"type:int;not null"`
-	Brand           Brand    `gorm:"foreignKey:BrandID;references:ID"`
+	CategoryID      int32 `gorm:"type:int;not null;comment:'商品分类ID'"`
+	Category        Category
+	BrandID         int32 `gorm:"type:int;not null"`
+	Brand           Brand
 	OnSale          bool     `gorm:"default:false;not null;comment:'是否特价'"`
 	GoodsSn         string   `gorm:"type:varchar(50);not null;comment:'商品编号'"`
 	Name            string   `gorm:"type:varchar(100);not null;comment:'商品名称'"`

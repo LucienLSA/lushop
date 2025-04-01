@@ -14,6 +14,7 @@ var conn *grpc.ClientConn
 
 func InitClient() {
 	var err error
+	// conn, err = grpc.Dial("127.0.0.1:8022", grpc.WithInsecure())
 	conn, err = grpc.Dial("127.0.0.1:8022", grpc.WithInsecure())
 	if err != nil {
 		panic(err)
@@ -36,7 +37,7 @@ func TestGetAllCategorysList() {
 func TestGetBrandList() {
 	rsp, err := cClient.BrandList(context.Background(), &proto.BrandFilterRequest{})
 	if err != nil {
-		fmt.Println("查询用户失败")
+		fmt.Println("查询失败")
 		panic(err)
 	}
 	fmt.Println(rsp.Total)

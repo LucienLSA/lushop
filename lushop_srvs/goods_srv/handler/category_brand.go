@@ -14,11 +14,11 @@ import (
 
 // 获取品牌与商品分类列表
 func (s *GoodsServer) CategoryBrandList(ctx context.Context, req *proto.CategoryBrandFilterRequest) (*proto.CategoryBrandListResponse, error) {
-	var categoryBrands []model.GoodsCategroyBrand
+	var categoryBrands []model.GoodsCategoryBrand
 	categoryBrandListRsp := proto.CategoryBrandListResponse{}
 
 	var total int64
-	global.DB.Model(&model.GoodsCategroyBrand{}).Count(&total)
+	global.DB.Model(&model.GoodsCategoryBrand{}).Count(&total)
 	categoryBrandListRsp.Total = int32(total)
 
 	global.DB.Preload("Category").Preload("Brands").Scopes(Paginate(int(req.Pages), int(req.PagePerNums))).Find(&categoryBrands)
@@ -35,9 +35,9 @@ func (s *GoodsServer) CategoryBrandList(ctx context.Context, req *proto.Category
 				ParentCategory: categoryBrand.Category.ParentCategoryID,
 			},
 			Brand: &proto.BrandInfoResponse{
-				Id:   categoryBrand.Brands.ID,
-				Name: categoryBrand.Brands.Name,
-				Logo: categoryBrand.Brands.Logo,
+				Id:   categoryBrand.Brand.ID,
+				Name: categoryBrand.Brand.Name,
+				Logo: categoryBrand.Brand.Logo,
 			},
 		})
 	}
@@ -57,8 +57,8 @@ func (s *GoodsServer) GetCategoryBrandList(ctx context.Context, req *proto.Categ
 		return nil, status.Errorf(codes.InvalidArgument, "商品分类不存在")
 	}
 	// 根据商品分类查询品牌商品分类表
-	var categoryBrands []model.GoodsCategroyBrand
-	result = db.Preload("Brands").Where(&model.GoodsCategroyBrand{CategoryID: category.ID}).Find(&categoryBrands)
+	var categoryBrands []model.GoodsCategoryBrand
+	result = db.Preload("Brands").Where(&model.GoodsCategoryBrand{CategoryID: category.ID}).Find(&categoryBrands)
 	if result.RowsAffected > 0 {
 		brandListRsp.Total = int32(result.RowsAffected)
 	}
@@ -66,9 +66,9 @@ func (s *GoodsServer) GetCategoryBrandList(ctx context.Context, req *proto.Categ
 	var brandInfoRsp []*proto.BrandInfoResponse
 	for _, categoryBrand := range categoryBrands {
 		brandInfoRsp = append(brandInfoRsp, &proto.BrandInfoResponse{
-			Id:   categoryBrand.Brands.ID,
-			Name: categoryBrand.Brands.Name,
-			Logo: categoryBrand.Brands.Logo,
+			Id:   categoryBrand.Brand.ID,
+			Name: categoryBrand.Brand.Name,
+			Logo: categoryBrand.Brand.Logo,
 		})
 	}
 	brandListRsp.Data = brandInfoRsp
@@ -81,14 +81,14 @@ func (s *GoodsServer) CreateCategoryBrand(ctx context.Context, req *proto.Catego
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "商品分类不存在")
 	}
-	var brand model.Brands
+	var brand model.Brand
 	result = global.DB.First(&brand, req.BrandId)
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "品牌不存在")
 	}
-	categoryBrand := model.GoodsCategroyBrand{
+	categoryBrand := model.GoodsCategoryBrand{
 		CategoryID: req.CategoryId,
-		BrandsID:   req.BrandId,
+		BrandID:    req.BrandId,
 	}
 	global.DB.Save(&categoryBrand)
 	return &proto.CategoryBrandResponse{
@@ -97,7 +97,7 @@ func (s *GoodsServer) CreateCategoryBrand(ctx context.Context, req *proto.Catego
 }
 
 func (s *GoodsServer) DeleteCategoryBrand(ctx context.Context, req *proto.CategoryBrandRequest) (*emptypb.Empty, error) {
-	result := global.DB.Delete(&model.GoodsCategroyBrand{}, req.Id)
+	result := global.DB.Delete(&model.GoodsCategoryBrand{}, req.Id)
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "商品分类不存在")
 	}
@@ -105,7 +105,7 @@ func (s *GoodsServer) DeleteCategoryBrand(ctx context.Context, req *proto.Catego
 }
 
 func (s *GoodsServer) UpdateCategoryBrand(ctx context.Context, req *proto.CategoryBrandRequest) (*emptypb.Empty, error) {
-	var categoryBrand model.GoodsCategroyBrand
+	var categoryBrand model.GoodsCategoryBrand
 	result := global.DB.First(&categoryBrand, req.Id)
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "商品分类品牌不存在")
@@ -117,13 +117,13 @@ func (s *GoodsServer) UpdateCategoryBrand(ctx context.Context, req *proto.Catego
 		return nil, status.Errorf(codes.NotFound, "商品分类不存在")
 	}
 
-	var brand model.Brands
+	var brand model.Brand
 	result = global.DB.First(&brand, req.BrandId)
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "品牌不存在")
 	}
 	categoryBrand.CategoryID = req.CategoryId
-	categoryBrand.BrandsID = req.BrandId
+	categoryBrand.BrandID = req.BrandId
 	global.DB.Save(&categoryBrand)
 	return &emptypb.Empty{}, nil
 }

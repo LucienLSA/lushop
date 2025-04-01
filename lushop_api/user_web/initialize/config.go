@@ -80,8 +80,8 @@ func Config() {
 	}
 	fmt.Println(global.ServerConfig)
 	err = clientConfig.ListenConfig(vo.ConfigParam{
-		DataId: "user_web.json",
-		Group:  "dev",
+		DataId: global.NacosConfig.NacosInfo.DataId,
+		Group:  global.NacosConfig.NacosInfo.Group,
 		OnChange: func(namespace, group, dataId, data string) {
 			fmt.Println("配置文件产生变化")
 			fmt.Println("group:" + group + ", dataId:" + dataId + ", data:" + data)

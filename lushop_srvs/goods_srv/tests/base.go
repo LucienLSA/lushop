@@ -116,8 +116,8 @@ func main() {
 	// TestGetAllCategorysList()
 	// TestGetSubCategory()
 	// TestGetCategoryBrandList()
-	// TestGoodsList()
+	TestGoodsList()
 	// TestBatchGetGoods()
-	TestGetGoodsDetail()
+	// TestGetGoodsDetail()
 	conn.Close()
 }

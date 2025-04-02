@@ -6,7 +6,10 @@ import (
 	"lushopapi/goods_web/initialize"
 	"lushopapi/goods_web/utils/addr"
 	"lushopapi/goods_web/utils/register/consul"
+	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -59,8 +62,20 @@ func main() {
 	}
 	zap.S().Info("init gin service success")
 
-	if err := Router.Run(fmt.Sprintf(":%v", global.ServerConfig.Port)); err != nil {
-		zap.S().Panic("商品web服务器启动失败", err.Error())
+	// 10. 优雅运行退出
+	go func() {
+		if err := Router.Run(fmt.Sprintf(":%d", global.ServerConfig.Port)); err != nil {
+			zap.S().Debugf("启动商品web服务器失败,端口:%d", global.ServerConfig.Port)
+		}
+	}()
+	// 接收终止信号
+	quit := make(chan os.Signal)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	err = register_client.DeRegister(serviceId)
+	if err != nil {
+		zap.S().Info("注销失败:", err.Error())
+	} else {
+		zap.S().Info("注销成功:")
 	}
-	zap.S().Debugf("启动商品web服务器,端口:%d", global.ServerConfig.Port)
 }

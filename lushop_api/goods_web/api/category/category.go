@@ -3,6 +3,7 @@ package category
 import (
 	"context"
 	"encoding/json"
+	"lushopapi/goods_web/api"
 	"lushopapi/goods_web/forms"
 	"lushopapi/goods_web/global"
 	"lushopapi/goods_web/proto"
@@ -70,7 +71,7 @@ func Detail(ctx *gin.Context) {
 
 func New(ctx *gin.Context) {
 	categoryForm := forms.CategoryForm{}
-	if err := ctx.ShouldBindJSON(&categoryForm); err != nil {
+	if err := ctx.ShouldBind(&categoryForm); err != nil {
 		api.HandleValidatorError(ctx, err)
 		return
 	}
@@ -118,7 +119,7 @@ func Delete(ctx *gin.Context) {
 
 func Update(ctx *gin.Context) {
 	categoryForm := forms.UpdateCategoryForm{}
-	if err := ctx.ShouldBindJSON(&categoryForm); err != nil {
+	if err := ctx.ShouldBind(&categoryForm); err != nil {
 		api.HandleValidatorError(ctx, err)
 		return
 	}

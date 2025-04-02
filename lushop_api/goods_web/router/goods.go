@@ -15,7 +15,7 @@ func InitGoodsRouter(Router *gin.RouterGroup) {
 		GoodsRouter.GET("/:id", goods.Detail)                                                             //获取商品详情
 		GoodsRouter.DELETE("/delete/:id", middlewares.JWTAuth(), middlewares.IsAdminAuth(), goods.Delete) // 删除商品
 		GoodsRouter.GET("/:id/stocks", goods.Stocks)
-		GoodsRouter.PATCH("/:id", middlewares.JWTAuth(), middlewares.IsAdminAuth(), goods.UpdateStatus)
-		GoodsRouter.PUT("/:id", middlewares.JWTAuth(), middlewares.IsAdminAuth(), goods.Update)
+		GoodsRouter.PATCH("/update/:id", middlewares.JWTAuth(), middlewares.IsAdminAuth(), goods.UpdateStatus)
+		GoodsRouter.PUT("/update/:id", middlewares.JWTAuth(), middlewares.IsAdminAuth(), goods.Update)
 	}
 }

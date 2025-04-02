@@ -49,7 +49,7 @@ func HandleGrpcErrorToHttp(err error, c *gin.Context) {
 	}
 }
 
-func HandlerValidatorError(ctx *gin.Context, err error) {
+func HandleValidatorError(ctx *gin.Context, err error) {
 	errs, ok := err.(validator.ValidationErrors)
 	if !ok {
 		ctx.JSON(http.StatusOK, gin.H{

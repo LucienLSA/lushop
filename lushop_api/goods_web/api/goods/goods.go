@@ -104,7 +104,7 @@ func List(ctx *gin.Context) {
 func New(ctx *gin.Context) {
 	goodsForm := forms.GoodsForm{}
 	if err := ctx.ShouldBind(&goodsForm); err != nil {
-		HandlerValidatorError(ctx, err)
+		api.HandleValidatorError(ctx, err)
 		return
 	}
 	goodsClient := global.GoodsSrvClient
@@ -123,7 +123,7 @@ func New(ctx *gin.Context) {
 		BrandId:         goodsForm.Brand,
 	})
 	if err != nil {
-		HandleGrpcErrorToHttp(err, ctx)
+		api.HandleGrpcErrorToHttp(err, ctx)
 		return
 	}
 	//如何设置库存
@@ -145,7 +145,7 @@ func Detail(ctx *gin.Context) {
 		Id: int32(idInt),
 	})
 	if err != nil {
-		HandleGrpcErrorToHttp(err, ctx)
+		api.HandleGrpcErrorToHttp(err, ctx)
 	}
 	fmt.Println(r)
 	// TODO: 去库存服务查询库存，并将其返回到下面的字段中。
@@ -189,7 +189,7 @@ func Delete(ctx *gin.Context) {
 	}
 	_, err = global.GoodsSrvClient.DeleteGoods(context.Background(), &proto.DeleteGoodsInfo{Id: int32(idInt)})
 	if err != nil {
-		HandleGrpcErrorToHttp(err, ctx)
+		api.HandleGrpcErrorToHttp(err, ctx)
 		return
 	}
 	ctx.Status(http.StatusOK)
@@ -212,7 +212,7 @@ func Stocks(ctx *gin.Context) {
 func UpdateStatus(ctx *gin.Context) {
 	goodsStatusForm := forms.GoodsStatusForm{}
 	if err := ctx.ShouldBind(&goodsStatusForm); err != nil {
-		HandlerValidatorError(ctx, err)
+		api.HandleValidatorError(ctx, err)
 		return
 	}
 
@@ -224,7 +224,7 @@ func UpdateStatus(ctx *gin.Context) {
 		IsNew:  *goodsStatusForm.IsNew,
 		OnSale: *goodsStatusForm.OnSale,
 	}); err != nil {
-		HandleGrpcErrorToHttp(err, ctx)
+		api.HandleGrpcErrorToHttp(err, ctx)
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{
@@ -236,7 +236,7 @@ func UpdateStatus(ctx *gin.Context) {
 func Update(ctx *gin.Context) {
 	goodsForm := forms.GoodsForm{}
 	if err := ctx.ShouldBind(&goodsForm); err != nil {
-		HandlerValidatorError(ctx, err)
+		api.HandleValidatorError(ctx, err)
 		return
 	}
 
@@ -257,7 +257,7 @@ func Update(ctx *gin.Context) {
 		CategoryId:      goodsForm.CategoryId,
 		BrandId:         goodsForm.Brand,
 	}); err != nil {
-		HandleGrpcErrorToHttp(err, ctx)
+		api.HandleGrpcErrorToHttp(err, ctx)
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{

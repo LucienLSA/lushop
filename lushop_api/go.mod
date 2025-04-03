@@ -6,6 +6,7 @@ require (
 	github.com/alibabacloud-go/darabonba-openapi/v2 v2.0.10
 	github.com/alibabacloud-go/dysmsapi-20170525/v4 v4.1.2
 	github.com/alibabacloud-go/tea v1.2.2
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
@@ -18,6 +19,7 @@ require (
 	github.com/mojocn/base64Captcha v1.3.8
 	github.com/nacos-group/nacos-sdk-go v1.1.5
 	github.com/redis/go-redis/v9 v9.7.3
+	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/viper v1.20.0
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.71.0

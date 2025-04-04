@@ -67,11 +67,11 @@ func main() {
 	if err != nil {
 		zap.S().Panic("服务注册失败", err.Error())
 	}
-	zap.S().Info("init gin service success")
+	zap.S().Info("init gin user web success")
 
 	// 10. 优雅运行退出
 	go func() {
-		if err := Router.Run(fmt.Sprintf(":%v", global.ServerConfig.Port)); err != nil {
+		if err = Router.Run(fmt.Sprintf(":%v", global.ServerConfig.Port)); err != nil {
 			zap.S().Panic("用户web服务器启动失败", err.Error())
 		}
 	}()

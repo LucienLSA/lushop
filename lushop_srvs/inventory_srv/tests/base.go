@@ -3,13 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"lushopsrvs/goods_srv/proto"
+	"lushopsrvs/inventory_srv/proto"
 
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-var cClient proto.GoodsClient
+var vClient proto.InventoryClient
 var conn *grpc.ClientConn
 
 func InitClient() {
@@ -19,106 +18,74 @@ func InitClient() {
 	if err != nil {
 		panic(err)
 	}
-	// brandClient = proto.NewGoodsClient(conn)
-	cClient = proto.NewGoodsClient(conn)
+	vClient = proto.NewInventoryClient(conn)
 }
 
-// 测试获取所有的商品分类列表
-func TestGetAllCategorysList() {
-	rsp, err := cClient.GetAllCategorysList(context.Background(), &emptypb.Empty{})
-	if err != nil {
-		fmt.Println("查询失败")
-		panic(err)
-	}
-	fmt.Println(rsp.JsonData)
-}
-
-// 测试获取品牌的列表
-func TestGetBrandList() {
-	rsp, err := cClient.BrandList(context.Background(), &proto.BrandFilterRequest{})
-	if err != nil {
-		fmt.Println("查询失败")
-		panic(err)
-	}
-	fmt.Println(rsp.Total)
-	for _, brand := range rsp.Data {
-		fmt.Println(brand.Name)
-	}
-}
-
-// 测试获取商品分类的子分类
-func TestGetSubCategory() {
-	rsp, err := cClient.GetSubCategory(context.Background(), &proto.CategoryListRequest{
-		Id: 136698,
+func TestSetInv(goodsId, num int32) {
+	_, err := vClient.SetInv(context.Background(), &proto.GoodsInvInfo{
+		GoodsId: goodsId,
+		Num:     num,
 	})
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(rsp.SubCategorys)
+	fmt.Println("设置库存成功")
 }
 
-// 测试获取商品分类和品牌类别
-func TestCategoryBrandList() {
-	rsp, err := cClient.CategoryBrandList(context.Background(), &proto.CategoryBrandFilterRequest{})
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(rsp.Data)
-}
-
-// 测试通过商品分配获取品牌
-func TestGetCategoryBrandList() {
-	rsp, err := cClient.GetCategoryBrandList(context.Background(), &proto.CategoryInfoRequest{
-		Id: 135200,
+func TestInvDetail(goodsId int32) {
+	resp, err := vClient.InvDetail(context.Background(), &proto.GoodsInvInfo{
+		GoodsId: goodsId,
 	})
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(rsp.Data)
+	fmt.Println(resp.Num)
 }
 
-// 测试商品查询
-func TestGoodsList() {
-	rsp, err := cClient.GoodsList(context.Background(), &proto.GoodsFilterRequest{
-		TopCategory: 136688,
+func TestSell() {
+	_, err := vClient.Sell(context.Background(), &proto.SellInfo{
+		GoodsInfo: []*proto.GoodsInvInfo{
+			{
+				GoodsId: 421,
+				Num:     10,
+			},
+			{
+				GoodsId: 422,
+				Num:     10,
+			},
+		},
 	})
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(rsp.Total)
-	fmt.Println(rsp.Data)
+	fmt.Println("商品库存扣减成功")
 }
 
-// 测试批量查询商品
-func TestBatchGetGoods() {
-	rsp, err := cClient.BatchGetGoods(context.Background(), &proto.BatchGoodsIdInfo{
-		Id: []int32{421, 422, 423},
+func TestReback() {
+	_, err := vClient.Reback(context.Background(), &proto.SellInfo{
+		GoodsInfo: []*proto.GoodsInvInfo{
+			{
+				GoodsId: 421,
+				Num:     10,
+			},
+			{
+				GoodsId: 423,
+				Num:     10,
+			},
+		},
 	})
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(rsp.Total)
-}
-
-// 测试获取商品的详情
-func TestGetGoodsDetail() {
-	rsp, err := cClient.GetGoodsDetail(context.Background(), &proto.GoodInfoRequest{
-		Id: 421,
-	})
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(rsp.Name)
+	fmt.Println("商品库存归还成功")
 }
 
 func main() {
 	InitClient()
-	// TestGetBrandList()
-	// TestGetAllCategorysList()
-	// TestGetSubCategory()
-	// TestGetCategoryBrandList()
-	TestGoodsList()
-	// TestBatchGetGoods()
-	// TestGetGoodsDetail()
+	fmt.Println("init success")
+	TestSetInv(422, 90)
+	// TestInvDetail(421)
+	// TestSell()
+	// TestReback()
 	conn.Close()
 }

@@ -3,11 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"lushopsrvs/goods_srv/addr"
+
 	"lushopsrvs/goods_srv/global"
 	"lushopsrvs/goods_srv/handler"
 	"lushopsrvs/goods_srv/initialize"
 	"lushopsrvs/goods_srv/proto"
+	"lushopsrvs/user_srv/utils/addr"
 	"net"
 	"os"
 	"os/signal"
@@ -34,7 +35,7 @@ func main() {
 
 	zap.S().Info(global.ServerConfig)
 	IP := flag.String("ip", "0.0.0.0", "ip地址")
-	Port := flag.Int("port", 8022, "端口号")
+	Port := flag.Int("port", 0, "端口号")
 	flag.Parse()
 	zap.S().Info("ip:", *IP)
 	if *Port == 0 {

@@ -3,18 +3,21 @@ package main
 import (
 	"flag"
 	"fmt"
-	"lushopsrvs/goods_srv/addr"
-	"lushopsrvs/goods_srv/global"
-	"lushopsrvs/goods_srv/handler"
-	"lushopsrvs/goods_srv/initialize"
-	"lushopsrvs/goods_srv/proto"
+	"strconv"
+
+	"lushopsrvs/inventory_srv/global"
+	"lushopsrvs/inventory_srv/handler"
+	"lushopsrvs/inventory_srv/proto"
+	"lushopsrvs/inventory_srv/utils/addr"
+	"lushopsrvs/inventory_srv/utils/register/consul"
+
+	"lushopsrvs/inventory_srv/initialize"
 	"net"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/google/uuid"
-	"github.com/hashicorp/consul/api"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -42,7 +45,7 @@ func main() {
 	}
 	zap.S().Info("port:", *Port)
 	server := grpc.NewServer()
-	proto.RegisterGoodsServer(server, &handler.GoodsServer{})
+	proto.RegisterInventoryServer(server, &handler.InventoryServer{})
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", *IP, *Port))
 	if err != nil {
 		zap.S().Errorf("ip:", *IP)
@@ -53,37 +56,48 @@ func main() {
 	healthgrpc.RegisterHealthServer(server, healthcheck)
 
 	// 服务注册
-	cfg := api.DefaultConfig()
-	// "192.168.226.140:8500"
-	cfg.Address = fmt.Sprintf("%s:%s", global.ServerConfig.ConsulInfo.Host,
-		global.ServerConfig.ConsulInfo.Port)
-	client, err := api.NewClient(cfg)
+	// cfg := api.DefaultConfig()
+	// // "192.168.226.140:8500"
+	// cfg.Address = fmt.Sprintf("%s:%s", global.ServerConfig.ConsulInfo.Host,
+	// 	global.ServerConfig.ConsulInfo.Port)
+	// client, err := api.NewClient(cfg)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// // 生成对应的检查对象
+	// check := &api.AgentServiceCheck{
+	// 	// 后续从配置中心nacos中获取
+	// 	GRPC:                           fmt.Sprintf("%s:%d", global.ServerConfig.Host, *Port),
+	// 	Timeout:                        "5s",
+	// 	Interval:                       "5s",
+	// 	DeregisterCriticalServiceAfter: "15s",
+	// }
+	// // 生成注册对象
+	// registeration := new(api.AgentServiceRegistration)
+	// registeration.Name = global.ServerConfig.Name
+	// serviceID := fmt.Sprintf("%s", uuid.New())
+	// registeration.ID = serviceID
+	// registeration.Port = *Port
+	// // 这里修改为配置中心所定义的Tags
+	// // registeration.Tags = []string{"goods_srv", "lushop_srv", "grpc", "lucien"}
+	// registeration.Tags = global.ServerConfig.Tags
+	// registeration.Address = global.ServerConfig.Host
+	// registeration.Check = check
+	// err = client.Agent().ServiceRegister(registeration)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// 9. 初始化服务注册
+	consulPortInt, _ := strconv.Atoi(global.ServerConfig.ConsulInfo.Port)
+	serviceId := fmt.Sprintf("%s", uuid.New())
+	register_client := consul.NewRegistryClient(global.ServerConfig.ConsulInfo.Host, consulPortInt)
+	err = register_client.Register(global.ServerConfig.Host, *Port, global.ServerConfig.Name, global.ServerConfig.Tags, serviceId)
 	if err != nil {
-		panic(err)
+		zap.S().Panic("服务注册失败", err.Error())
 	}
-	// 生成对应的检查对象
-	check := &api.AgentServiceCheck{
-		// 后续从配置中心nacos中获取
-		GRPC:                           fmt.Sprintf("%s:%d", global.ServerConfig.Host, *Port),
-		Timeout:                        "5s",
-		Interval:                       "5s",
-		DeregisterCriticalServiceAfter: "15s",
-	}
-	// 生成注册对象
-	registeration := new(api.AgentServiceRegistration)
-	registeration.Name = global.ServerConfig.Name
-	serviceID := fmt.Sprintf("%s", uuid.New())
-	registeration.ID = serviceID
-	registeration.Port = *Port
-	// 这里修改为配置中心所定义的Tags
-	// registeration.Tags = []string{"goods_srv", "lushop_srv", "grpc", "lucien"}
-	registeration.Tags = global.ServerConfig.Tags
-	registeration.Address = global.ServerConfig.Host
-	registeration.Check = check
-	err = client.Agent().ServiceRegister(registeration)
-	if err != nil {
-		panic(err)
-	}
+	zap.S().Debugf("init grpc inventory service success,port:%d", *Port)
+
 	go func() {
 		err = server.Serve(lis)
 		if err != nil {
@@ -95,8 +109,11 @@ func main() {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	if err = client.Agent().ServiceDeregister(serviceID); err != nil {
-		zap.S().Info("注销失败")
+	err = register_client.DeRegister(serviceId)
+	// client.Agent().ServiceDeregister(serviceID)
+	if err != nil {
+		zap.S().Info("注销失败:", err.Error())
+	} else {
+		zap.S().Info("注销成功:")
 	}
-	zap.S().Info("注销成功")
 }

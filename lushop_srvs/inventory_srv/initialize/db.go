@@ -3,8 +3,8 @@ package initialize
 import (
 	"fmt"
 	"log"
-	"lushopsrvs/goods_srv/global"
-	"lushopsrvs/goods_srv/model"
+	"lushopsrvs/inventory_srv/global"
+	"lushopsrvs/inventory_srv/model"
 
 	"os"
 	"time"
@@ -75,9 +75,7 @@ func MySQL() {
 		}))
 	// 没必要设置，在DSN就设置好了
 	// _db = _db.Set("gorm:table_options", "charset=utf8mb4")
-	err = global.DB.AutoMigrate(&model.Category{},
-		&model.Brand{}, &model.GoodsCategoryBrand{},
-		&model.Banner{}, &model.Goods{})
+	err = global.DB.AutoMigrate(&model.Inventory{})
 	if err != nil {
 		// Todo log
 		panic(err)

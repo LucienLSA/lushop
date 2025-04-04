@@ -1,13 +1,13 @@
-# name: 'goods_srv'
+# name: 'inventory_srv'
 # host: '10.99.192.85'
-# tags: ['goods_srv','grpc','lushop_srv','lucien']
+# tags: ['inventory_srv','grpc','lushop_srv','lucien','inventory']
 
 # mysql:
 #   host: '127.0.0.1'
 #   port: '3306'
 #   user: "root"
 #   password: "123456"
-#   db_name: 'lushop_goods_srv'
+#   db_name: 'lushop_inventory_srv'
 
 # consul:
 #   host: '192.168.226.140'
@@ -16,8 +16,8 @@
 nacos:
   host: '192.168.226.140'
   port: '8848'
-  namespace: 'd44bc5b3-42e3-4aa1-9ea7-14d6a747880c'
+  namespace: '882378fb-1b26-49d4-90c4-51db79108f34'
   user: 'nacos'
   password: 'nacos'
-  dataid: 'goods_srv.json'
+  dataid: 'inventory_srv.json'
   group: 'dev'

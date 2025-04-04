@@ -3,7 +3,7 @@ package initialize
 import (
 	"encoding/json"
 	"fmt"
-	"lushopsrvs/goods_srv/global"
+	"lushopsrvs/inventory_srv/global"
 
 	"time"
 

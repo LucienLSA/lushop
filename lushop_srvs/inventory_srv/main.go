@@ -3,18 +3,16 @@ package main
 import (
 	"flag"
 	"fmt"
-	"strconv"
-
 	"lushopsrvs/inventory_srv/global"
 	"lushopsrvs/inventory_srv/handler"
+	"lushopsrvs/inventory_srv/initialize"
 	"lushopsrvs/inventory_srv/proto"
 	"lushopsrvs/inventory_srv/utils/addr"
 	"lushopsrvs/inventory_srv/utils/register/consul"
-
-	"lushopsrvs/inventory_srv/initialize"
 	"net"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 
 	"github.com/google/uuid"

@@ -65,7 +65,7 @@ func main() {
 	// 10. 优雅运行退出
 	go func() {
 		if err := Router.Run(fmt.Sprintf(":%d", global.ServerConfig.Port)); err != nil {
-			zap.S().Debugf("启动商品web服务器失败,端口:%d", global.ServerConfig.Port)
+			zap.S().Errorf("启动商品web服务器失败,端口:%d", global.ServerConfig.Port)
 		}
 	}()
 	// 接收终止信号

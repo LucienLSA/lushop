@@ -33,7 +33,7 @@ func (r *Registry) Register(address string, port int, name string, tags []string
 	}
 	//生成对应的检查对象
 	check := &api.AgentServiceCheck{
-		GRPC:                           fmt.Sprintf("http://%s:%d/health", address, port),
+		GRPC:                           fmt.Sprintf("%s:%d", address, port),
 		Timeout:                        "5s",
 		Interval:                       "5s",
 		DeregisterCriticalServiceAfter: "10s",

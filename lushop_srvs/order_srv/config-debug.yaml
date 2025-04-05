@@ -1,0 +1,30 @@
+# name: 'order_srv'
+# host: '10.99.192.85'
+# tags: ['order_srv','grpc','lushop_srv','lucien','order']
+
+# mysql:
+#   host: '127.0.0.1'
+#   port: '3306'
+#   user: "root"
+#   password: "123456"
+#   db_name: 'lushop_order_srv'
+
+# consul:
+#   host: '192.168.226.140'
+#   port: '8500'
+
+# redis:
+#   host: '127.0.0.1'
+#   port: '6379'
+#   db: 4
+#   password: ''
+#   pool_size: 10
+
+nacos:
+  host: '192.168.226.140'
+  port: '8848'
+  namespace: '41c209c8-0ef0-4df1-b1b2-0641b78ca428'
+  user: 'nacos'
+  password: 'nacos'
+  dataid: 'order_srv.json'
+  group: 'dev'

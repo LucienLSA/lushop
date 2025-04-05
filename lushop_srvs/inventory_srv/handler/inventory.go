@@ -13,7 +13,6 @@ import (
 
 	"github.com/go-redsync/redsync/v4"
 	"github.com/go-redsync/redsync/v4/redis/goredis/v9"
-	goredislib "github.com/redis/go-redis/v9"
 )
 
 type InventoryServer struct {
@@ -92,13 +91,13 @@ func (v *InventoryServer) InvDetail(ctx context.Context, req *proto.GoodsInvInfo
 //		return &emptypb.Empty{}, nil
 //	}
 func (v *InventoryServer) Sell(ctx context.Context, req *proto.SellInfo) (*emptypb.Empty, error) {
-	client := goredislib.NewClient(&goredislib.Options{
-		// Addr:fmt.Sprintf("%s:%d",)
-		Addr: "localhost:6379",
-	})
-	tx := global.DB.Begin()
-	pool := goredis.NewPool(client)
+	// client := goredislib.NewClient(&goredislib.Options{
+	// 	Addr: fmt.Sprintf("%s:%s", global.ServerConfig.RedisInfo.Host, global.ServerConfig.RedisInfo.Port),
+	// 	// Addr: "localhost:6379",
+	// })
+	pool := goredis.NewPool(global.Rdb)
 	rs := redsync.New(pool)
+	tx := global.DB.Begin()
 	for _, goodInfo := range req.GoodsInfo {
 		var inv model.Inventory
 		mutex := rs.NewMutex(fmt.Sprintf("goods_%d", goodInfo.GoodsId))

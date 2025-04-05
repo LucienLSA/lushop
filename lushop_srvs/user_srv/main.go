@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 
+	"lushopsrvs/inventory_srv/utils/register/consul"
 	"lushopsrvs/user_srv/global"
 	"lushopsrvs/user_srv/handler"
 	"lushopsrvs/user_srv/initialize"
@@ -15,7 +17,6 @@ import (
 	"net"
 
 	"github.com/google/uuid"
-	"github.com/hashicorp/consul/api"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -53,35 +54,43 @@ func main() {
 	healthgrpc.RegisterHealthServer(server, healthcheck)
 
 	// 服务注册
-	cfg := api.DefaultConfig()
-	// "192.168.226.140:8500"
-	cfg.Address = fmt.Sprintf("%s:%s", global.ServerConfig.ConsulInfo.Host,
-		global.ServerConfig.ConsulInfo.Port)
-	client, err := api.NewClient(cfg)
+	// cfg := api.DefaultConfig()
+	// // "192.168.226.140:8500"
+	// cfg.Address = fmt.Sprintf("%s:%s", global.ServerConfig.ConsulInfo.Host,
+	// 	global.ServerConfig.ConsulInfo.Port)
+	// client, err := api.NewClient(cfg)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// // 生成对应的检查对象
+	// check := &api.AgentServiceCheck{
+	// 	// 后续从配置中心nacos中获取
+	// 	GRPC:                           fmt.Sprintf("%s:%d", global.ServerConfig.Host, *Port),
+	// 	Timeout:                        "5s",
+	// 	Interval:                       "5s",
+	// 	DeregisterCriticalServiceAfter: "15s",
+	// }
+	// // 生成注册对象
+	// registeration := new(api.AgentServiceRegistration)
+	// registeration.Name = global.ServerConfig.Name
+	// serviceID := fmt.Sprintf("%s", uuid.New())
+	// registeration.ID = serviceID
+	// registeration.Port = *Port
+	// registeration.Tags = global.ServerConfig.Tags
+	// registeration.Address = global.ServerConfig.Host
+	// registeration.Check = check
+	// err = client.Agent().ServiceRegister(registeration)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	consulPortInt, _ := strconv.Atoi(global.ServerConfig.ConsulInfo.Port)
+	serviceId := fmt.Sprintf("%s", uuid.New())
+	register_client := consul.NewRegistryClient(global.ServerConfig.ConsulInfo.Host, consulPortInt)
+	err = register_client.Register(global.ServerConfig.Host, *Port, global.ServerConfig.Name, global.ServerConfig.Tags, serviceId)
 	if err != nil {
-		panic(err)
+		zap.S().Panic("服务注册失败", err.Error())
 	}
-	// 生成对应的检查对象
-	check := &api.AgentServiceCheck{
-		// 后续从配置中心nacos中获取
-		GRPC:                           fmt.Sprintf("%s:%d", global.ServerConfig.Host, *Port),
-		Timeout:                        "5s",
-		Interval:                       "5s",
-		DeregisterCriticalServiceAfter: "15s",
-	}
-	// 生成注册对象
-	registeration := new(api.AgentServiceRegistration)
-	registeration.Name = global.ServerConfig.Name
-	serviceID := fmt.Sprintf("%s", uuid.New())
-	registeration.ID = serviceID
-	registeration.Port = *Port
-	registeration.Tags = global.ServerConfig.Tags
-	registeration.Address = global.ServerConfig.Host
-	registeration.Check = check
-	err = client.Agent().ServiceRegister(registeration)
-	if err != nil {
-		panic(err)
-	}
+	zap.S().Debugf("init grpc user service success,port:%d", *Port)
 	go func() {
 		err = server.Serve(lis)
 		if err != nil {
@@ -93,7 +102,9 @@ func main() {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	if err = client.Agent().ServiceDeregister(serviceID); err != nil {
+	// err = client.Agent().ServiceDeregister(serviceID);
+	err = register_client.DeRegister(serviceId)
+	if err != nil {
 		zap.S().Info("注销失败")
 	}
 	zap.S().Info("注销成功")

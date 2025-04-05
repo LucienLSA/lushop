@@ -3,12 +3,14 @@ package global
 import (
 	"lushopsrvs/inventory_srv/config"
 
+	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
 var (
 	DB           *gorm.DB
+	Rdb          *redis.Client
 	ServerConfig config.ServerConfig
 	NacosConfig  config.NacosConfig
 )

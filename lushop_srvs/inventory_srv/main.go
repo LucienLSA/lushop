@@ -32,6 +32,11 @@ func main() {
 	// 初始化Mysql
 	initialize.MySQL()
 	zap.S().Info("init MySQL sucess")
+	// 初始化redis
+	if err := initialize.Redis(); err != nil {
+		zap.S().Panic("初始化redis失败", err.Error())
+	}
+	zap.S().Info("init Redis sucess")
 
 	zap.S().Info(global.ServerConfig)
 	IP := flag.String("ip", "0.0.0.0", "ip地址")

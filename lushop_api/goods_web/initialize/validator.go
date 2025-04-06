@@ -3,7 +3,7 @@ package initialize
 import (
 	"fmt"
 	"lushopapi/goods_web/global"
-	myValidator "lushopapi/user_web/utils/validator"
+	myValidator "lushopapi/goods_web/utils/validator"
 	"reflect"
 	"strings"
 

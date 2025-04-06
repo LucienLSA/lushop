@@ -1,0 +1,51 @@
+2025-04-06T20:58:54.964+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<./temp/nacos/log>   cacheDir:<./temp/nacos/cache>
+2025-04-06T20:58:54.978+0800	[31mERROR[0m	nacos_server/nacos_server.go:199	api</v1/cs/configs>,method:<GET>, params:<{"dataId":"order_web.json","group":"dev","tenant":"41c209c8-0ef0-4df1-b1b2-0641b78ca428"}>, call domain error:<[404] config data not exist
+> , result:<config data not exist
+>
+2025-04-06T20:58:54.989+0800	[31mERROR[0m	nacos_server/nacos_server.go:199	api</v1/cs/configs>,method:<GET>, params:<{"dataId":"order_web.json","group":"dev","tenant":"41c209c8-0ef0-4df1-b1b2-0641b78ca428"}>, call domain error:<[404] config data not exist
+> , result:<config data not exist
+>
+2025-04-06T20:58:54.997+0800	[31mERROR[0m	nacos_server/nacos_server.go:199	api</v1/cs/configs>,method:<GET>, params:<{"dataId":"order_web.json","group":"dev","tenant":"41c209c8-0ef0-4df1-b1b2-0641b78ca428"}>, call domain error:<[404] config data not exist
+> , result:<config data not exist
+>
+2025-04-06T20:58:54.997+0800	[31mERROR[0m	config_client/config_client.go:202	get config from server error:[404] config data not exist
+ 
+2025-04-06T20:58:54.999+0800	[33mWARN[0m	config_client/config_client.go:207	[client.GetConfig] config not found, dataId: order_web.json, group: dev, namespaceId: 41c209c8-0ef0-4df1-b1b2-0641b78ca428.
+2025-04-06T20:59:22.875+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<./temp/nacos/log>   cacheDir:<./temp/nacos/cache>
+2025-04-06T20:59:22.881+0800	[31mERROR[0m	nacos_server/nacos_server.go:199	api</v1/cs/configs>,method:<GET>, params:<{"dataId":"order_web.json","group":"dev","tenant":"41c209c8-0ef0-4df1-b1b2-0641b78ca428"}>, call domain error:<[404] config data not exist
+> , result:<config data not exist
+>
+2025-04-06T20:59:22.892+0800	[31mERROR[0m	nacos_server/nacos_server.go:199	api</v1/cs/configs>,method:<GET>, params:<{"dataId":"order_web.json","group":"dev","tenant":"41c209c8-0ef0-4df1-b1b2-0641b78ca428"}>, call domain error:<[404] config data not exist
+> , result:<config data not exist
+>
+2025-04-06T20:59:22.895+0800	[31mERROR[0m	nacos_server/nacos_server.go:199	api</v1/cs/configs>,method:<GET>, params:<{"dataId":"order_web.json","group":"dev","tenant":"41c209c8-0ef0-4df1-b1b2-0641b78ca428"}>, call domain error:<[404] config data not exist
+> , result:<config data not exist
+>
+2025-04-06T20:59:22.895+0800	[31mERROR[0m	config_client/config_client.go:202	get config from server error:[404] config data not exist
+ 
+2025-04-06T20:59:22.895+0800	[33mWARN[0m	config_client/config_client.go:207	[client.GetConfig] config not found, dataId: order_web.json, group: dev, namespaceId: 41c209c8-0ef0-4df1-b1b2-0641b78ca428.
+2025-04-06T20:59:30.683+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<./temp/nacos/log>   cacheDir:<./temp/nacos/cache>
+2025-04-06T20:59:30.688+0800	[31mERROR[0m	nacos_server/nacos_server.go:199	api</v1/cs/configs>,method:<GET>, params:<{"dataId":"order_web.json","group":"dev","tenant":"41c209c8-0ef0-4df1-b1b2-0641b78ca428"}>, call domain error:<[404] config data not exist
+> , result:<config data not exist
+>
+2025-04-06T20:59:30.701+0800	[31mERROR[0m	nacos_server/nacos_server.go:199	api</v1/cs/configs>,method:<GET>, params:<{"dataId":"order_web.json","group":"dev","tenant":"41c209c8-0ef0-4df1-b1b2-0641b78ca428"}>, call domain error:<[404] config data not exist
+> , result:<config data not exist
+>
+2025-04-06T20:59:30.705+0800	[31mERROR[0m	nacos_server/nacos_server.go:199	api</v1/cs/configs>,method:<GET>, params:<{"dataId":"order_web.json","group":"dev","tenant":"41c209c8-0ef0-4df1-b1b2-0641b78ca428"}>, call domain error:<[404] config data not exist
+> , result:<config data not exist
+>
+2025-04-06T20:59:30.705+0800	[31mERROR[0m	config_client/config_client.go:202	get config from server error:[404] config data not exist
+ 
+2025-04-06T20:59:30.706+0800	[33mWARN[0m	config_client/config_client.go:207	[client.GetConfig] config not found, dataId: order_web.json, group: dev, namespaceId: 41c209c8-0ef0-4df1-b1b2-0641b78ca428.
+2025-04-06T21:00:52.825+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<./temp/nacos/log>   cacheDir:<./temp/nacos/cache>
+2025-04-06T21:00:53.328+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order_web.jsondevbdaa3880abf52c1a4146d8c22eaf9e3d41c209c8-0ef0-4df1-b1b2-0641b78ca428 tenant:41c209c8-0ef0-4df1-b1b2-0641b78ca428] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 Long-Pulling-Timeout-No-Hangup:true accessKey: secretKey:] 
+
+2025-04-06T21:00:53.341+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-04-06T21:00:53.353+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order_web.jsondevbdaa3880abf52c1a4146d8c22eaf9e3d41c209c8-0ef0-4df1-b1b2-0641b78ca428 tenant:41c209c8-0ef0-4df1-b1b2-0641b78ca428] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-04-06T21:14:29.432+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<./temp/nacos/log>   cacheDir:<./temp/nacos/cache>
+2025-04-06T21:14:29.935+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order_web.jsondevbdaa3880abf52c1a4146d8c22eaf9e3d41c209c8-0ef0-4df1-b1b2-0641b78ca428 tenant:41c209c8-0ef0-4df1-b1b2-0641b78ca428] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 Long-Pulling-Timeout-No-Hangup:true accessKey: secretKey:] 
+
+2025-04-06T21:14:29.944+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-04-06T21:14:29.954+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order_web.jsondevbdaa3880abf52c1a4146d8c22eaf9e3d41c209c8-0ef0-4df1-b1b2-0641b78ca428 tenant:41c209c8-0ef0-4df1-b1b2-0641b78ca428] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+

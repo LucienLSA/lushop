@@ -19,7 +19,6 @@ require (
 	github.com/mojocn/base64Captcha v1.3.8
 	github.com/nacos-group/nacos-sdk-go v1.1.5
 	github.com/redis/go-redis/v9 v9.7.3
-	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/viper v1.20.0
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.71.0

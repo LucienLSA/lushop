@@ -15,7 +15,7 @@ var conn *grpc.ClientConn
 func InitClient() {
 	var err error
 	// conn, err = grpc.Dial("127.0.0.1:8022", grpc.WithInsecure())
-	conn, err = grpc.Dial("127.0.0.1:8022", grpc.WithInsecure())
+	conn, err = grpc.Dial("127.0.0.1:56709", grpc.WithInsecure())
 	if err != nil {
 		panic(err)
 	}
@@ -81,18 +81,18 @@ func TestReback() {
 func main() {
 	InitClient()
 	fmt.Println("init success")
-	// var i int32
-	// for i = 421; i < 840; i++ {
-	// 	TestSetInv(i, 100)
-	// }
+	var i int32
+	for i = 421; i < 840; i++ {
+		TestSetInv(i, 100)
+	}
 	// TestInvDetail(421)
 	// TestSell()
 	// TestReback()
-	var wg sync.WaitGroup
-	wg.Add(10)
-	for i := 0; i < 10; i++ {
-		go TestSell(&wg)
-	}
-	wg.Wait()
+	// var wg sync.WaitGroup
+	// wg.Add(10)
+	// for i := 0; i < 10; i++ {
+	// 	go TestSell(&wg)
+	// }
+	// wg.Wait()
 	conn.Close()
 }

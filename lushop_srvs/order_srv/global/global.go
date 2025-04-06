@@ -2,6 +2,7 @@ package global
 
 import (
 	"lushopsrvs/order_srv/config"
+	"lushopsrvs/order_srv/proto"
 
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
@@ -13,6 +14,9 @@ var (
 	Rdb          *redis.Client
 	ServerConfig config.ServerConfig
 	NacosConfig  config.NacosConfig
+
+	GoodsSrvClient     proto.GoodsClient
+	InventorySrvClient proto.InventoryClient
 )
 
 const Mode = "LUSHOP_DEBUG"

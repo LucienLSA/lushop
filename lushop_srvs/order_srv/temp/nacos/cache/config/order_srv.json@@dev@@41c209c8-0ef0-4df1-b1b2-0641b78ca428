@@ -25,5 +25,11 @@
         "db": 4,
         "password": "",
         "pool_size": 10
+    },
+    "goods_srv": {
+        "name": "goods_srv"
+    },
+    "inventory_srv": {
+        "name": "inventory_srv"
     }
 }

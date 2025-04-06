@@ -16,6 +16,14 @@ type RedisConfig struct {
 	DB       int    `mapstructure:"db" json:"db"`
 }
 
+type GoodsSrvConfig struct {
+	Name string `mapstructure:"name" json:"name"`
+}
+
+type InventorySrvConfig struct {
+	Name string `mapstructure:"name" json:"name"`
+}
+
 type ServerConfig struct {
 	Name       string       `mapstructure:"name" json:"name"`
 	Host       string       `mapstructure:"host" json:"host"`
@@ -23,6 +31,9 @@ type ServerConfig struct {
 	MySQLInfo  MySQLConfig  `mapstructure:"mysql" json:"mysql"`
 	ConsulInfo ConsulConfig `mapstructure:"consul" json:"consul"`
 	RedisInfo  RedisConfig  `mapstructure:"redis" json:"redis"`
+
+	GoodsSrvInfo     GoodsSrvConfig     `mapstructure:"goods_srv" json:"goods_srv"`
+	InventorySrvInfo InventorySrvConfig `mapstructure:"inventory_srv" json:"inventory_srv"`
 }
 
 type ConsulConfig struct {

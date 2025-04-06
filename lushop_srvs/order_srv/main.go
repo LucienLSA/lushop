@@ -37,6 +37,9 @@ func main() {
 		zap.S().Panic("初始化redis失败", err.Error())
 	}
 	zap.S().Info("init Redis sucess")
+	// 初始化跨服务连接
+	initialize.SrvConn()
+	zap.S().Info("init SrvConn sucess")
 
 	zap.S().Info(global.ServerConfig)
 	IP := flag.String("ip", "0.0.0.0", "ip地址")

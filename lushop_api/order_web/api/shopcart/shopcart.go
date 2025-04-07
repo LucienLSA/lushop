@@ -59,6 +59,7 @@ func List(ctx *gin.Context) {
 			]
 		}
 	*/
+	goodsList := make([]interface{})
 	for _, item := range rsp.Data {
 		for _, good := range goodsRsp.Data {
 			if good.Id == item.GoodsId {
@@ -67,7 +68,9 @@ func List(ctx *gin.Context) {
 				tempMap["goods_id"] = item.GoodsId
 				tempMap["goods_name"] = good.Name
 				tempMap["goods_image"] = good.GoodsFrontImage
-				tempMap["goods_price"] = item.ShopPrice
+				tempMap["goods_price"] = item.S
+				tempMap["nums"] = item.Nums
+				tempMap["checked"] = item.Checked
 			}
 		}
 	}

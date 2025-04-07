@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	"lushopapi/order_web/utils/jwtClaims"
 	"net/http"
+	"orderweb/utils/jwtClaims"
 
 	"github.com/gin-gonic/gin"
 )

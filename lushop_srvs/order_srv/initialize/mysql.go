@@ -3,8 +3,8 @@ package initialize
 import (
 	"fmt"
 	"log"
-	"lushopsrvs/order_srv/global"
-	"lushopsrvs/order_srv/model"
+	"ordersrv/global"
+	"ordersrv/model"
 
 	"os"
 	"time"

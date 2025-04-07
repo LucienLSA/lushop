@@ -2,9 +2,9 @@ package middlewares
 
 import (
 	"errors"
-	"lushopapi/order_web/global"
-	"lushopapi/order_web/utils/jwtClaims"
 	"net/http"
+	"orderweb/global"
+	"orderweb/utils/jwtClaims"
 	"time"
 
 	"github.com/gin-gonic/gin"

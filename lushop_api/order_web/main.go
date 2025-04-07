@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"lushopapi/order_web/global"
-	"lushopapi/order_web/initialize"
-	"lushopapi/order_web/utils/addr"
-	"lushopapi/order_web/utils/register/consul"
+	"orderweb/global"
+	"orderweb/initialize"
+	"orderweb/utils/addr"
+	"orderweb/utils/register/consul"
 	"os"
 	"os/signal"
 	"strconv"

@@ -2,8 +2,8 @@ package initialize
 
 import (
 	"fmt"
-	"lushopapi/order_web/global"
-	myValidator "lushopapi/order_web/utils/validator"
+	"orderweb/global"
+	myValidator "orderweb/utils/validator"
 	"reflect"
 	"strings"
 

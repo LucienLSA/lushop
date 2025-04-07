@@ -2,8 +2,10 @@ package initialize
 
 import (
 	"fmt"
-	"lushopapi/order_web/global"
-	"lushopapi/order_web/proto"
+	"orderweb/global"
+	proto_goods "orderweb/proto/gen/goods"
+	proto_inventory "orderweb/proto/gen/inventory"
+	proto_order "orderweb/proto/gen/order"
 
 	_ "github.com/mbobakov/grpc-consul-resolver"
 	"go.uber.org/zap"
@@ -21,7 +23,7 @@ func SrvConn() {
 	if err != nil {
 		zap.S().Fatalf("[Init SrvConn] 连接 [订单服务失败]", err.Error())
 	}
-	OrderSrvClient := proto.NewOrderClient(orderConn)
+	OrderSrvClient := proto_order.NewOrderClient(orderConn)
 	global.OrderSrvClient = OrderSrvClient
 
 	goodsConn, err := grpc.Dial(
@@ -32,8 +34,19 @@ func SrvConn() {
 	if err != nil {
 		zap.S().Fatalf("[Init SrvConn] 连接 [商品服务失败]", err.Error())
 	}
-	GoodsSrvClient := proto.NewGoodsClient(goodsConn)
+	GoodsSrvClient := proto_goods.NewGoodsClient(goodsConn)
 	global.GoodsSrvClient = GoodsSrvClient
+
+	inventoryConn, err := grpc.Dial(
+		fmt.Sprintf("consul://%s:%s/%s?wait=14s", consulInfo.Host, consulInfo.Port, global.ServerConfig.InventorySrvInfo.Name),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`),
+	)
+	if err != nil {
+		zap.S().Fatalf("[Init SrvConn] 连接 [库存服务失败]", err.Error())
+	}
+	InventorySrvClient := proto_inventory.NewInventoryClient(inventoryConn)
+	global.InventorySrvClient = InventorySrvClient
 }
 
 // func SrvConn2() {

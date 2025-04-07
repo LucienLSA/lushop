@@ -1,19 +1,23 @@
 package global
 
 import (
-	"lushopapi/order_web/config"
-	"lushopapi/order_web/proto"
+	"orderweb/config"
+	proto_goods "orderweb/proto/gen/goods"
+	proto_inventory "orderweb/proto/gen/inventory"
+	proto_order "orderweb/proto/gen/order"
 
 	ut "github.com/go-playground/universal-translator"
 	"github.com/spf13/viper"
 )
 
 var (
-	ServerConfig   *config.ServerConfig = &config.ServerConfig{}
-	Trans          ut.Translator
-	GoodsSrvClient proto.GoodsClient
-	OrderSrvClient proto.OrderClient
-	NacosConfig    *config.NacosConfig = &config.NacosConfig{}
+	ServerConfig       *config.ServerConfig = &config.ServerConfig{}
+	Trans              ut.Translator
+	GoodsSrvClient     proto_goods.GoodsClient
+	OrderSrvClient     proto_order.OrderClient
+	InventorySrvClient proto_inventory.InventoryClient
+
+	NacosConfig *config.NacosConfig = &config.NacosConfig{}
 )
 
 // var (

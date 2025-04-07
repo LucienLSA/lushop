@@ -27,6 +27,15 @@ type RedisConfig struct {
 	DB       int    `mapstructure:"db" json:"db"`
 }
 
+type AlipayConfig struct {
+	AppID        string `mapstructure:"app_id" json:"app_id"`
+	PrivateKey   string `mapstructure:"private_key" json:"private_key"`
+	AliPublicKey string `mapstructure:"ali_public_key" json:"ali_public_key"`
+	NotifyURL    string `mapstructure:"notify_url" json:"notify_url"`
+	ReturnURL    string `mapstructure:"return_url" json:"return_url"`
+	ProductCode  string `mapstructure:"product_code" json:"product_code"`
+}
+
 type ConsulConfig struct {
 	Host string `mapstructure:"host" json:"host"`
 	Port string `mapstructure:"port" json:"port"`
@@ -42,6 +51,7 @@ type ServerConfig struct {
 	InventorySrvInfo InventorySrvConfig `mapstructure:"inventory_srv" json:"inventory_srv"`
 	JwtInfo          JwtConfig          `mapstructure:"jwt" json:"jwt"`
 	ConsulInfo       ConsulConfig       `mapstructure:"consul" json:"consul"`
+	AlipayInfo       AlipayConfig       `mapstructure:"alipay" json:"alipay"`
 }
 
 type NacosConfig struct {

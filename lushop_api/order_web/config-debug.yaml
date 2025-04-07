@@ -38,6 +38,14 @@
 #   host: '192.168.226.140'
 #   port: '8500'
 
+# alipay:
+#   app_id: 'AliPay_Id'
+#   private_key: 'Lushop_Private_Key'
+#   ali_public_key: 'AliPay_Public_Key'
+#   notify_url: ''
+#   return_url: ''
+#   product_code: 'FAST_INSTANT_TRADE_PAY'
+
 
 nacos:
   host: '192.168.226.140'

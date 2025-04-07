@@ -3,13 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"lushopsrvs/order_srv/global"
-	"lushopsrvs/order_srv/handler"
-	"lushopsrvs/order_srv/initialize"
-	"lushopsrvs/order_srv/proto"
-	"lushopsrvs/order_srv/utils/addr"
-	"lushopsrvs/order_srv/utils/register/consul"
 	"net"
+	"ordersrv/global"
+	"ordersrv/handler"
+	"ordersrv/initialize"
+	proto_order "ordersrv/proto/gen/order"
+	"ordersrv/utils/addr"
+	"ordersrv/utils/register/consul"
 	"os"
 	"os/signal"
 	"strconv"
@@ -51,7 +51,7 @@ func main() {
 	}
 	zap.S().Info("port:", *Port)
 	server := grpc.NewServer()
-	proto.RegisterOrderServer(server, &handler.OrderServer{})
+	proto_order.RegisterOrderServer(server, &handler.OrderServer{})
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", *IP, *Port))
 	if err != nil {
 		zap.S().Errorf("ip:", *IP)

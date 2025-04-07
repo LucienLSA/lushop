@@ -10,6 +10,9 @@ type OrderSrvConfig struct {
 type GoodsSrvConfig struct {
 	Name string `mapstructure:"name" json:"name"`
 }
+type InventorySrvConfig struct {
+	Name string `mapstructure:"name" json:"name"`
+}
 
 type JwtConfig struct {
 	SigningKey string `mapstructure:"key" json:"key"`
@@ -30,14 +33,15 @@ type ConsulConfig struct {
 }
 
 type ServerConfig struct {
-	Name         string         `mapstructure:"name" json:"name"`
-	Host         string         `mapstructure:"host" json:"host"`
-	Tags         []string       `mapstructure:"tags" json:"tags"`
-	Port         int            `mapstructure:"port" json:"port"`
-	OrderSrvInfo OrderSrvConfig `mapstructure:"order_srv" json:"order_srv"`
-	GoodsSrvInfo GoodsSrvConfig `mapstructure:"goods_srv" json:"goods_srv"`
-	JwtInfo      JwtConfig      `mapstructure:"jwt" json:"jwt"`
-	ConsulInfo   ConsulConfig   `mapstructure:"consul" json:"consul"`
+	Name             string             `mapstructure:"name" json:"name"`
+	Host             string             `mapstructure:"host" json:"host"`
+	Tags             []string           `mapstructure:"tags" json:"tags"`
+	Port             int                `mapstructure:"port" json:"port"`
+	OrderSrvInfo     OrderSrvConfig     `mapstructure:"order_srv" json:"order_srv"`
+	GoodsSrvInfo     GoodsSrvConfig     `mapstructure:"goods_srv" json:"goods_srv"`
+	InventorySrvInfo InventorySrvConfig `mapstructure:"inventory_srv" json:"inventory_srv"`
+	JwtInfo          JwtConfig          `mapstructure:"jwt" json:"jwt"`
+	ConsulInfo       ConsulConfig       `mapstructure:"consul" json:"consul"`
 }
 
 type NacosConfig struct {

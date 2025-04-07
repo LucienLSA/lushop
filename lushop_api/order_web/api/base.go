@@ -1,8 +1,8 @@
 package api
 
 import (
-	"lushopapi/goods_web/global"
 	"net/http"
+	"orderweb/global"
 	"strings"
 
 	"github.com/gin-gonic/gin"

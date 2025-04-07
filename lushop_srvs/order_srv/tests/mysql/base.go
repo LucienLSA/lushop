@@ -3,12 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"lushopsrvs/order_srv/proto"
+	proto_order "ordersrv/proto/gen/order"
 
 	"google.golang.org/grpc"
 )
 
-var oClient proto.OrderClient
+var oClient proto_order.OrderClient
 var conn *grpc.ClientConn
 
 func InitClient() {
@@ -18,11 +18,11 @@ func InitClient() {
 	if err != nil {
 		panic(err)
 	}
-	oClient = proto.NewOrderClient(conn)
+	oClient = proto_order.NewOrderClient(conn)
 }
 
 func TestCreateCartItem(userId, nums, goodsId int32) {
-	rsp, err := oClient.CreateCartItem(context.Background(), &proto.CartItemRequest{
+	rsp, err := oClient.CreateCartItem(context.Background(), &proto_order.CartItemRequest{
 		UserId:  userId,
 		Nums:    nums,
 		GoodsId: goodsId,
@@ -34,7 +34,7 @@ func TestCreateCartItem(userId, nums, goodsId int32) {
 }
 
 func TestCartItemList(userId int32) {
-	rsp, err := oClient.CartItemList(context.Background(), &proto.UserInfo{
+	rsp, err := oClient.CartItemList(context.Background(), &proto_order.UserInfo{
 		Id: userId,
 	})
 	if err != nil {
@@ -46,7 +46,7 @@ func TestCartItemList(userId int32) {
 }
 
 func TestUpdateCartItem(id int32) {
-	_, err := oClient.UpdateCartItem(context.Background(), &proto.CartItemRequest{
+	_, err := oClient.UpdateCartItem(context.Background(), &proto_order.CartItemRequest{
 		Id:      id,
 		Checked: true,
 	})
@@ -56,7 +56,7 @@ func TestUpdateCartItem(id int32) {
 }
 
 func TestCreateOrder() {
-	_, err := oClient.CreateOrder(context.Background(), &proto.OrderRequest{
+	_, err := oClient.CreateOrder(context.Background(), &proto_order.OrderRequest{
 		UserId:  1,
 		Address: "北京市",
 		Name:    "bobby",
@@ -69,7 +69,7 @@ func TestCreateOrder() {
 }
 
 func TestOrderDetail(orderId int32) {
-	rsp, err := oClient.OrderDetail(context.Background(), &proto.OrderRequest{
+	rsp, err := oClient.OrderDetail(context.Background(), &proto_order.OrderRequest{
 		Id: orderId,
 	})
 	if err != nil {
@@ -82,7 +82,7 @@ func TestOrderDetail(orderId int32) {
 }
 
 func TestOrderList() {
-	rsp, err := oClient.OrderList(context.Background(), &proto.OrderFilterRequest{})
+	rsp, err := oClient.OrderList(context.Background(), &proto_order.OrderFilterRequest{})
 	if err != nil {
 		panic(err)
 	}

@@ -2,9 +2,11 @@ package handler
 
 import (
 	"context"
-	"lushopsrvs/order_srv/global"
-	"lushopsrvs/order_srv/model"
-	"lushopsrvs/order_srv/proto"
+	"ordersrv/global"
+	"ordersrv/model"
+	proto_goods "ordersrv/proto/gen/goods"
+	proto_inventory "ordersrv/proto/gen/inventory"
+	proto_order "ordersrv/proto/gen/order"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -12,14 +14,14 @@ import (
 )
 
 type OrderServer struct {
-	proto.UnimplementedOrderServer
+	proto_order.UnimplementedOrderServer
 }
 
 // 购物车
-func (s *OrderServer) CartItemList(ctx context.Context, req *proto.UserInfo) (*proto.CartItemListResponse, error) {
+func (s *OrderServer) CartItemList(ctx context.Context, req *proto_order.UserInfo) (*proto_order.CartItemListResponse, error) {
 	// 获取用户的购物车列表
 	var shopCarts []model.ShoppingCart
-	var rsp proto.CartItemListResponse
+	var rsp proto_order.CartItemListResponse
 	result := global.DB.Where(&model.ShoppingCart{User: req.Id}).Find(&shopCarts)
 	if result.Error != nil {
 		return nil, result.Error
@@ -27,7 +29,7 @@ func (s *OrderServer) CartItemList(ctx context.Context, req *proto.UserInfo) (*p
 		rsp.Total = int32(result.RowsAffected)
 	}
 	for _, shopCart := range shopCarts {
-		rsp.Data = append(rsp.Data, &proto.ShopCartInfoResponse{
+		rsp.Data = append(rsp.Data, &proto_order.ShopCartInfoResponse{
 			Id:      shopCart.ID,
 			UserId:  shopCart.ID,
 			GoodsId: shopCart.Goods,
@@ -40,7 +42,7 @@ func (s *OrderServer) CartItemList(ctx context.Context, req *proto.UserInfo) (*p
 
 // 将商品添加到购物车
 // 购物车中原本没有该商品。购物车中存在该商品
-func (s *OrderServer) CreateCartItem(ctx context.Context, req *proto.CartItemRequest) (*proto.ShopCartInfoResponse, error) {
+func (s *OrderServer) CreateCartItem(ctx context.Context, req *proto_order.CartItemRequest) (*proto_order.ShopCartInfoResponse, error) {
 	var shopCart model.ShoppingCart
 	result := global.DB.Where(&model.ShoppingCart{Goods: req.GoodsId, User: req.UserId}).First(&shopCart)
 	if result.RowsAffected == 1 {
@@ -54,11 +56,11 @@ func (s *OrderServer) CreateCartItem(ctx context.Context, req *proto.CartItemReq
 		shopCart.Checked = false
 	}
 	global.DB.Save(&shopCart)
-	return &proto.ShopCartInfoResponse{Id: shopCart.ID}, nil
+	return &proto_order.ShopCartInfoResponse{Id: shopCart.ID}, nil
 }
-func (s *OrderServer) UpdateCartItem(ctx context.Context, req *proto.CartItemRequest) (*emptypb.Empty, error) {
+func (s *OrderServer) UpdateCartItem(ctx context.Context, req *proto_order.CartItemRequest) (*emptypb.Empty, error) {
 	var shopCart model.ShoppingCart
-	result := global.DB.First(&shopCart, req.Id)
+	result := global.DB.Where("goods=? and user=?", req.GoodsId, req.UserId).First(&shopCart, req.Id)
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "购物车记录不存在")
 	}
@@ -70,8 +72,8 @@ func (s *OrderServer) UpdateCartItem(ctx context.Context, req *proto.CartItemReq
 	return &emptypb.Empty{}, nil
 }
 
-func (s *OrderServer) DeleteCartItem(ctx context.Context, req *proto.CartItemRequest) (*emptypb.Empty, error) {
-	result := global.DB.Delete(&model.ShoppingCart{}, req.Id)
+func (s *OrderServer) DeleteCartItem(ctx context.Context, req *proto_order.CartItemRequest) (*emptypb.Empty, error) {
+	result := global.DB.Where("goods=? and user=?", req.GoodsId, req.UserId).Delete(&model.ShoppingCart{})
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "购物车记录不存在")
 	}
@@ -79,7 +81,7 @@ func (s *OrderServer) DeleteCartItem(ctx context.Context, req *proto.CartItemReq
 }
 
 // 订单
-func (s *OrderServer) CreateOrder(ctx context.Context, req *proto.OrderRequest) (*proto.OrderInfoResponse, error) {
+func (s *OrderServer) CreateOrder(ctx context.Context, req *proto_order.OrderRequest) (*proto_order.OrderInfoResponse, error) {
 	var goodsIds []int32
 	var shopCarts []model.ShoppingCart
 	goodsNumsMap := make(map[int32]int32)
@@ -92,7 +94,7 @@ func (s *OrderServer) CreateOrder(ctx context.Context, req *proto.OrderRequest) 
 		goodsNumsMap[shopCart.Goods] = shopCart.Nums
 	}
 	// 跨服务调用 商品
-	goods, err := global.GoodsSrvClient.BatchGetGoods(context.Background(), &proto.BatchGoodsIdInfo{
+	goods, err := global.GoodsSrvClient.BatchGetGoods(context.Background(), &proto_goods.BatchGoodsIdInfo{
 		Id: goodsIds,
 	})
 	if err != nil {
@@ -100,7 +102,7 @@ func (s *OrderServer) CreateOrder(ctx context.Context, req *proto.OrderRequest) 
 	}
 	var orderAmount float32
 	var orderGoods []*model.OrderGoods
-	var goodsInvInfo []*proto.GoodsInvInfo
+	var goodsInvInfo []*proto_inventory.GoodsInvInfo
 	for _, good := range goods.Data {
 		orderAmount += good.ShopPrice * float32(goodsNumsMap[good.Id])
 		orderGoods = append(orderGoods, &model.OrderGoods{
@@ -110,13 +112,13 @@ func (s *OrderServer) CreateOrder(ctx context.Context, req *proto.OrderRequest) 
 			GoodsPrice: good.ShopPrice,
 			Nums:       goodsNumsMap[good.Id],
 		})
-		goodsInvInfo = append(goodsInvInfo, &proto.GoodsInvInfo{
+		goodsInvInfo = append(goodsInvInfo, &proto_inventory.GoodsInvInfo{
 			GoodsId: good.Id,
 			Num:     goodsNumsMap[good.Id],
 		})
 	}
 	// 跨服务 库存扣减
-	_, err = global.InventorySrvClient.Sell(context.Background(), &proto.SellInfo{GoodsInfo: goodsInvInfo})
+	_, err = global.InventorySrvClient.Sell(context.Background(), &proto_inventory.SellInfo{GoodsInfo: goodsInvInfo})
 	if err != nil {
 		return nil, status.Errorf(codes.ResourceExhausted, "扣减库存失败")
 	}
@@ -150,22 +152,22 @@ func (s *OrderServer) CreateOrder(ctx context.Context, req *proto.OrderRequest) 
 		return nil, status.Errorf(codes.Internal, "创建订单失败")
 	}
 	tx.Commit()
-	return &proto.OrderInfoResponse{
+	return &proto_order.OrderInfoResponse{
 		Id:      order.ID,
 		OrderSn: order.OrderSn,
 		Total:   order.OrderMount,
 	}, nil
 }
-func (s *OrderServer) OrderList(ctx context.Context, req *proto.OrderFilterRequest) (*proto.OrderListResponse, error) {
+func (s *OrderServer) OrderList(ctx context.Context, req *proto_order.OrderFilterRequest) (*proto_order.OrderListResponse, error) {
 	var orders []model.OrderInfo
-	var rsp proto.OrderListResponse
+	var rsp proto_order.OrderListResponse
 	var total int64
 	global.DB.Where(&model.OrderInfo{User: req.UserId}).Count(&total)
 	rsp.Total = int32(total)
 	// 分页
 	global.DB.Scopes(Paginate(int(req.Pages), int(req.PagePerNums))).Where(&model.OrderInfo{User: req.UserId}).Find(&orders)
 	for _, order := range orders {
-		rsp.Data = append(rsp.Data, &proto.OrderInfoResponse{
+		rsp.Data = append(rsp.Data, &proto_order.OrderInfoResponse{
 			UserId:  order.User,
 			Id:      order.ID,
 			OrderSn: order.OrderSn,
@@ -176,18 +178,19 @@ func (s *OrderServer) OrderList(ctx context.Context, req *proto.OrderFilterReque
 			Address: order.Address,
 			Name:    order.SignerName,
 			Mobile:  order.SingerMobile,
+			AddTime: order.CreatedAt.Format("2006-01-02 15:03:05"),
 		})
 	}
 	return &rsp, nil
 }
-func (s *OrderServer) OrderDetail(ctx context.Context, req *proto.OrderRequest) (*proto.OrderInfoDetailResponse, error) {
+func (s *OrderServer) OrderDetail(ctx context.Context, req *proto_order.OrderRequest) (*proto_order.OrderInfoDetailResponse, error) {
 	var order model.OrderInfo
-	var rsp proto.OrderInfoDetailResponse
+	var rsp proto_order.OrderInfoDetailResponse
 	result := global.DB.Where("id=? AND user=?", req.Id, req.UserId).First(&order)
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "订单不存在")
 	}
-	orderInfo := proto.OrderInfoResponse{}
+	orderInfo := proto_order.OrderInfoResponse{}
 	orderInfo.Id = order.ID
 	orderInfo.UserId = order.User
 	orderInfo.OrderSn = order.OrderSn
@@ -205,7 +208,7 @@ func (s *OrderServer) OrderDetail(ctx context.Context, req *proto.OrderRequest) 
 		return nil, result.Error
 	}
 	for _, orderGoods := range orderGoods {
-		rsp.Goods = append(rsp.Goods, &proto.OrderItemResponse{
+		rsp.Goods = append(rsp.Goods, &proto_order.OrderItemResponse{
 			GoodsId:    orderGoods.Goods,
 			GoodsName:  orderGoods.GoodsName,
 			GoodsImage: orderGoods.GoodsImage,
@@ -215,7 +218,7 @@ func (s *OrderServer) OrderDetail(ctx context.Context, req *proto.OrderRequest) 
 	}
 	return &rsp, nil
 }
-func (s *OrderServer) UpdateOrderStatus(ctx context.Context, req *proto.OrderStatus) (*emptypb.Empty, error) {
+func (s *OrderServer) UpdateOrderStatus(ctx context.Context, req *proto_order.OrderStatus) (*emptypb.Empty, error) {
 	if result := global.DB.Model(&model.OrderInfo{}).
 		Where("order_sn = ?", req.OrderSn).
 		Update("status", req.Status); result.RowsAffected == 0 {

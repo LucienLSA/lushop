@@ -2,8 +2,9 @@ package initialize
 
 import (
 	"fmt"
-	"lushopsrvs/order_srv/global"
-	"lushopsrvs/order_srv/proto"
+	"ordersrv/global"
+	proto_goods "ordersrv/proto/gen/goods"
+	proto_inventory "ordersrv/proto/gen/inventory"
 
 	_ "github.com/mbobakov/grpc-consul-resolver"
 	"go.uber.org/zap"
@@ -22,7 +23,7 @@ func SrvConn() {
 	if err != nil {
 		zap.S().Fatalf("[Init SrvConn] 连接 [商品服务失败]", err.Error())
 	}
-	GoodsSrvClient := proto.NewGoodsClient(goodsConn)
+	GoodsSrvClient := proto_goods.NewGoodsClient(goodsConn)
 	global.GoodsSrvClient = GoodsSrvClient
 	// 库存服务连接
 	inventoryConn, err := grpc.Dial(
@@ -33,5 +34,5 @@ func SrvConn() {
 	if err != nil {
 		zap.S().Fatalf("[Init SrvConn] 连接 [库存服务失败]", err.Error())
 	}
-	global.InventorySrvClient = proto.NewInventoryClient(inventoryConn)
+	global.InventorySrvClient = proto_inventory.NewInventoryClient(inventoryConn)
 }

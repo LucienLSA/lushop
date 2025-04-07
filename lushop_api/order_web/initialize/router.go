@@ -1,10 +1,10 @@
 package initialize
 
 import (
-	"lushopapi/order_web/global"
-	"lushopapi/order_web/middlewares"
-	"lushopapi/order_web/router"
 	"net/http"
+	"orderweb/global"
+	"orderweb/middlewares"
+	"orderweb/router"
 
 	"github.com/gin-gonic/gin"
 )

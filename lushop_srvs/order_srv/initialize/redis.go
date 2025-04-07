@@ -2,7 +2,8 @@ package initialize
 
 import (
 	"context"
-	"lushopsrvs/order_srv/global"
+	"ordersrv/global"
+
 	"strings"
 
 	"github.com/redis/go-redis/v9"

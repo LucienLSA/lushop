@@ -2,7 +2,8 @@ package main
 
 import (
 	"log"
-	"lushopsrvs/order_srv/model"
+	"ordersrv/model"
+
 	"os"
 	"time"
 

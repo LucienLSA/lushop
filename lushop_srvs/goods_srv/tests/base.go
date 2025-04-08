@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"lushopsrvs/goods_srv/proto"
+	"goodssrv/proto"
 
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"

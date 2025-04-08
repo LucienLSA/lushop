@@ -3,12 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"goodssrv/global"
+	"goodssrv/handler"
+	"goodssrv/initialize"
+	"goodssrv/proto"
+	"goodssrv/utils/addr"
 
-	"lushopsrvs/goods_srv/global"
-	"lushopsrvs/goods_srv/handler"
-	"lushopsrvs/goods_srv/initialize"
-	"lushopsrvs/goods_srv/proto"
-	"lushopsrvs/user_srv/utils/addr"
 	"net"
 	"os"
 	"os/signal"

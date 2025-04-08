@@ -3,9 +3,9 @@ package handler
 import (
 	"context"
 	"fmt"
-	"lushopsrvs/goods_srv/global"
-	"lushopsrvs/goods_srv/model"
-	"lushopsrvs/goods_srv/proto"
+	"goodssrv/global"
+	"goodssrv/model"
+	"goodssrv/proto"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

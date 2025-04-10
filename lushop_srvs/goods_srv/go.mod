@@ -6,6 +6,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/consul/api v1.32.0
 	github.com/nacos-group/nacos-sdk-go v1.1.5
+	github.com/olivere/elastic/v7 v7.0.32
 	github.com/spf13/viper v1.20.1
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.71.1
@@ -34,8 +35,10 @@ require (
 	github.com/hashicorp/serf v0.10.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.9 // indirect
+	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect

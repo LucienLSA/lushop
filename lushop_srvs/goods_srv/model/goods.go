@@ -1,5 +1,13 @@
 package model
 
+import (
+	"context"
+	"goodssrv/global"
+	"strconv"
+
+	"gorm.io/gorm"
+)
+
 type Category struct {
 	BaseModel
 	Name             string      `gorm:"type:varchar(20);not null;comment:'商品分类名称'" json:"name"`
@@ -61,4 +69,30 @@ type Goods struct {
 	GoodsFrontImage string   `gorm:"type:varchar(200);not null;comment:'商品封面图'"`
 	IsNew           bool     `gorm:"default:false;not null;comment:'是否新品'"`
 	IsHot           bool     `gorm:"default:false;not null;comment:'是否热卖'"`
+}
+
+func (g *Goods) AfterCreate(tx *gorm.DB) (err error) {
+	esModel := EsGoods{
+		ID:          g.ID,
+		CategoryID:  g.CategoryID,
+		BrandID:     g.BrandID,
+		OnSale:      g.OnSale,
+		ShipFree:    g.ShipFree,
+		IsNew:       g.IsNew,
+		IsHot:       g.IsHot,
+		Name:        g.Name,
+		ClickNum:    g.ClickNum,
+		SoldNum:     g.SoldNum,
+		FavNum:      g.FavNum,
+		MarketPrice: g.MarketPrice,
+		GoodsBrief:  g.GoodsBrief,
+		ShopPrice:   g.ShopPrice,
+	}
+	_, err = global.EsClient.Index().Index(esModel.GetIndexName()).
+		BodyJson(esModel).Id(strconv.Itoa(int(g.ID))).
+		Do(context.Background())
+	if err != nil {
+		return err
+	}
+	return nil
 }

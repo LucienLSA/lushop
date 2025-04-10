@@ -32,6 +32,9 @@ func main() {
 	// 初始化Mysql
 	initialize.MySQL()
 	zap.S().Info("init MySQL sucess")
+	// 初始化es
+	initialize.Es()
+	zap.S().Info("init Es sucess")
 
 	zap.S().Info(global.ServerConfig)
 	IP := flag.String("ip", "0.0.0.0", "ip地址")

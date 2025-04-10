@@ -3,6 +3,7 @@ package global
 import (
 	"goodssrv/config"
 
+	"github.com/olivere/elastic/v7"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
@@ -11,6 +12,7 @@ var (
 	DB           *gorm.DB
 	ServerConfig config.ServerConfig
 	NacosConfig  config.NacosConfig
+	EsClient     *elastic.Client
 )
 
 const Mode = "LUSHOP_DEBUG"

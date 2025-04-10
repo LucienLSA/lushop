@@ -14,6 +14,12 @@ type ServerConfig struct {
 	Tags       []string     `mapstructure:"tags" json:"tags"`
 	MySQLInfo  MySQLConfig  `mapstructure:"mysql" json:"mysql"`
 	ConsulInfo ConsulConfig `mapstructure:"consul" json:"consul"`
+	EsInfo     EsConfig     `mapstructure:"es" json:"es"`
+}
+
+type EsConfig struct {
+	Host string `mapstructure:"host" json:"host"`
+	Port string `mapstructure:"port" json:"port"`
 }
 
 type ConsulConfig struct {

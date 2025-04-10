@@ -1,13 +1,16 @@
 package main
 
 import (
+	"context"
 	"goodssrv/global"
 	"goodssrv/model"
 	"log"
+	"strconv"
 
 	"os"
 	"time"
 
+	"github.com/olivere/elastic/v7"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -45,13 +48,43 @@ func main() {
 	sqlDB.SetMaxIdleConns(20)  // 设置连接池，空闲
 	sqlDB.SetMaxOpenConns(100) // 打开
 	sqlDB.SetConnMaxLifetime(time.Second * 30)
-	global.DB = db
-	global.DB = global.DB.Set("gorm:table_options", "charset=utf8mb4")
-	err = global.DB.AutoMigrate(&model.Category{},
-		&model.Brand{}, &model.GoodsCategoryBrand{},
-		&model.Banner{}, &model.Goods{})
+
+	host := "http://192.168.226.140:9200"
+	logger := log.New(os.Stdout, "lushop", log.LstdFlags)
+	global.EsClient, err = elastic.NewClient(elastic.SetURL(host), elastic.SetSniff(false),
+		elastic.SetTraceLog(logger))
 	if err != nil {
-		// Todo log
 		panic(err)
 	}
+
+	var goods []model.Goods
+	err = db.Find(&goods).Error
+	if err != nil {
+		panic(err)
+	}
+	for _, g := range goods {
+		esModel := model.EsGoods{
+			ID:          g.ID,
+			CategoryID:  g.CategoryID,
+			BrandID:     g.BrandID,
+			OnSale:      g.OnSale,
+			ShipFree:    g.ShipFree,
+			IsNew:       g.IsNew,
+			IsHot:       g.IsHot,
+			Name:        g.Name,
+			ClickNum:    g.ClickNum,
+			SoldNum:     g.SoldNum,
+			FavNum:      g.FavNum,
+			MarketPrice: g.MarketPrice,
+			GoodsBrief:  g.GoodsBrief,
+			ShopPrice:   g.ShopPrice,
+		}
+		_, err = global.EsClient.Index().Index(esModel.GetIndexName()).
+			BodyJson(esModel).Id(strconv.Itoa(int(g.ID))).
+			Do(context.Background())
+		if err != nil {
+			panic(err)
+		}
+	}
+	// 一定要将docker启动es的java_ops的内存设置大一些 否则运行过程中会出现 bad request错误
 }

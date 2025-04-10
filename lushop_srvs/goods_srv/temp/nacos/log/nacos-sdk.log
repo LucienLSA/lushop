@@ -6364,3 +6364,27 @@
 2025-04-08T17:03:54.323+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
 2025-04-08T17:03:54.334+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:goods_srv.jsondev3d6c5c1565910a2ec23e6a6dcd41a3d3d44bc5b3-42e3-4aa1-9ea7-14d6a747880c tenant:d44bc5b3-42e3-4aa1-9ea7-14d6a747880c] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
 
+2025-04-10T10:48:22.681+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<./temp/nacos/log>   cacheDir:<./temp/nacos/cache>
+2025-04-10T10:48:23.184+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:goods_srv.jsondev6f32e34be777d8eeb623f8be45cc667ed44bc5b3-42e3-4aa1-9ea7-14d6a747880c tenant:d44bc5b3-42e3-4aa1-9ea7-14d6a747880c] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 Long-Pulling-Timeout-No-Hangup:true accessKey: secretKey:] 
+
+2025-04-10T10:48:23.202+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-04-10T10:48:23.213+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:goods_srv.jsondev6f32e34be777d8eeb623f8be45cc667ed44bc5b3-42e3-4aa1-9ea7-14d6a747880c tenant:d44bc5b3-42e3-4aa1-9ea7-14d6a747880c] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-04-10T10:48:52.738+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-04-10T10:48:52.749+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:goods_srv.jsondev6f32e34be777d8eeb623f8be45cc667ed44bc5b3-42e3-4aa1-9ea7-14d6a747880c tenant:d44bc5b3-42e3-4aa1-9ea7-14d6a747880c] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-04-10T10:49:22.261+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-04-10T10:49:22.272+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:goods_srv.jsondev6f32e34be777d8eeb623f8be45cc667ed44bc5b3-42e3-4aa1-9ea7-14d6a747880c tenant:d44bc5b3-42e3-4aa1-9ea7-14d6a747880c] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-04-10T10:49:51.778+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-04-10T10:49:51.789+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:goods_srv.jsondev6f32e34be777d8eeb623f8be45cc667ed44bc5b3-42e3-4aa1-9ea7-14d6a747880c tenant:d44bc5b3-42e3-4aa1-9ea7-14d6a747880c] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-04-10T10:50:21.296+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-04-10T10:50:21.307+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:goods_srv.jsondev6f32e34be777d8eeb623f8be45cc667ed44bc5b3-42e3-4aa1-9ea7-14d6a747880c tenant:d44bc5b3-42e3-4aa1-9ea7-14d6a747880c] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-04-10T10:50:50.823+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-04-10T10:50:50.835+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:goods_srv.jsondev6f32e34be777d8eeb623f8be45cc667ed44bc5b3-42e3-4aa1-9ea7-14d6a747880c tenant:d44bc5b3-42e3-4aa1-9ea7-14d6a747880c] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-04-10T10:51:20.339+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-04-10T10:51:20.350+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:goods_srv.jsondev6f32e34be777d8eeb623f8be45cc667ed44bc5b3-42e3-4aa1-9ea7-14d6a747880c tenant:d44bc5b3-42e3-4aa1-9ea7-14d6a747880c] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+

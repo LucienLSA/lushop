@@ -1,7 +1,7 @@
 package global
 
 import (
-	"lushopsrvs/inventory_srv/config"
+	"inventorysrv/config"
 
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"

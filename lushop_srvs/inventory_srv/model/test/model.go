@@ -2,8 +2,9 @@ package main
 
 import (
 	"context"
+	"inventorysrv/model"
 	"log"
-	"lushopsrvs/inventory_srv/model"
+
 	"os"
 	"time"
 

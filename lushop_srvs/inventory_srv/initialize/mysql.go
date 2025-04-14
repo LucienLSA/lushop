@@ -2,9 +2,9 @@ package initialize
 
 import (
 	"fmt"
+	"inventorysrv/global"
+	"inventorysrv/model"
 	"log"
-	"lushopsrvs/inventory_srv/global"
-	"lushopsrvs/inventory_srv/model"
 
 	"os"
 	"time"

@@ -3,7 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"lushopsrvs/inventory_srv/proto"
+	"inventorysrv/proto"
+
 	"sync"
 
 	"google.golang.org/grpc"

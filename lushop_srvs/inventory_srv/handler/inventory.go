@@ -2,15 +2,20 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"inventorysrv/global"
 	"inventorysrv/model"
 	"inventorysrv/proto"
 
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"gorm.io/gorm"
 
+	"github.com/apache/rocketmq-client-go/v2/consumer"
+	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/go-redsync/redsync/v4"
 	"github.com/go-redsync/redsync/v4/redis/goredis/v9"
 )
@@ -98,7 +103,16 @@ func (v *InventoryServer) Sell(ctx context.Context, req *proto.SellInfo) (*empty
 	pool := goredis.NewPool(global.Rdb)
 	rs := redsync.New(pool)
 	tx := global.DB.Begin()
+	sellDetail := model.StockSellDetail{
+		OrderSn: req.OrderSn,
+		Status:  1,
+	}
+	var details []model.GoodsDetail
 	for _, goodInfo := range req.GoodsInfo {
+		details = append(details, model.GoodsDetail{
+			Goods: goodInfo.GoodsId,
+			Num:   goodInfo.Num,
+		})
 		var inv model.Inventory
 		mutex := rs.NewMutex(fmt.Sprintf("goods_%d", goodInfo.GoodsId))
 		if err := mutex.Lock(); err != nil {
@@ -120,6 +134,12 @@ func (v *InventoryServer) Sell(ctx context.Context, req *proto.SellInfo) (*empty
 		if ok, err := mutex.Unlock(); !ok || err != nil {
 			return nil, status.Errorf(codes.Internal, "释放redis分布式锁异常")
 		}
+	}
+	sellDetail.Detail = details
+	// 写sellDetail表
+	if result := tx.Create(&sellDetail); result.RowsAffected == 0 {
+		tx.Rollback()
+		return nil, status.Error(codes.Internal, "保存库存扣减历史记录失败")
 	}
 	if err := tx.Commit().Error; err != nil {
 		return nil, status.Errorf(codes.Internal, "提交事务失败")
@@ -258,4 +278,47 @@ func (v *InventoryServer) Reback(ctx context.Context, req *proto.SellInfo) (*emp
 	}
 	tx.Commit() // 必须手动提交
 	return &emptypb.Empty{}, nil
+}
+
+// 自动归还库存，放在consumer监听库存中
+func AutoReback(ctx context.Context, me ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
+	type OrderInfo struct {
+		OrderSn string
+	}
+	for i := range me {
+		var orderInfo OrderInfo
+		err := json.Unmarshal(me[i].Body, &orderInfo)
+		if err != nil {
+			zap.S().Errorf("解析json失败:%v\n", me[i].Body)
+			return consumer.ConsumeSuccess, nil
+		}
+		// 将inv的库存加回去，将selldetail的status设置为2，在事务中执行
+		tx := global.DB.Begin()
+		var sellDetail model.StockSellDetail
+		if result := tx.Where(&model.
+			StockSellDetail{OrderSn: orderInfo.OrderSn, Status: 1}).
+			First(&sellDetail); result.RowsAffected == 0 {
+			return consumer.ConsumeSuccess, nil
+		}
+		// 如果查询到逐个归还库存
+		for _, orderGood := range sellDetail.Detail {
+			// 先查询Inventory表，但是使用update会有锁冲突，并发情况下
+			result := tx.Where(&model.Inventory{Goods: orderGood.Goods}).
+				Update("stocks", gorm.Expr("stock+?", orderGood.Num))
+			if result.RowsAffected == 0 {
+				tx.Rollback()
+				return consumer.ConsumeRetryLater, nil
+			}
+		}
+		sellDetail.Status = 2
+		result := tx.Where(&model.StockSellDetail{OrderSn: orderInfo.OrderSn}).
+			Update("status", 2)
+		if result.RowsAffected == 0 {
+			tx.Rollback()
+			return consumer.ConsumeRetryLater, nil
+		}
+		tx.Commit()
+		return consumer.ConsumeSuccess, nil
+	}
+	return consumer.ConsumeSuccess, nil
 }

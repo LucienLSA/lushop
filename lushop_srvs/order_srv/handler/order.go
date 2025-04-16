@@ -141,7 +141,8 @@ func (o *OrderListener) ExecuteLocalTransaction(msg *primitive.Message) primitiv
 		})
 	}
 	// 跨服务 库存扣减
-	_, err = global.InventorySrvClient.Sell(context.Background(), &proto_inventory.SellInfo{GoodsInfo: goodsInvInfo})
+	_, err = global.InventorySrvClient.Sell(context.Background(),
+		&proto_inventory.SellInfo{OrderSn: orderInfo.OrderSn, GoodsInfo: goodsInvInfo})
 	if err != nil {
 		// 当遇到网络问题时，如何避免误判，对于库存服务中的sell逻辑，判断返回的状态码信息，确定是什么原因
 		// 遇到该状态码时，则返回Commit
@@ -184,6 +185,7 @@ func (o *OrderListener) ExecuteLocalTransaction(msg *primitive.Message) primitiv
 		// return nil, status.Errorf(codes.Internal, "创建订单失败")
 	}
 	tx.Commit()
+	o.Code = codes.OK
 	return primitive.RollbackMessageState
 }
 
@@ -227,14 +229,14 @@ func (s *OrderServer) CreateOrder(ctx context.Context, req *proto_order.OrderReq
 
 	jsonString, _ := json.Marshal(order)
 
-	res, err := p.SendMessageInTransaction(context.Background(),
+	_, err = p.SendMessageInTransaction(context.Background(),
 		primitive.NewMessage("order_reback", jsonString))
 	if err != nil {
 		fmt.Printf("发送失败:%s\n", err)
 		return nil, status.Error(codes.Internal, "发送消息失败")
 	}
-	if res.State == primitive.CommitMessageState {
-		return nil, status.Error(codes.Internal, "新建订单失败")
+	if orderListener.Code != codes.OK {
+		return nil, status.Error(orderListener.Code, orderListener.Detail)
 	}
 	return &proto_order.OrderInfoResponse{
 		Id:      orderListener.ID,

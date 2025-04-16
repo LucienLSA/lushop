@@ -19,3 +19,20 @@ type InventoryNew struct {
 	Version int32 `gorm:"type:int"` //分布式锁的乐观锁
 	Freeze  int32 `gorm:"type:int"` //冻结库存
 }
+
+type Delivery struct {
+	Goods   int32  `gorm:"type:int;index"`
+	Nums    int32  `gorm:"type:int"`
+	OrderSn string `gorm:"type:varchar(200)"`
+	Status  string `gorm:"type:varchar(200)"` // 1.代表等待支付，2.代表支付成功，3.支付失败
+}
+
+type StockSellDetail struct {
+	OrderSn string         `gorm:"type:varchar(200);index:idx_order_sn,unique;"`
+	Status  int32          `gorm:"type:varchar(200)"` // 1.代表已扣减，2.代表已归还，3.失败
+	Detail  GormDetailList `gorm:"type:varchar(200)"`
+}
+
+func (StockSellDetail) TableName() string {
+	return "stockselldetail"
+}

@@ -9,6 +9,7 @@ import (
 	"inventorysrv/proto"
 	"inventorysrv/utils/addr"
 	"inventorysrv/utils/register/consul"
+	"time"
 
 	"net"
 	"os"
@@ -16,6 +17,8 @@ import (
 	"strconv"
 	"syscall"
 
+	"github.com/apache/rocketmq-client-go/v2"
+	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -101,6 +104,29 @@ func main() {
 		zap.S().Panic("服务注册失败", err.Error())
 	}
 	zap.S().Debugf("init grpc inventory service success,port:%d", *Port)
+
+	//监听库存并归还
+	c, err := rocketmq.NewPushConsumer(
+		consumer.WithNameServer([]string{"192.168.226.140:9876"}),
+		consumer.WithGroupName("lushop"),
+	)
+	if err != nil {
+		zap.S().Panic("创建pushconsumer失败", err.Error())
+	}
+	err = c.Subscribe("lucien1", consumer.MessageSelector{}, handler.AutoReback)
+	if err != nil {
+		zap.S().Panic("读取消息失败", err.Error())
+	}
+	err = c.Start()
+	if err != nil {
+		zap.S().Panic("启动监听消息失败", err.Error())
+	}
+	// 不能让主协程退出
+	time.Sleep(time.Hour)
+	err = c.Shutdown()
+	if err != nil {
+		zap.S().Panic("关闭consumer监听协程失败", err.Error())
+	}
 
 	go func() {
 		err = server.Serve(lis)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"inventorysrv/model"
 	"log"
 
@@ -56,9 +57,23 @@ func main() {
 	sqlDB.SetConnMaxLifetime(time.Second * 30)
 	_db = db
 	_db = _db.Set("gorm:table_options", "charset=utf8mb4")
-	err = _db.AutoMigrate(&model.Inventory{})
-	if err != nil {
-		// Todo log
-		panic(err)
-	}
+	// err = _db.AutoMigrate(&model.Inventory{}, &model.StockSellDetail{})
+	// if err != nil {
+	// 	// Todo log
+	// 	panic(err)
+	// }
+
+	// orderDetail := model.StockSellDetail{
+	// 	OrderSn: "lucien-lushop",
+	// 	Status:  1,
+	// 	Detail: []model.GoodsDetail{
+	// 		{Goods: 1, Num: 2},
+	// 		{Goods: 2, Num: 3},
+	// 	},
+	// }
+	// _db.Create(&orderDetail)
+
+	var sellDetail model.StockSellDetail
+	db.Where(model.StockSellDetail{OrderSn: "lucien-lushop"}).First(&sellDetail)
+	fmt.Println(sellDetail.Detail)
 }

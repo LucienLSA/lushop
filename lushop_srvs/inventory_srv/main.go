@@ -9,7 +9,6 @@ import (
 	"inventorysrv/proto"
 	"inventorysrv/utils/addr"
 	"inventorysrv/utils/register/consul"
-	"time"
 
 	"net"
 	"os"
@@ -108,24 +107,18 @@ func main() {
 	//监听库存并归还
 	c, err := rocketmq.NewPushConsumer(
 		consumer.WithNameServer([]string{"192.168.226.140:9876"}),
-		consumer.WithGroupName("lushop"),
+		consumer.WithGroupName("lushop-inventory"),
 	)
 	if err != nil {
 		zap.S().Panic("创建pushconsumer失败", err.Error())
 	}
-	err = c.Subscribe("lucien1", consumer.MessageSelector{}, handler.AutoReback)
+	err = c.Subscribe("order_reback", consumer.MessageSelector{}, handler.AutoReback)
 	if err != nil {
 		zap.S().Panic("读取消息失败", err.Error())
 	}
 	err = c.Start()
 	if err != nil {
 		zap.S().Panic("启动监听消息失败", err.Error())
-	}
-	// 不能让主协程退出
-	time.Sleep(time.Hour)
-	err = c.Shutdown()
-	if err != nil {
-		zap.S().Panic("关闭consumer监听协程失败", err.Error())
 	}
 
 	go func() {
@@ -139,6 +132,10 @@ func main() {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
+	err = c.Shutdown()
+	if err != nil {
+		zap.S().Panic("关闭consumer监听协程失败", err.Error())
+	}
 	err = register_client.DeRegister(serviceId)
 	// client.Agent().ServiceDeregister(serviceID)
 	if err != nil {

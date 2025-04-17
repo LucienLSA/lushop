@@ -295,7 +295,7 @@ func AutoReback(ctx context.Context, me ...*primitive.MessageExt) (consumer.Cons
 		// 将inv的库存加回去，将selldetail的status设置为2，在事务中执行
 		tx := global.DB.Begin()
 		var sellDetail model.StockSellDetail
-		if result := tx.Where(&model.
+		if result := tx.Model(&model.StockSellDetail{}).Where(&model.
 			StockSellDetail{OrderSn: orderInfo.OrderSn, Status: 1}).
 			First(&sellDetail); result.RowsAffected == 0 {
 			return consumer.ConsumeSuccess, nil
@@ -303,7 +303,7 @@ func AutoReback(ctx context.Context, me ...*primitive.MessageExt) (consumer.Cons
 		// 如果查询到逐个归还库存
 		for _, orderGood := range sellDetail.Detail {
 			// 先查询Inventory表，但是使用update会有锁冲突，并发情况下
-			result := tx.Where(&model.Inventory{Goods: orderGood.Goods}).
+			result := tx.Model(&model.Inventory{}).Where(&model.Inventory{Goods: orderGood.Goods}).
 				Update("stocks", gorm.Expr("stock+?", orderGood.Num))
 			if result.RowsAffected == 0 {
 				tx.Rollback()
@@ -311,7 +311,7 @@ func AutoReback(ctx context.Context, me ...*primitive.MessageExt) (consumer.Cons
 			}
 		}
 		sellDetail.Status = 2
-		result := tx.Where(&model.StockSellDetail{OrderSn: orderInfo.OrderSn}).
+		result := tx.Model(&model.StockSellDetail{}).Where(&model.StockSellDetail{OrderSn: orderInfo.OrderSn}).
 			Update("status", 2)
 		if result.RowsAffected == 0 {
 			tx.Rollback()

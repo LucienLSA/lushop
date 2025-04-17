@@ -15,6 +15,8 @@ import (
 	"strconv"
 	"syscall"
 
+	"github.com/apache/rocketmq-client-go/v2"
+	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -104,6 +106,23 @@ func main() {
 	}
 	zap.S().Debugf("init grpc orderservice success,port:%d", *Port)
 
+	//监听订单超时topic
+	c, err := rocketmq.NewPushConsumer(
+		consumer.WithNameServer([]string{"192.168.226.140:9876"}),
+		consumer.WithGroupName("lushop-order"),
+	)
+	if err != nil {
+		zap.S().Panic("创建pushconsumer失败", err.Error())
+	}
+	err = c.Subscribe("order_timeout", consumer.MessageSelector{}, handler.OrderTimeout)
+	if err != nil {
+		zap.S().Panic("读取消息失败", err.Error())
+	}
+	err = c.Start()
+	if err != nil {
+		zap.S().Panic("启动监听消息失败", err.Error())
+	}
+
 	go func() {
 		err = server.Serve(lis)
 		if err != nil {
@@ -115,6 +134,10 @@ func main() {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
+	err = c.Shutdown()
+	if err != nil {
+		zap.S().Panic("关闭consumer监听协程失败", err.Error())
+	}
 	err = register_client.DeRegister(serviceId)
 	// client.Agent().ServiceDeregister(serviceID)
 	if err != nil {

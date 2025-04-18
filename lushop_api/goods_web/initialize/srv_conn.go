@@ -2,8 +2,8 @@ package initialize
 
 import (
 	"fmt"
-	"lushopapi/goods_web/global"
-	"lushopapi/goods_web/proto"
+	"goodsweb/global"
+	"goodsweb/proto"
 
 	_ "github.com/mbobakov/grpc-consul-resolver"
 	"go.uber.org/zap"

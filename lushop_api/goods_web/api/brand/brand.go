@@ -2,11 +2,11 @@ package brand
 
 import (
 	"context"
+	"goodsweb/api"
+	"goodsweb/forms"
+	"goodsweb/global"
+	"goodsweb/proto"
 
-	"lushopapi/goods_web/api"
-	"lushopapi/goods_web/forms"
-	"lushopapi/goods_web/global"
-	"lushopapi/goods_web/proto"
 	"net/http"
 	"strconv"
 

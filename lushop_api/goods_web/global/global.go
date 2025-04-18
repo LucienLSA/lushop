@@ -1,8 +1,8 @@
 package global
 
 import (
-	"lushopapi/goods_web/config"
-	"lushopapi/goods_web/proto"
+	"goodsweb/config"
+	"goodsweb/proto"
 
 	ut "github.com/go-playground/universal-translator"
 	"github.com/spf13/viper"

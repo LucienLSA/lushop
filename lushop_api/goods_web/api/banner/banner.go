@@ -2,10 +2,11 @@ package banner
 
 import (
 	"context"
-	"lushopapi/goods_web/api"
-	"lushopapi/goods_web/forms"
-	"lushopapi/goods_web/global"
-	"lushopapi/goods_web/proto"
+	"goodsweb/api"
+	"goodsweb/forms"
+	"goodsweb/global"
+	"goodsweb/proto"
+
 	"net/http"
 	"strconv"
 

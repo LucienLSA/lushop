@@ -151,3 +151,56 @@
 2025-04-07T17:32:30.434+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
 2025-04-07T17:32:30.445+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order_web.jsondev7508706ac575005049c1efece405e80341c209c8-0ef0-4df1-b1b2-0641b78ca428 tenant:41c209c8-0ef0-4df1-b1b2-0641b78ca428] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
 
+2025-04-18T14:12:54.143+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<./temp/nacos/log>   cacheDir:<./temp/nacos/cache>
+2025-04-18T14:12:59.144+0800	[31mERROR[0m	nacos_server/nacos_server.go:199	api</v1/cs/configs>,method:<GET>, params:<{"dataId":"order_web.json","group":"dev","tenant":"41c209c8-0ef0-4df1-b1b2-0641b78ca428"}>, call domain error:<Get "http://192.168.226.140:8848/nacos/v1/cs/configs?dataId=order_web.json&group=dev&tenant=41c209c8-0ef0-4df1-b1b2-0641b78ca428": context deadline exceeded (Client.Timeout exceeded while awaiting headers)> , result:<>
+2025-04-18T14:13:04.144+0800	[31mERROR[0m	nacos_server/nacos_server.go:199	api</v1/cs/configs>,method:<GET>, params:<{"dataId":"order_web.json","group":"dev","tenant":"41c209c8-0ef0-4df1-b1b2-0641b78ca428"}>, call domain error:<Get "http://192.168.226.140:8848/nacos/v1/cs/configs?tenant=41c209c8-0ef0-4df1-b1b2-0641b78ca428&dataId=order_web.json&group=dev": context deadline exceeded (Client.Timeout exceeded while awaiting headers)> , result:<>
+2025-04-18T14:13:09.145+0800	[31mERROR[0m	nacos_server/nacos_server.go:199	api</v1/cs/configs>,method:<GET>, params:<{"dataId":"order_web.json","group":"dev","tenant":"41c209c8-0ef0-4df1-b1b2-0641b78ca428"}>, call domain error:<Get "http://192.168.226.140:8848/nacos/v1/cs/configs?tenant=41c209c8-0ef0-4df1-b1b2-0641b78ca428&dataId=order_web.json&group=dev": context deadline exceeded (Client.Timeout exceeded while awaiting headers)> , result:<>
+2025-04-18T14:13:09.145+0800	[31mERROR[0m	config_client/config_client.go:202	get config from server error:Get "http://192.168.226.140:8848/nacos/v1/cs/configs?tenant=41c209c8-0ef0-4df1-b1b2-0641b78ca428&dataId=order_web.json&group=dev": context deadline exceeded (Client.Timeout exceeded while awaiting headers) 
+2025-04-18T14:13:09.654+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order_web.jsondev7508706ac575005049c1efece405e80341c209c8-0ef0-4df1-b1b2-0641b78ca428 tenant:41c209c8-0ef0-4df1-b1b2-0641b78ca428] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 Long-Pulling-Timeout-No-Hangup:true accessKey: secretKey:] 
+
+2025-04-18T14:13:30.708+0800	[31mERROR[0m	nacos_server/nacos_server.go:199	api</v1/cs/configs/listener>,method:<POST>, params:<{"Listening-Configs":"order_web.json\u0002dev\u00027508706ac575005049c1efece405e803\u000241c209c8-0ef0-4df1-b1b2-0641b78ca428\u0001","tenant":"41c209c8-0ef0-4df1-b1b2-0641b78ca428"}>, call domain error:<Post "http://192.168.226.140:8848/nacos/v1/cs/configs/listener": dial tcp 192.168.226.140:8848: connectex: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond.> , result:<>
+2025-04-18T14:17:42.492+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<./temp/nacos/log>   cacheDir:<./temp/nacos/cache>
+2025-04-18T14:17:42.996+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order_web.jsondev7508706ac575005049c1efece405e80341c209c8-0ef0-4df1-b1b2-0641b78ca428 tenant:41c209c8-0ef0-4df1-b1b2-0641b78ca428] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 Long-Pulling-Timeout-No-Hangup:true accessKey: secretKey:] 
+
+2025-04-18T14:17:43.009+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-04-18T14:17:43.020+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order_web.jsondev7508706ac575005049c1efece405e80341c209c8-0ef0-4df1-b1b2-0641b78ca428 tenant:41c209c8-0ef0-4df1-b1b2-0641b78ca428] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-04-18T14:19:57.949+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<./temp/nacos/log>   cacheDir:<./temp/nacos/cache>
+2025-04-18T14:19:58.451+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order_web.jsondev7508706ac575005049c1efece405e80341c209c8-0ef0-4df1-b1b2-0641b78ca428 tenant:41c209c8-0ef0-4df1-b1b2-0641b78ca428] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 Long-Pulling-Timeout-No-Hangup:true accessKey: secretKey:] 
+
+2025-04-18T14:19:58.457+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-04-18T14:19:58.468+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order_web.jsondev7508706ac575005049c1efece405e80341c209c8-0ef0-4df1-b1b2-0641b78ca428 tenant:41c209c8-0ef0-4df1-b1b2-0641b78ca428] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-04-18T14:20:27.979+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-04-18T14:20:27.990+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order_web.jsondev7508706ac575005049c1efece405e80341c209c8-0ef0-4df1-b1b2-0641b78ca428 tenant:41c209c8-0ef0-4df1-b1b2-0641b78ca428] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-04-18T14:20:57.500+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-04-18T14:20:57.510+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order_web.jsondev7508706ac575005049c1efece405e80341c209c8-0ef0-4df1-b1b2-0641b78ca428 tenant:41c209c8-0ef0-4df1-b1b2-0641b78ca428] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-04-18T14:32:04.581+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<./temp/nacos/log>   cacheDir:<./temp/nacos/cache>
+2025-04-18T14:32:05.085+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order_web.jsondev7508706ac575005049c1efece405e80341c209c8-0ef0-4df1-b1b2-0641b78ca428 tenant:41c209c8-0ef0-4df1-b1b2-0641b78ca428] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 Long-Pulling-Timeout-No-Hangup:true accessKey: secretKey:] 
+
+2025-04-18T14:32:05.088+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-04-18T14:32:05.099+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order_web.jsondev7508706ac575005049c1efece405e80341c209c8-0ef0-4df1-b1b2-0641b78ca428 tenant:41c209c8-0ef0-4df1-b1b2-0641b78ca428] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-04-18T14:32:34.579+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-04-18T14:32:34.590+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order_web.jsondev7508706ac575005049c1efece405e80341c209c8-0ef0-4df1-b1b2-0641b78ca428 tenant:41c209c8-0ef0-4df1-b1b2-0641b78ca428] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-04-18T14:36:12.180+0800	[34mINFO[0m	clients/client_factory.go:47	logDir:<./temp/nacos/log>   cacheDir:<./temp/nacos/cache>
+2025-04-18T14:36:12.682+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order_web.jsondev7508706ac575005049c1efece405e80341c209c8-0ef0-4df1-b1b2-0641b78ca428 tenant:41c209c8-0ef0-4df1-b1b2-0641b78ca428] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 Long-Pulling-Timeout-No-Hangup:true accessKey: secretKey:] 
+
+2025-04-18T14:36:12.687+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-04-18T14:36:12.697+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order_web.jsondev7508706ac575005049c1efece405e80341c209c8-0ef0-4df1-b1b2-0641b78ca428 tenant:41c209c8-0ef0-4df1-b1b2-0641b78ca428] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-04-18T14:36:42.203+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-04-18T14:36:42.218+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order_web.jsondev7508706ac575005049c1efece405e80341c209c8-0ef0-4df1-b1b2-0641b78ca428 tenant:41c209c8-0ef0-4df1-b1b2-0641b78ca428] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-04-18T14:37:11.783+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-04-18T14:37:11.793+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order_web.jsondev7508706ac575005049c1efece405e80341c209c8-0ef0-4df1-b1b2-0641b78ca428 tenant:41c209c8-0ef0-4df1-b1b2-0641b78ca428] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-04-18T14:37:41.358+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-04-18T14:37:41.369+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order_web.jsondev7508706ac575005049c1efece405e80341c209c8-0ef0-4df1-b1b2-0641b78ca428 tenant:41c209c8-0ef0-4df1-b1b2-0641b78ca428] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+
+2025-04-18T14:38:10.895+0800	[34mINFO[0m	config_client/config_client.go:433	[client.ListenConfig] no change
+2025-04-18T14:38:10.905+0800	[34mINFO[0m	config_client/config_proxy.go:180	[client.ListenConfig] request params:map[Listening-Configs:order_web.jsondev7508706ac575005049c1efece405e80341c209c8-0ef0-4df1-b1b2-0641b78ca428 tenant:41c209c8-0ef0-4df1-b1b2-0641b78ca428] header:map[Content-Type:application/x-www-form-urlencoded;charset=utf-8 Long-Pulling-Timeout:30000 accessKey: secretKey:] 
+

@@ -1,9 +1,9 @@
 package initialize
 
 import (
-	"lushopapi/goods_web/global"
-	"lushopapi/goods_web/middlewares"
-	"lushopapi/goods_web/router"
+	"goodsweb/global"
+	"goodsweb/middlewares"
+	"goodsweb/router"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

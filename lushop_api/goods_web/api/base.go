@@ -1,7 +1,7 @@
 package api
 
 import (
-	"lushopapi/goods_web/global"
+	"goodsweb/global"
 	"net/http"
 	"strings"
 

@@ -1,8 +1,8 @@
 package router
 
 import (
-	"lushopapi/goods_web/api/category"
-	"lushopapi/goods_web/middlewares"
+	"goodsweb/api/category"
+	"goodsweb/middlewares"
 
 	"github.com/gin-gonic/gin"
 )

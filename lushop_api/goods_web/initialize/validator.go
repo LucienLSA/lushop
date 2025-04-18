@@ -2,8 +2,8 @@ package initialize
 
 import (
 	"fmt"
-	"lushopapi/goods_web/global"
-	myValidator "lushopapi/goods_web/utils/validator"
+	"goodsweb/global"
+	myValidator "goodsweb/utils/validator"
 	"reflect"
 	"strings"
 

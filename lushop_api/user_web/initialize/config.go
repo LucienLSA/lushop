@@ -3,8 +3,8 @@ package initialize
 import (
 	"encoding/json"
 	"fmt"
-	"lushopapi/user_web/global"
 	"time"
+	"userweb/global"
 
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"

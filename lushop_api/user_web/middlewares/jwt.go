@@ -2,8 +2,9 @@ package middlewares
 
 import (
 	"errors"
-	"lushopapi/user_web/global"
-	"lushopapi/user_web/utils/jwtClaims"
+	"userweb/global"
+	"userweb/utils/jwtClaims"
+
 	"net/http"
 	"time"
 

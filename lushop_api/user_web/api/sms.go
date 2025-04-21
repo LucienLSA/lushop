@@ -3,8 +3,8 @@ package api
 import (
 	"context"
 	"fmt"
-	"lushopapi/user_web/forms"
-	"lushopapi/user_web/global"
+	"userweb/forms"
+	"userweb/global"
 
 	"math/rand"
 	"net/http"

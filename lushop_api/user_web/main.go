@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"lushopapi/user_web/global"
-	"lushopapi/user_web/initialize"
-	"lushopapi/user_web/utils/addr"
-	"lushopapi/user_web/utils/register/consul"
+	"userweb/global"
+	"userweb/initialize"
+	"userweb/utils/addr"
+	"userweb/utils/register/consul"
+
 	"os"
 	"os/signal"
 	"strconv"

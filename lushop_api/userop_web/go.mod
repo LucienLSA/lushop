@@ -10,10 +10,10 @@ require (
 	github.com/go-playground/validator/v10 v10.26.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.6.0
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.1
 	github.com/hashicorp/consul/api v1.32.0
 	github.com/mbobakov/grpc-consul-resolver v1.5.3
 	github.com/nacos-group/nacos-sdk-go v1.1.5
-	github.com/smartwalle/alipay/v3 v3.2.25
 	github.com/spf13/viper v1.20.1
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.71.1
@@ -58,9 +58,6 @@ require (
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
-	github.com/smartwalle/ncrypto v1.0.4 // indirect
-	github.com/smartwalle/ngx v1.0.9 // indirect
-	github.com/smartwalle/nsign v1.0.9 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.12.0 // indirect
 	github.com/spf13/cast v1.7.1 // indirect
@@ -72,7 +69,7 @@ require (
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/crypto v0.33.0 // indirect
 	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8 // indirect
-	golang.org/x/net v0.34.0 // indirect
+	golang.org/x/net v0.35.0 // indirect
 	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect

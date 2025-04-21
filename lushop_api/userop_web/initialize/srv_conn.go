@@ -2,24 +2,36 @@ package initialize
 
 import (
 	"fmt"
+	"time"
 	"useropweb/global"
 	proto_address "useropweb/proto/gen/address"
 	proto_goods "useropweb/proto/gen/goods"
 	proto_message "useropweb/proto/gen/message"
 	proto_userfav "useropweb/proto/gen/userfav"
 
+	grpc_retry "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
+
 	_ "github.com/mbobakov/grpc-consul-resolver"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 func SrvConn() {
 	consulInfo := global.ServerConfig.ConsulInfo
+	var opts []grpc.DialOption
+	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`))
+	retryOpts := []grpc_retry.CallOption{
+		grpc_retry.WithMax(3),                           // 最大重试次数
+		grpc_retry.WithPerRetryTimeout(1 * time.Second), // 每次超时最大时间
+		grpc_retry.WithCodes(codes.Unknown, codes.DeadlineExceeded, codes.Unavailable),
+	}
+	opts = append(opts, grpc.WithUnaryInterceptor(grpc_retry.UnaryClientInterceptor(retryOpts...)))
 	userOpConn, err := grpc.Dial(
 		fmt.Sprintf("consul://%s:%s/%s?wait=14s", consulInfo.Host, consulInfo.Port, global.ServerConfig.UserOpSrvInfo.Name),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`),
+		opts...,
 	)
 	if err != nil {
 		zap.S().Fatalf("[Init SrvConn] 连接 [用户操作服务失败]", err.Error())

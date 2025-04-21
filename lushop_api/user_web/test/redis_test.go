@@ -2,8 +2,9 @@ package test
 
 import (
 	"context"
-	"lushopapi/user_web/global"
-	"lushopapi/user_web/initialize"
+	"userweb/global"
+	"userweb/initialize"
+
 	"testing"
 
 	"github.com/redis/go-redis/v9"

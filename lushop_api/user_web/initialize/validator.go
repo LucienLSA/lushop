@@ -2,10 +2,11 @@ package initialize
 
 import (
 	"fmt"
-	"lushopapi/user_web/global"
-	myValidator "lushopapi/user_web/utils/validator"
+
 	"reflect"
 	"strings"
+	"userweb/global"
+	myValidator "userweb/utils/validator"
 
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/locales/en"

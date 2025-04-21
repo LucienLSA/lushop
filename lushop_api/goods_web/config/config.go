@@ -25,6 +25,20 @@ type ConsulConfig struct {
 	Port string `mapstructure:"port" json:"port"`
 }
 
+type JaegerConfig struct {
+	ServiceName       string `mapstructure:"service_name" json:"service_name"`
+	JaegerGinEndpoint string `mapstructure:"jaeger_gin_endpoint" json:"jaeger_gin_endpoint"`
+}
+
+type LogConfig struct {
+	Level      string `mapstructure:"level" json:"level"`
+	FilePath   string `mapstructure:"filepath" json:"filepath"`
+	FileName   string `mapstructure:"filename" json:"filename"`
+	MaxSize    int    `mapstructure:"max_size" json:"max_size"`
+	MaxAge     int    `mapstructure:"max_age" json:"max_age"`
+	MaxBackUps int    `mapstructure:"max_backups" json:"max_backups"`
+}
+
 type ServerConfig struct {
 	Name         string         `mapstructure:"name" json:"name"`
 	Host         string         `mapstructure:"host" json:"host"`
@@ -33,6 +47,8 @@ type ServerConfig struct {
 	GoodsSrvInfo GoodsSrvConfig `mapstructure:"goods_srv" json:"goods_srv"`
 	JwtInfo      JwtConfig      `mapstructure:"jwt" json:"jwt"`
 	ConsulInfo   ConsulConfig   `mapstructure:"consul" json:"consul"`
+	JaegerInfo   JaegerConfig   `mapstructure:"jaeger" json:"jaeger"`
+	LogInfo      LogConfig      `mapstructure:"log" json:"log"`
 }
 
 type NacosConfig struct {

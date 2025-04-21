@@ -2,14 +2,14 @@ package api
 
 import (
 	"context"
+	"userweb/forms"
+	"userweb/global"
+	"userweb/global/response"
+	"userweb/global/types"
+	"userweb/middlewares"
+	"userweb/proto"
+	"userweb/utils/jwtClaims"
 
-	"lushopapi/user_web/forms"
-	"lushopapi/user_web/global"
-	"lushopapi/user_web/global/response"
-	"lushopapi/user_web/global/types"
-	"lushopapi/user_web/middlewares"
-	"lushopapi/user_web/proto"
-	"lushopapi/user_web/utils/jwtClaims"
 	"net/http"
 	"strconv"
 	"strings"

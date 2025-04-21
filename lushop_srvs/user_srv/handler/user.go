@@ -3,9 +3,10 @@ package handler
 import (
 	"context"
 	"fmt"
-	"lushopsrvs/user_srv/global"
-	"lushopsrvs/user_srv/model"
-	"lushopsrvs/user_srv/proto"
+	"usersrv/global"
+	"usersrv/model"
+	"usersrv/proto"
+
 	"time"
 
 	"github.com/golang/protobuf/ptypes/empty"

@@ -103,6 +103,11 @@ func List(ctx *gin.Context) {
 
 // 新建商品
 func New(ctx *gin.Context) {
+
+	_, span := global.Tracer.Start(
+		ctx.Request.Context(), "goods_New")
+	defer span.End()
+
 	goodsForm := forms.GoodsForm{}
 	if err := ctx.ShouldBind(&goodsForm); err != nil {
 		api.HandleValidatorError(ctx, err)

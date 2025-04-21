@@ -3,8 +3,9 @@ package initialize
 import (
 	"fmt"
 	"log"
-	"lushopsrvs/user_srv/global"
-	"lushopsrvs/user_srv/model"
+	"usersrv/global"
+	"usersrv/model"
+
 	"os"
 	"time"
 

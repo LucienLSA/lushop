@@ -2,7 +2,8 @@ package initialize
 
 import (
 	"context"
-	"lushopapi/user_web/global"
+	"userweb/global"
+
 	"strings"
 
 	"github.com/redis/go-redis/v9"

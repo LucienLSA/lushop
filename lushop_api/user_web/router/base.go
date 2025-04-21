@@ -1,7 +1,7 @@
 package router
 
 import (
-	"lushopapi/user_web/api"
+	"userweb/api"
 
 	"github.com/gin-gonic/gin"
 )

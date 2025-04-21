@@ -3,7 +3,8 @@ package initialize
 import (
 	"encoding/json"
 	"fmt"
-	"lushopsrvs/user_srv/global"
+	"usersrv/global"
+
 	"time"
 
 	"github.com/nacos-group/nacos-sdk-go/clients"

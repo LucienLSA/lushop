@@ -1,7 +1,7 @@
 package global
 
 import (
-	"lushopsrvs/user_srv/config"
+	"usersrv/config"
 
 	"github.com/spf13/viper"
 	"gorm.io/gorm"

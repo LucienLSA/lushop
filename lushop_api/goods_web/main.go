@@ -1,11 +1,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"goodsweb/global"
 	"goodsweb/initialize"
 	"goodsweb/utils/addr"
 	"goodsweb/utils/register/consul"
+	"goodsweb/utils/track"
+	"log"
 
 	"os"
 	"os/signal"
@@ -13,17 +16,33 @@ import (
 	"syscall"
 
 	"github.com/google/uuid"
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 	"go.uber.org/zap"
 )
 
 func main() {
 	// 1. 初始化zap日志
-	initialize.Logger()
+	logger := initialize.Logger()
 	zap.S().Info("init Logger success")
+	otelzap.L().Info("初始化logger成功")
+	defer logger()
 
 	// 2. 初始化配置文件
 	initialize.Config()
 	zap.S().Info("init Config success")
+	otelzap.L().Info("初始化 Config 成功")
+
+	// 10. 初始化trace
+	ctx := context.Background()
+	tp, err := track.InitTracer(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func() {
+		if err := tp.Shutdown(ctx); err != nil {
+			log.Fatalf("shutting down tracer provider failed, err:%v\n", err)
+		}
+	}()
 
 	// 3. 初始化routers
 	Router := initialize.Routers()
@@ -57,13 +76,13 @@ func main() {
 	consulPortInt, _ := strconv.Atoi(global.ServerConfig.ConsulInfo.Port)
 	serviceId := fmt.Sprintf("%s", uuid.New())
 	register_client := consul.NewRegistryClient(global.ServerConfig.ConsulInfo.Host, consulPortInt)
-	err := register_client.Register(global.ServerConfig.Host, global.ServerConfig.Port, global.ServerConfig.Name, global.ServerConfig.Tags, serviceId)
+	err = register_client.Register(global.ServerConfig.Host, global.ServerConfig.Port, global.ServerConfig.Name, global.ServerConfig.Tags, serviceId)
 	if err != nil {
 		zap.S().Panic("服务注册失败", err.Error())
 	}
 	zap.S().Info("init gin service success")
 
-	// 10. 优雅运行退出
+	//  优雅运行退出
 	go func() {
 		if err := Router.Run(fmt.Sprintf(":%d", global.ServerConfig.Port)); err != nil {
 			zap.S().Errorf("启动商品web服务器失败,端口:%d", global.ServerConfig.Port)

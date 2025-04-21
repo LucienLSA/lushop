@@ -6,6 +6,7 @@ import (
 
 	ut "github.com/go-playground/universal-translator"
 	"github.com/spf13/viper"
+	"go.opentelemetry.io/otel"
 )
 
 var (
@@ -15,6 +16,8 @@ var (
 	GoodsSrvClient proto.GoodsClient
 	NacosConfig    *config.NacosConfig = &config.NacosConfig{}
 )
+
+var Tracer = otel.Tracer("goods_web")
 
 // var (
 // 	ServerConfig config.ServerConfig

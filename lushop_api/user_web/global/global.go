@@ -1,8 +1,8 @@
 package global
 
 import (
-	"lushopapi/user_web/config"
-	"lushopapi/user_web/proto"
+	"userweb/config"
+	"userweb/proto"
 
 	ut "github.com/go-playground/universal-translator"
 	"github.com/redis/go-redis/v9"

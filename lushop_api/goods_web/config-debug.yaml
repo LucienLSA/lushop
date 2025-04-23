@@ -39,6 +39,21 @@
 #   jaeger_gin_endpoint: '192.168.226.140:4317'
 
 
+sentinel:
+  app:
+    name: goods_web
+    type: 0
+  log:
+    dir: "./temp/csp"
+    pid: false
+    metric:
+      maxFileCount: 14
+      flushIntervalSec: 1
+  stat:
+    globalStatisticIntervalMsTotal: 6000
+    system:
+      collectIntervalMs: 1000
+
 # log:
 #   level: "debug"
 #   filepath: "./temp/logs/"
@@ -46,6 +61,8 @@
 #   max_size: 200
 #   max_age: 30
 #   max_backups: 7
+
+
 
 nacos:
   host: '192.168.226.140'

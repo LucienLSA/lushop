@@ -7,10 +7,13 @@ import (
 	"goodsweb/forms"
 	"goodsweb/global"
 	"goodsweb/proto"
-
 	"net/http"
 	"strconv"
 
+	sentinel "github.com/alibaba/sentinel-golang/api"
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
+
+	"github.com/alibaba/sentinel-golang/core/base"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -58,6 +61,16 @@ func List(ctx *gin.Context) {
 	brandIdInt, _ := strconv.Atoi(brandId)
 	request.Brand = int32(brandIdInt)
 
+	// 添加限流熔断规则
+	e, b := sentinel.Entry(global.ServerConfig.SentinelInfo.App.Name, sentinel.WithTrafficType(base.Inbound))
+	if b != nil {
+		otelzap.S().Warnf("请求过于频繁，请稍后重试", b.Error())
+		ctx.JSON(http.StatusTooManyRequests, gin.H{
+			"msg": "请求过于频繁，请稍后重试",
+		})
+		return
+	}
+
 	// 请求商品的service服务
 	rsp, err := global.GoodsSrvClient.GoodsList(context.Background(), request)
 	if err != nil {
@@ -65,6 +78,8 @@ func List(ctx *gin.Context) {
 		api.HandleGrpcErrorToHttp(err, ctx)
 		return
 	}
+	e.Exit()
+
 	// 业务层决定返回哪些数据
 	reMap := map[string]interface{}{
 		"total": rsp.Total,

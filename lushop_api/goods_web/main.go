@@ -62,6 +62,9 @@ func main() {
 	initialize.SrvConn()
 	zap.S().Info("init SrcConn and nacos success")
 
+	// 初始化sentinel
+	initialize.Sentinel()
+
 	// 8. 初始化可用端口，debug模式则指定端口
 	mode := global.GetEnvInfoBool(global.Mode)
 	if !mode {

@@ -2,7 +2,7 @@ package initialize
 
 import (
 	"fmt"
-	"lushopapi/oss_web/global"
+	"ossweb/global"
 
 	"reflect"
 	"strings"

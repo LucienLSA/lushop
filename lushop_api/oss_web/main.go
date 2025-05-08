@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"lushopapi/oss_web/global"
-	"lushopapi/oss_web/initialize"
-	"lushopapi/oss_web/utils"
-	"lushopapi/oss_web/utils/register/consul"
+	"ossweb/global"
+	"ossweb/initialize"
+	"ossweb/utils"
+	"ossweb/utils/register/consul"
 	"strconv"
 
 	"os"

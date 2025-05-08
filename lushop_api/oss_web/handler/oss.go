@@ -2,8 +2,8 @@ package handler
 
 import (
 	"fmt"
-	"lushopapi/oss_web/global"
-	"lushopapi/oss_web/utils"
+	"ossweb/global"
+	"ossweb/utils"
 
 	"net/http"
 	"net/url"

@@ -15,7 +15,7 @@ import (
 	"hash"
 	"io"
 	"io/ioutil"
-	"lushopapi/oss_web/global"
+	"ossweb/global"
 
 	"net/http"
 	"strconv"

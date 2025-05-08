@@ -3,8 +3,8 @@ package middlewares
 import (
 	"errors"
 
-	"lushopapi/oss_web/global"
-	"lushopapi/oss_web/models"
+	"ossweb/global"
+	"ossweb/models"
 
 	"net/http"
 	"time"

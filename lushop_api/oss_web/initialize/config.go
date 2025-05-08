@@ -3,7 +3,7 @@ package initialize
 import (
 	"encoding/json"
 	"fmt"
-	"lushopapi/oss_web/global"
+	"ossweb/global"
 
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"

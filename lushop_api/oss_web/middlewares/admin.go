@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	"lushopapi/oss_web/models"
 	"net/http"
+	"ossweb/models"
 
 	"github.com/gin-gonic/gin"
 )

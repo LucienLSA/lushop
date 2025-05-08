@@ -1,3 +1,18 @@
+/*
+ Navicat Premium Data Transfer
+
+ Source Server         : centos7
+ Source Server Type    : MySQL
+ Source Server Version : 50731
+ Source Host           : 192.168.0.104:3306
+ Source Schema         : mxshop_goods_srv
+
+ Target Server Type    : MySQL
+ Target Server Version : 50731
+ File Encoding         : 65001
+
+ Date: 20/04/2021 16:21:47
+*/
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
@@ -26,10 +41,10 @@ INSERT INTO `banner` VALUES (3, '2020-10-04 13:01:42', 1, '2020-12-24 12:26:32',
 INSERT INTO `banner` VALUES (4, '2020-10-04 13:04:51', 0, '2020-10-04 13:04:51', 'http://shop.projectsedu.com/media/banner/banner3_u5SU5y2.jpg', '426', 3, NULL);
 
 -- ----------------------------
--- Table structure for brand
+-- Table structure for brands
 -- ----------------------------
-DROP TABLE IF EXISTS `brand`;
-CREATE TABLE `brand`  (
+DROP TABLE IF EXISTS `brands`;
+CREATE TABLE `brands`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `logo` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
@@ -38,151 +53,131 @@ CREATE TABLE `brand`  (
   `update_time` datetime(3) NULL DEFAULT NULL,
   `deleted_at` datetime(3) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `brand_name`(`name`) USING BTREE
+  UNIQUE INDEX `brands_name`(`name`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1113 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Records of brand
+-- Records of brands
 -- ----------------------------
-INSERT INTO `brand` VALUES (614, '京觅', 'https://img30.360buyimg.com/popshop/jfs/t1/5871/24/8604/4075/5baa0148E93f1a75f/3ea946875c373491.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (616, '佳农（Goodfarmer）', 'https://img30.360buyimg.com/popshop/jfs/t1585/164/34798472/47804/ccfc4032/555061e9Ne78b8563.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (618, '壹农壹果', 'https://img30.360buyimg.com/popshop/jfs/t3148/339/6218763594/13705/2efaf19e/58a17f5fNf29a51cd.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (622, '西域美农', 'https://img30.360buyimg.com/popshop/jfs/t2428/114/2893255306/5394/6d2f141f/56f8a0feN621521bc.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (624, '顾一', 'https://img30.360buyimg.com/popshop/jfs/t1/98183/9/11949/4649/5e3fb8ceEaef5fdc5/8764ab0c94d48c0a.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (626, '顶端果业', 'https://img30.360buyimg.com/popshop/jfs/t11515/131/2176783/25707/782720c7/59e57a30N97306a9c.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (628, '涵果', 'https://img30.360buyimg.com/popshop/jfs/t1/10755/20/8366/16226/5c3435a9E8d1a7e2f/3bddc731bcb3c581.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (632, '华圣', 'https://img30.360buyimg.com/popshop/jfs/t2620/301/878291984/19773/c543147f/5729c77aN90f40f26.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (634, '自然搭档（zirandadang）', 'https://img30.360buyimg.com/popshop/jfs/t22132/250/1839564775/26396/84a8ef0b/5b35ee0dNb486d787.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (644, '日日顺乐农', 'https://img30.360buyimg.com/popshop/jfs/t1/90483/17/16572/8564/5e7dd5beE18ded905/db8e65d708324cb4.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (646, '静益乐源', 'https://img30.360buyimg.com/popshop/jfs/t3052/129/777351201/20943/e9cef945/57bed719N631c0dea.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (656, 'Member\'s Mark', 'https://img30.360buyimg.com/popshop/jfs/t1/4697/3/3765/3529/5b9a28e2E18f035a6/357a3b159027c731.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (658, '鑫富百（xinfubai）', 'https://img30.360buyimg.com/popshop/jfs/t1/94995/39/14447/31120/5e6733a8E0c39fee6/1c007a2604b8a38a.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (660, '金山湾（JINSHANWAN）', 'https://img30.360buyimg.com/popshop/jfs/t5806/357/5735743541/35667/54eee36e/5964665fNfc636c5e.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (662, '鼎端', 'https://img30.360buyimg.com/popshop/jfs/t1/25767/24/4810/4919/5c359a1aEdf6630cb/db1b4eba0e018f11.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (666, '迎春鸟', 'https://img30.360buyimg.com/popshop/jfs/t1/20377/13/10888/826449/5c8a030fE43434d22/bf1a0af451ad43f8.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (674, '果惠缘', 'https://img30.360buyimg.com/popshop/jfs/t23884/293/2453164405/33479/bc0bb37/5b800a6bN28b899c8.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (680, '文果', 'https://img30.360buyimg.com/popshop/jfs/t706/9/49009931/38911/1d6a6d3f/548051e2Nd234d936.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (684, '寻真', 'https://img30.360buyimg.com/popshop/g14/M07/00/07/rBEhVlNbtbQIAAAAAABkSa5aPwgAAMntgP-L6sAAGRh809.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (686, '亿果争鲜', 'https://img30.360buyimg.com/popshop/jfs/t17983/342/393166735/828314/aa9b33be/5a731071Nce292d16.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (690, '远来食家', 'https://img30.360buyimg.com/popshop/jfs/t1/37309/20/7570/40117/5ccaf5a7Ea9febc70/2fa6a872ed392a0c.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (694, '富原红（FUYUANHONG）', 'https://img30.360buyimg.com/popshop/jfs/t1/115973/23/1176/6671/5e95511cEe618589d/d84f5c0396667b1a.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (698, '鲜果皇', 'https://img30.360buyimg.com/popshop/jfs/t22663/338/81137819/92156/668368cf/5b24c0baNf5da5dc8.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (700, '轻恋', 'https://img30.360buyimg.com/popshop/jfs/t24610/95/2110296376/51317/db69af18/5bc46670Nb5f90f28.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (702, '东方态美', 'https://img30.360buyimg.com/popshop/jfs/t23314/127/442563992/39146/9ba3f6eb/5b2f9439N4030968b.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (704, '马小二果园', 'https://img30.360buyimg.com/popshop/jfs/t1/25674/39/4874/4757/5c359a52E7944de42/f097ca6d40eb1b6e.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (706, '寻天果蔬', 'https://img30.360buyimg.com/popshop/jfs/t1/23461/30/1265/5760/5c10c291E59e4e564/4dded6109b3df887.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (708, '优木良品', 'https://img30.360buyimg.com/popshop/jfs/t25162/349/1258050025/5982/47d5695f/5b90c92cNd94f8dca.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (712, '广兴果园', 'https://img30.360buyimg.com/popshop/jfs/t20092/130/2427558315/37504/72a3257a/5b42bb65Ne0012800.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (714, '怡果鲜', 'https://img30.360buyimg.com/popshop/jfs/t1/63352/5/6402/130379/5d47f1efEe463f5e8/5c3dfe917b646ce1.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (716, '蜀果源', 'https://img30.360buyimg.com/popshop/jfs/t12334/42/62039283/998519/f2798575/5a02b3b7N2cd2877f.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (718, '飞犇', 'https://img30.360buyimg.com/popshop/jfs/t1/108792/32/12849/2711/5e9bc408E8addedf6/9daffdc94d93743f.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (728, '百运通', 'https://img30.360buyimg.com/popshop/popshop/jfs/t18223/230/782917118/28141/a32ebf17/5aa7a4f2N44a49c01.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (736, '玉靖生鲜', 'https://img30.360buyimg.com/popshop/jfs/t1/81250/1/143/29130/5ce36b56Eabfd2396/7f0f386f942d8ac0.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (742, '三萌果蔬', 'https://img30.360buyimg.com/popshop/jfs/t1/94059/10/14871/8326/5e6b3664Eea17f4ef/2b606e8df10c0648.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (748, '拾橙', 'https://img30.360buyimg.com/popshop/jfs/t27820/343/388444462/6111/19b40b66/5b90c84eNbe603283.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (758, '方盛（FANGSHENG）', 'https://img30.360buyimg.com/popshop/jfs/t1/140152/29/2812/2501160/5f0d59d1E57962081/dfe6b6b3a5aca50d.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (760, '希果贝贝', 'https://img30.360buyimg.com/popshop/jfs/t1/110632/1/16719/13316/5eb3b905E88dd8104/74e09f7ce4ef09e7.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (768, 'VAKADA', 'https://img30.360buyimg.com/popshop/jfs/t1/9862/5/6129/15073/5bdff587Ec9fda753/a0f0c95e85d9b2ff.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (770, '怡然优果（YrYGO）', 'https://img30.360buyimg.com/popshop/jfs/t1/9271/6/12421/9033/5c359a92E72ca27c9/358b14b1a734ed40.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (772, '安绿源（ALY）', 'https://img30.360buyimg.com/popshop/jfs/t10657/184/649957083/23222/94525d33/59d5bb1aN6a6dd0d5.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (776, '佑家果园', 'https://img30.360buyimg.com/popshop/jfs/t1/71097/40/12635/89136/5da15e23Ebb55bdd2/e0b97adcd517bbe8.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (780, '胡小哥', 'https://img30.360buyimg.com/popshop/jfs/t1/58893/38/13167/2010/5da13008E174320d3/41a2474840fc8529.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (782, '十七岁的甜', 'https://img30.360buyimg.com/popshop/jfs/t1/54767/8/14692/48890/5db7f522Eb125a0f3/c56cf5a8f674e695.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (786, '友谊森', 'https://img30.360buyimg.com/popshop/jfs/t21817/264/1061099399/292770/5c8abd73/5b1f2f35N82744cdd.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (788, '彭衙天品', 'https://img30.360buyimg.com/popshop/jfs/t1/131582/9/1248/8170/5ed70a06E0e80893c/022054dbbccf2119.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (792, '鲜临食感', 'https://img30.360buyimg.com/popshop/jfs/t1/101016/4/10022/8222/5e14a3e0Ead7fe403/5bd0c81df03443fc.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (794, '康乐欣', 'https://img30.360buyimg.com/popshop/jfs/t27583/77/406172868/3405/54b85e37/5b90c795N827bee15.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (798, '果九妹', 'https://img30.360buyimg.com/popshop/jfs/t1/144947/21/532/13686/5ee3222fE100aa1a4/9546000409218205.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (800, '集鲜锋', 'https://img30.360buyimg.com/popshop/jfs/t19552/98/263350164/49823/3c3c0943/5a66ef15Nc3904ed3.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (808, '西域美猴', 'https://img30.360buyimg.com/popshop/jfs/t1/110936/5/5147/30151/5eb25975Eff4d6318/d7d838ad936e9ac4.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (814, '果臻美（GUOZHENMEI）', 'https://img30.360buyimg.com/popshop/jfs/t1/32512/32/2202/49110/5c6690c9E6cdcaeb6/7379f454624c080c.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (822, '上邱山', 'https://img30.360buyimg.com/popshop/jfs/t1/114287/3/9034/53486/5ed60ceaE615d5acf/b404cfd7e607caaf.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (840, '愉果（yuguo）', 'https://img30.360buyimg.com/popshop/jfs/t21343/56/1961979761/30061/90179fc5/5b3f0d32N9d51784b.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (842, '桃又淘（tao you tao）', 'https://img30.360buyimg.com/popshop/jfs/t1/23408/40/11532/67882/5c8fb313E7f1a9ed7/ea6d58b6d6c6b966.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (844, '秦义（QINYI）', 'https://img30.360buyimg.com/popshop/jfs/t1/2715/11/11249/31289/5bcee3c7E8c2d45f1/ff59f1751adca260.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (846, '小博生鲜', 'https://img30.360buyimg.com/popshop/jfs/t1/91824/22/9295/58719/5e0d4eb1E4c0158e6/9f5f6b7d2d25b112.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (850, '湖马鼎鲜', 'https://img30.360buyimg.com/popshop/jfs/t1/43509/13/4781/504698/5cda551eE5d6b03d8/21a0fd1bdf49d38e.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (852, '天山玉', 'https://img30.360buyimg.com/popshop/jfs/t1/61410/10/15837/15111/5dd39901E2d48d731/69a293235a7611da.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (856, '藩鲜（panxian）', 'https://img30.360buyimg.com/popshop/jfs/t5620/227/2757558902/9792/7101341f/59336641N40cbcf0d.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (860, '柿景', 'https://img30.360buyimg.com/popshop/jfs/t1/65130/15/2130/8385/5d0733a0Eb1ac89d5/4df0abb9098aa2ba.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (866, '鸢语', 'https://img30.360buyimg.com/popshop/jfs/t1/101624/40/16933/307076/5e816062E63e56614/aa44131ada4b5652.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (882, '仙迹寻踪', 'https://img30.360buyimg.com/popshop/jfs/t1/14787/29/1316/3277/5c10c1b5E194ecba5/01053d90cba0f75f.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (886, '杨沃果', 'https://img30.360buyimg.com/popshop/jfs/t1/101826/15/8693/37287/5e05b4f3Ef052edae/ef4dd56713617c25.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (890, '云依禾农庄', 'https://img30.360buyimg.com/popshop/jfs/t1/8624/24/1545/23434/5bcecd92E15efb700/d368fd88f68b5ee7.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (900, '李绅', 'https://img30.360buyimg.com/popshop/jfs/t5659/98/9928396528/18485/1b724bc2/598ac10fN3a8a3d3b.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (904, '佰里康', 'https://img30.360buyimg.com/popshop/jfs/t1/50397/37/12139/871063/5d90798aEc4626783/9fab43baed14805f.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (910, '帆儿庄园', 'https://img30.360buyimg.com/popshop/jfs/t3202/300/4749429748/52205/ecab7862/585154c9Nbb8c3e89.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (914, '铁坡（tiepo）', 'https://img30.360buyimg.com/popshop/jfs/t1/53311/5/2601/139218/5d072d4aEcc3aa22d/f22a4907117b9ea3.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (918, '爱常鲜儿', 'https://img30.360buyimg.com/popshop/jfs/t4921/285/1477646944/41453/bb9e8a1c/58f0e8f2N454b99bd.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
-INSERT INTO `brand` VALUES (922, '新边界', 'https://img30.360buyimg.com/popshop/jfs/t1/17102/22/1850/3674/5c174cb8Ec6b60348/6e94392cc5db157b.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (930, '诚成果', 'https://img30.360buyimg.com/popshop/jfs/t1/107020/40/19661/57884/5ea00570E0bf18750/8035cb4f48c3b1b0.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (934, '鲜果小镇', 'https://img30.360buyimg.com/popshop/jfs/t1/4043/26/3293/3906/5b98e90eE4a3c00aa/5f7edd51f4e083bd.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (936, '山胖子', 'https://img30.360buyimg.com/popshop/jfs/t1354/128/297143733/43837/143c03ef/556e5132N94adfb0a.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (938, '果王佳园（GUOWANGJIAYUAN）', 'https://img30.360buyimg.com/popshop/jfs/t5953/69/557797935/35553/e621cb50/592939daN0ed1b912.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (940, '密之蓝天（Mi Zhi Lan Tian）', 'https://img30.360buyimg.com/popshop/jfs/t19006/198/730721150/47523/43f02de/5aa0f6c6N206457e5.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (942, '心疆农哥', 'https://img30.360buyimg.com/popshop/jfs/t1/100602/24/12292/10553/5e47c2f8E8d7af0b1/bf502543c495d73f.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (948, '旬邑红（RED XUNYI）', 'https://img30.360buyimg.com/popshop/jfs/t5614/213/3288765134/924670/8684fb9f/59393d0eN7bdb9b1a.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (950, '果然优', 'https://img30.360buyimg.com/popshop/jfs/t1/113981/37/11122/49253/5ef88f69Ecc60850d/411c27f7b96a8f2c.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (964, '拾亩记', 'https://img30.360buyimg.com/popshop/jfs/t6739/299/1630614351/29051/a47f9456/5954983fN2f665b13.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (974, '延安苹果（yan an apple）', 'https://img30.360buyimg.com/popshop/jfs/t16888/228/522793662/53295/85ca4585/5a90c9b9N2c52ae56.png', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (976, '生鲜猫', 'https://img30.360buyimg.com/popshop/jfs/t5509/80/2284213647/528019/88761339/591953e9N7f627660.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (978, '泰和生活（harmoniouslife）', 'https://img30.360buyimg.com/popshop/jfs/t3142/129/4361485573/38776/bf70f60c/583e43a4N4e53359e.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (984, '那口老井', 'https://img30.360buyimg.com/popshop/popshop/jfs/t17956/20/931368932/49274/753c99cd/5ab1f43fNdcd8490c.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (986, '坤力丰', 'https://img30.360buyimg.com/popshop/jfs/t1/78760/18/7946/10409/5d5cefa8Ebd79a9fe/3c2e193fb82b4c5c.png', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (992, '彩虹云宝', 'https://img30.360buyimg.com/popshop/jfs/t6430/358/1013711651/20646/fdbfbf03/5948c23bN8ddf1267.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1002, '唐果食光', 'https://img30.360buyimg.com/popshop/jfs/t1/2047/31/274/5454/5b90c882E011057e5/f9d29e6a32c31896.png', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1006, '雪兰（xuelan）', 'https://img30.360buyimg.com/popshop/jfs/t18766/284/363501049/66592/872b279d/5a702b4dNed37ac6a.png', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1008, '农派三叔', 'https://img30.360buyimg.com/popshop/jfs/t1/3279/16/290/4678/5b90c7eeEea918be8/839e5619ca78dd1b.png', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1014, '奇愿', 'https://img30.360buyimg.com/popshop/jfs/t1/108949/22/4430/9975/5e1fcf0bE130694ed/218e0246a8115bf6.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1020, '榴鲜生（Liuxiansheng）', 'https://img30.360buyimg.com/popshop/jfs/t1981/281/1229119210/30512/93298c07/564fd226N327287f8.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1024, '果支路', 'https://img30.360buyimg.com/popshop/jfs/t1/106239/18/17961/11484/5e8f01d6E921ef254/d797a90cc5955ee4.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1026, '甄歆', 'https://img30.360buyimg.com/popshop/jfs/t22735/169/1883276999/39400/28867086/5b6bfdfcNd552f745.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1032, '悠嘉', 'https://img30.360buyimg.com/popshop/jfs/t11068/316/231672836/12578/5e08238/59eada81N06415c3d.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1036, '优仙果', 'https://img30.360buyimg.com/popshop/jfs/t7900/164/2969229170/33297/7884452d/59b89ddeNbe536838.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1040, '中鲜生', 'https://img30.360buyimg.com/popshop/jfs/t1/60025/3/12496/2427/5d9ebdfbE699644c3/1ec8f93baadc73f8.png', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1044, '猕小呆', 'https://img30.360buyimg.com/popshop/jfs/t27094/348/157546591/21031/9d400fae/5b876bf6Nbb2be379.png', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1052, '同人和众', 'https://img30.360buyimg.com/popshop/jfs/t22066/274/1667249711/136857/40af5eca/5b30541aN1fd64725.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1056, '莹多爱（YINGDUOAI）', 'https://img30.360buyimg.com/popshop/jfs/t22348/304/556260843/34388/9662fc3e/5b10c6f4Na1ad0468.png', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1060, '皕宝楼', 'https://img30.360buyimg.com/popshop/jfs/t8935/79/2344947535/32534/559de287/59ccaa19Nfa0bc3f7.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1062, '农大姐妹', 'https://img30.360buyimg.com/popshop/jfs/t5320/91/2445609580/13263/b80cce1e/591c1d8eN7122ce1f.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1070, 'NANGUOXIANSHENG', 'https://img30.360buyimg.com/popshop/jfs/t1/27593/10/6451/55894/5c5454f6E8f06ef37/9b7228325b981093.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1072, '果鲜岛', 'https://img30.360buyimg.com/popshop/jfs/t1/94109/7/17803/18589/5e8bf27fE08c90b3f/78cf629a35c6db1f.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1080, '缤咕', 'https://img30.360buyimg.com/popshop/jfs/t3121/77/206617348/35396/b6553f8b/57aafbe0N12c1f027.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1084, '鲜伶伶', 'https://img30.360buyimg.com/popshop/jfs/t11860/251/2303768324/24051/61960e4f/5a6a9c25Nfbb9aff7.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1088, '熊猫兔', 'https://img30.360buyimg.com/popshop/jfs/t1/37807/23/7014/4006/5cc7fa81E785cd50c/feab1429dfcff5f6.png', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1092, '好果源（NICEFRUITSOURCE）', 'https://img30.360buyimg.com/popshop/jfs/t145/81/1910648954/56784/afb22b71/53bfb3d0Nb081e281.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1096, '迈啃吱（MAIKENZHI）', 'https://img30.360buyimg.com/popshop/jfs/t1/120653/33/3465/12095/5ed0e5e1Eddf1cb5c/8925a04c174a6b05.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1100, '京豆云', 'https://img30.360buyimg.com/popshop/jfs/t1/74621/7/10525/29776/5d81a868Ebdab6ad1/7a278e4800fd9a70.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1104, '糖老板', 'https://img30.360buyimg.com/popshop/jfs/t1/89449/28/18357/14330/5e95450eE0fb2e5d9/8c5b6cf33bccbe98.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1106, '紫玉', 'https://img30.360buyimg.com/popshop/jfs/t4618/132/662882030/14648/87b84291/58d33ac6N934499ff.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1108, '欧蜜（OUMI）', 'https://img30.360buyimg.com/popshop/jfs/t1/953/9/552/4974/5b90c7fcE888c7d38/e380c68a4ef6fd30.png', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1110, '大胖猴', 'https://img30.360buyimg.com/popshop/jfs/t1/97196/27/14088/4087/5e6088c8Eb2253c85/340bd56c1129d2d4.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
-INSERT INTO `brand` VALUES (1111, 'TQ%0Rm', 'mailto://pdqmn.sc/mlxjmyfu', '2020-10-03 22:21:47.000', 1, '2020-10-03 22:22:26.000', NULL);
-INSERT INTO `brand` VALUES (1112, '我的品牌', 'http://mxshop-files.oss-cn-hangzhou.aliyuncs.com/mxshop-images/pic.jpg', '2020-12-24 12:10:52.000', 0, '2020-12-24 12:10:52.000', NULL);
+INSERT INTO `brands` VALUES (614, '京觅', 'https://img30.360buyimg.com/popshop/jfs/t1/5871/24/8604/4075/5baa0148E93f1a75f/3ea946875c373491.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (616, '佳农（Goodfarmer）', 'https://img30.360buyimg.com/popshop/jfs/t1585/164/34798472/47804/ccfc4032/555061e9Ne78b8563.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (618, '壹农壹果', 'https://img30.360buyimg.com/popshop/jfs/t3148/339/6218763594/13705/2efaf19e/58a17f5fNf29a51cd.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (622, '西域美农', 'https://img30.360buyimg.com/popshop/jfs/t2428/114/2893255306/5394/6d2f141f/56f8a0feN621521bc.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (624, '顾一', 'https://img30.360buyimg.com/popshop/jfs/t1/98183/9/11949/4649/5e3fb8ceEaef5fdc5/8764ab0c94d48c0a.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (626, '顶端果业', 'https://img30.360buyimg.com/popshop/jfs/t11515/131/2176783/25707/782720c7/59e57a30N97306a9c.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (628, '涵果', 'https://img30.360buyimg.com/popshop/jfs/t1/10755/20/8366/16226/5c3435a9E8d1a7e2f/3bddc731bcb3c581.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (632, '华圣', 'https://img30.360buyimg.com/popshop/jfs/t2620/301/878291984/19773/c543147f/5729c77aN90f40f26.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (634, '自然搭档（zirandadang）', 'https://img30.360buyimg.com/popshop/jfs/t22132/250/1839564775/26396/84a8ef0b/5b35ee0dNb486d787.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (644, '日日顺乐农', 'https://img30.360buyimg.com/popshop/jfs/t1/90483/17/16572/8564/5e7dd5beE18ded905/db8e65d708324cb4.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (646, '静益乐源', 'https://img30.360buyimg.com/popshop/jfs/t3052/129/777351201/20943/e9cef945/57bed719N631c0dea.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (656, 'Member\'s Mark', 'https://img30.360buyimg.com/popshop/jfs/t1/4697/3/3765/3529/5b9a28e2E18f035a6/357a3b159027c731.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (658, '鑫富百（xinfubai）', 'https://img30.360buyimg.com/popshop/jfs/t1/94995/39/14447/31120/5e6733a8E0c39fee6/1c007a2604b8a38a.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (660, '金山湾（JINSHANWAN）', 'https://img30.360buyimg.com/popshop/jfs/t5806/357/5735743541/35667/54eee36e/5964665fNfc636c5e.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (662, '鼎端', 'https://img30.360buyimg.com/popshop/jfs/t1/25767/24/4810/4919/5c359a1aEdf6630cb/db1b4eba0e018f11.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (666, '迎春鸟', 'https://img30.360buyimg.com/popshop/jfs/t1/20377/13/10888/826449/5c8a030fE43434d22/bf1a0af451ad43f8.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (674, '果惠缘', 'https://img30.360buyimg.com/popshop/jfs/t23884/293/2453164405/33479/bc0bb37/5b800a6bN28b899c8.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (680, '文果', 'https://img30.360buyimg.com/popshop/jfs/t706/9/49009931/38911/1d6a6d3f/548051e2Nd234d936.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (684, '寻真', 'https://img30.360buyimg.com/popshop/g14/M07/00/07/rBEhVlNbtbQIAAAAAABkSa5aPwgAAMntgP-L6sAAGRh809.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (686, '亿果争鲜', 'https://img30.360buyimg.com/popshop/jfs/t17983/342/393166735/828314/aa9b33be/5a731071Nce292d16.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (690, '远来食家', 'https://img30.360buyimg.com/popshop/jfs/t1/37309/20/7570/40117/5ccaf5a7Ea9febc70/2fa6a872ed392a0c.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (694, '富原红（FUYUANHONG）', 'https://img30.360buyimg.com/popshop/jfs/t1/115973/23/1176/6671/5e95511cEe618589d/d84f5c0396667b1a.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (698, '鲜果皇', 'https://img30.360buyimg.com/popshop/jfs/t22663/338/81137819/92156/668368cf/5b24c0baNf5da5dc8.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (700, '轻恋', 'https://img30.360buyimg.com/popshop/jfs/t24610/95/2110296376/51317/db69af18/5bc46670Nb5f90f28.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (702, '东方态美', 'https://img30.360buyimg.com/popshop/jfs/t23314/127/442563992/39146/9ba3f6eb/5b2f9439N4030968b.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (704, '马小二果园', 'https://img30.360buyimg.com/popshop/jfs/t1/25674/39/4874/4757/5c359a52E7944de42/f097ca6d40eb1b6e.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (706, '寻天果蔬', 'https://img30.360buyimg.com/popshop/jfs/t1/23461/30/1265/5760/5c10c291E59e4e564/4dded6109b3df887.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (708, '优木良品', 'https://img30.360buyimg.com/popshop/jfs/t25162/349/1258050025/5982/47d5695f/5b90c92cNd94f8dca.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (712, '广兴果园', 'https://img30.360buyimg.com/popshop/jfs/t20092/130/2427558315/37504/72a3257a/5b42bb65Ne0012800.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (714, '怡果鲜', 'https://img30.360buyimg.com/popshop/jfs/t1/63352/5/6402/130379/5d47f1efEe463f5e8/5c3dfe917b646ce1.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (716, '蜀果源', 'https://img30.360buyimg.com/popshop/jfs/t12334/42/62039283/998519/f2798575/5a02b3b7N2cd2877f.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (718, '飞犇', 'https://img30.360buyimg.com/popshop/jfs/t1/108792/32/12849/2711/5e9bc408E8addedf6/9daffdc94d93743f.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (728, '百运通', 'https://img30.360buyimg.com/popshop/popshop/jfs/t18223/230/782917118/28141/a32ebf17/5aa7a4f2N44a49c01.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (736, '玉靖生鲜', 'https://img30.360buyimg.com/popshop/jfs/t1/81250/1/143/29130/5ce36b56Eabfd2396/7f0f386f942d8ac0.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (742, '三萌果蔬', 'https://img30.360buyimg.com/popshop/jfs/t1/94059/10/14871/8326/5e6b3664Eea17f4ef/2b606e8df10c0648.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (748, '拾橙', 'https://img30.360buyimg.com/popshop/jfs/t27820/343/388444462/6111/19b40b66/5b90c84eNbe603283.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (758, '方盛（FANGSHENG）', 'https://img30.360buyimg.com/popshop/jfs/t1/140152/29/2812/2501160/5f0d59d1E57962081/dfe6b6b3a5aca50d.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (760, '希果贝贝', 'https://img30.360buyimg.com/popshop/jfs/t1/110632/1/16719/13316/5eb3b905E88dd8104/74e09f7ce4ef09e7.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (768, 'VAKADA', 'https://img30.360buyimg.com/popshop/jfs/t1/9862/5/6129/15073/5bdff587Ec9fda753/a0f0c95e85d9b2ff.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (770, '怡然优果（YrYGO）', 'https://img30.360buyimg.com/popshop/jfs/t1/9271/6/12421/9033/5c359a92E72ca27c9/358b14b1a734ed40.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (772, '安绿源（ALY）', 'https://img30.360buyimg.com/popshop/jfs/t10657/184/649957083/23222/94525d33/59d5bb1aN6a6dd0d5.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (776, '佑家果园', 'https://img30.360buyimg.com/popshop/jfs/t1/71097/40/12635/89136/5da15e23Ebb55bdd2/e0b97adcd517bbe8.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (780, '胡小哥', 'https://img30.360buyimg.com/popshop/jfs/t1/58893/38/13167/2010/5da13008E174320d3/41a2474840fc8529.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (782, '十七岁的甜', 'https://img30.360buyimg.com/popshop/jfs/t1/54767/8/14692/48890/5db7f522Eb125a0f3/c56cf5a8f674e695.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (786, '友谊森', 'https://img30.360buyimg.com/popshop/jfs/t21817/264/1061099399/292770/5c8abd73/5b1f2f35N82744cdd.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (788, '彭衙天品', 'https://img30.360buyimg.com/popshop/jfs/t1/131582/9/1248/8170/5ed70a06E0e80893c/022054dbbccf2119.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (792, '鲜临食感', 'https://img30.360buyimg.com/popshop/jfs/t1/101016/4/10022/8222/5e14a3e0Ead7fe403/5bd0c81df03443fc.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (794, '康乐欣', 'https://img30.360buyimg.com/popshop/jfs/t27583/77/406172868/3405/54b85e37/5b90c795N827bee15.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (798, '果九妹', 'https://img30.360buyimg.com/popshop/jfs/t1/144947/21/532/13686/5ee3222fE100aa1a4/9546000409218205.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (800, '集鲜锋', 'https://img30.360buyimg.com/popshop/jfs/t19552/98/263350164/49823/3c3c0943/5a66ef15Nc3904ed3.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (808, '西域美猴', 'https://img30.360buyimg.com/popshop/jfs/t1/110936/5/5147/30151/5eb25975Eff4d6318/d7d838ad936e9ac4.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (814, '果臻美（GUOZHENMEI）', 'https://img30.360buyimg.com/popshop/jfs/t1/32512/32/2202/49110/5c6690c9E6cdcaeb6/7379f454624c080c.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (822, '上邱山', 'https://img30.360buyimg.com/popshop/jfs/t1/114287/3/9034/53486/5ed60ceaE615d5acf/b404cfd7e607caaf.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (840, '愉果（yuguo）', 'https://img30.360buyimg.com/popshop/jfs/t21343/56/1961979761/30061/90179fc5/5b3f0d32N9d51784b.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (842, '桃又淘（tao you tao）', 'https://img30.360buyimg.com/popshop/jfs/t1/23408/40/11532/67882/5c8fb313E7f1a9ed7/ea6d58b6d6c6b966.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (844, '秦义（QINYI）', 'https://img30.360buyimg.com/popshop/jfs/t1/2715/11/11249/31289/5bcee3c7E8c2d45f1/ff59f1751adca260.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (846, '小博生鲜', 'https://img30.360buyimg.com/popshop/jfs/t1/91824/22/9295/58719/5e0d4eb1E4c0158e6/9f5f6b7d2d25b112.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (850, '湖马鼎鲜', 'https://img30.360buyimg.com/popshop/jfs/t1/43509/13/4781/504698/5cda551eE5d6b03d8/21a0fd1bdf49d38e.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (852, '天山玉', 'https://img30.360buyimg.com/popshop/jfs/t1/61410/10/15837/15111/5dd39901E2d48d731/69a293235a7611da.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (856, '藩鲜（panxian）', 'https://img30.360buyimg.com/popshop/jfs/t5620/227/2757558902/9792/7101341f/59336641N40cbcf0d.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (860, '柿景', 'https://img30.360buyimg.com/popshop/jfs/t1/65130/15/2130/8385/5d0733a0Eb1ac89d5/4df0abb9098aa2ba.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (866, '鸢语', 'https://img30.360buyimg.com/popshop/jfs/t1/101624/40/16933/307076/5e816062E63e56614/aa44131ada4b5652.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (882, '仙迹寻踪', 'https://img30.360buyimg.com/popshop/jfs/t1/14787/29/1316/3277/5c10c1b5E194ecba5/01053d90cba0f75f.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (886, '杨沃果', 'https://img30.360buyimg.com/popshop/jfs/t1/101826/15/8693/37287/5e05b4f3Ef052edae/ef4dd56713617c25.png', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (890, '云依禾农庄', 'https://img30.360buyimg.com/popshop/jfs/t1/8624/24/1545/23434/5bcecd92E15efb700/d368fd88f68b5ee7.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (900, '李绅', 'https://img30.360buyimg.com/popshop/jfs/t5659/98/9928396528/18485/1b724bc2/598ac10fN3a8a3d3b.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (904, '佰里康', 'https://img30.360buyimg.com/popshop/jfs/t1/50397/37/12139/871063/5d90798aEc4626783/9fab43baed14805f.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (910, '帆儿庄园', 'https://img30.360buyimg.com/popshop/jfs/t3202/300/4749429748/52205/ecab7862/585154c9Nbb8c3e89.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (914, '铁坡（tiepo）', 'https://img30.360buyimg.com/popshop/jfs/t1/53311/5/2601/139218/5d072d4aEcc3aa22d/f22a4907117b9ea3.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (918, '爱常鲜儿', 'https://img30.360buyimg.com/popshop/jfs/t4921/285/1477646944/41453/bb9e8a1c/58f0e8f2N454b99bd.jpg', '2020-09-02 01:10:50.000', 0, '2020-09-02 01:10:50.000', NULL);
+INSERT INTO `brands` VALUES (922, '新边界', 'https://img30.360buyimg.com/popshop/jfs/t1/17102/22/1850/3674/5c174cb8Ec6b60348/6e94392cc5db157b.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (930, '诚成果', 'https://img30.360buyimg.com/popshop/jfs/t1/107020/40/19661/57884/5ea00570E0bf18750/8035cb4f48c3b1b0.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (934, '鲜果小镇', 'https://img30.360buyimg.com/popshop/jfs/t1/4043/26/3293/3906/5b98e90eE4a3c00aa/5f7edd51f4e083bd.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (936, '山胖子', 'https://img30.360buyimg.com/popshop/jfs/t1354/128/297143733/43837/143c03ef/556e5132N94adfb0a.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (938, '果王佳园（GUOWANGJIAYUAN）', 'https://img30.360buyimg.com/popshop/jfs/t5953/69/557797935/35553/e621cb50/592939daN0ed1b912.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (940, '密之蓝天（Mi Zhi Lan Tian）', 'https://img30.360buyimg.com/popshop/jfs/t19006/198/730721150/47523/43f02de/5aa0f6c6N206457e5.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (942, '心疆农哥', 'https://img30.360buyimg.com/popshop/jfs/t1/100602/24/12292/10553/5e47c2f8E8d7af0b1/bf502543c495d73f.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (948, '旬邑红（RED XUNYI）', 'https://img30.360buyimg.com/popshop/jfs/t5614/213/3288765134/924670/8684fb9f/59393d0eN7bdb9b1a.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (950, '果然优', 'https://img30.360buyimg.com/popshop/jfs/t1/113981/37/11122/49253/5ef88f69Ecc60850d/411c27f7b96a8f2c.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (964, '拾亩记', 'https://img30.360buyimg.com/popshop/jfs/t6739/299/1630614351/29051/a47f9456/5954983fN2f665b13.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (974, '延安苹果（yan an apple）', 'https://img30.360buyimg.com/popshop/jfs/t16888/228/522793662/53295/85ca4585/5a90c9b9N2c52ae56.png', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (976, '生鲜猫', 'https://img30.360buyimg.com/popshop/jfs/t5509/80/2284213647/528019/88761339/591953e9N7f627660.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (978, '泰和生活（harmoniouslife）', 'https://img30.360buyimg.com/popshop/jfs/t3142/129/4361485573/38776/bf70f60c/583e43a4N4e53359e.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (984, '那口老井', 'https://img30.360buyimg.com/popshop/popshop/jfs/t17956/20/931368932/49274/753c99cd/5ab1f43fNdcd8490c.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (986, '坤力丰', 'https://img30.360buyimg.com/popshop/jfs/t1/78760/18/7946/10409/5d5cefa8Ebd79a9fe/3c2e193fb82b4c5c.png', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (992, '彩虹云宝', 'https://img30.360buyimg.com/popshop/jfs/t6430/358/1013711651/20646/fdbfbf03/5948c23bN8ddf1267.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1002, '唐果食光', 'https://img30.360buyimg.com/popshop/jfs/t1/2047/31/274/5454/5b90c882E011057e5/f9d29e6a32c31896.png', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1006, '雪兰（xuelan）', 'https://img30.360buyimg.com/popshop/jfs/t18766/284/363501049/66592/872b279d/5a702b4dNed37ac6a.png', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1008, '农派三叔', 'https://img30.360buyimg.com/popshop/jfs/t1/3279/16/290/4678/5b90c7eeEea918be8/839e5619ca78dd1b.png', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1014, '奇愿', 'https://img30.360buyimg.com/popshop/jfs/t1/108949/22/4430/9975/5e1fcf0bE130694ed/218e0246a8115bf6.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1020, '榴鲜生（Liuxiansheng）', 'https://img30.360buyimg.com/popshop/jfs/t1981/281/1229119210/30512/93298c07/564fd226N327287f8.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1024, '果支路', 'https://img30.360buyimg.com/popshop/jfs/t1/106239/18/17961/11484/5e8f01d6E921ef254/d797a90cc5955ee4.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1026, '甄歆', 'https://img30.360buyimg.com/popshop/jfs/t22735/169/1883276999/39400/28867086/5b6bfdfcNd552f745.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1032, '悠嘉', 'https://img30.360buyimg.com/popshop/jfs/t11068/316/231672836/12578/5e08238/59eada81N06415c3d.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1036, '优仙果', 'https://img30.360buyimg.com/popshop/jfs/t7900/164/2969229170/33297/7884452d/59b89ddeNbe536838.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1040, '中鲜生', 'https://img30.360buyimg.com/popshop/jfs/t1/60025/3/12496/2427/5d9ebdfbE699644c3/1ec8f93baadc73f8.png', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1044, '猕小呆', 'https://img30.360buyimg.com/popshop/jfs/t27094/348/157546591/21031/9d400fae/5b876bf6Nbb2be379.png', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1052, '同人和众', 'https://img30.360buyimg.com/popshop/jfs/t22066/274/1667249711/136857/40af5eca/5b30541aN1fd64725.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1056, '莹多爱（YINGDUOAI）', 'https://img30.360buyimg.com/popshop/jfs/t22348/304/556260843/34388/9662fc3e/5b10c6f4Na1ad0468.png', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1060, '皕宝楼', 'https://img30.360buyimg.com/popshop/jfs/t8935/79/2344947535/32534/559de287/59ccaa19Nfa0bc3f7.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1062, '农大姐妹', 'https://img30.360buyimg.com/popshop/jfs/t5320/91/2445609580/13263/b80cce1e/591c1d8eN7122ce1f.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1070, 'NANGUOXIANSHENG', 'https://img30.360buyimg.com/popshop/jfs/t1/27593/10/6451/55894/5c5454f6E8f06ef37/9b7228325b981093.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1072, '果鲜岛', 'https://img30.360buyimg.com/popshop/jfs/t1/94109/7/17803/18589/5e8bf27fE08c90b3f/78cf629a35c6db1f.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1080, '缤咕', 'https://img30.360buyimg.com/popshop/jfs/t3121/77/206617348/35396/b6553f8b/57aafbe0N12c1f027.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1084, '鲜伶伶', 'https://img30.360buyimg.com/popshop/jfs/t11860/251/2303768324/24051/61960e4f/5a6a9c25Nfbb9aff7.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1088, '熊猫兔', 'https://img30.360buyimg.com/popshop/jfs/t1/37807/23/7014/4006/5cc7fa81E785cd50c/feab1429dfcff5f6.png', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1092, '好果源（NICEFRUITSOURCE）', 'https://img30.360buyimg.com/popshop/jfs/t145/81/1910648954/56784/afb22b71/53bfb3d0Nb081e281.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1096, '迈啃吱（MAIKENZHI）', 'https://img30.360buyimg.com/popshop/jfs/t1/120653/33/3465/12095/5ed0e5e1Eddf1cb5c/8925a04c174a6b05.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1100, '京豆云', 'https://img30.360buyimg.com/popshop/jfs/t1/74621/7/10525/29776/5d81a868Ebdab6ad1/7a278e4800fd9a70.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1104, '糖老板', 'https://img30.360buyimg.com/popshop/jfs/t1/89449/28/18357/14330/5e95450eE0fb2e5d9/8c5b6cf33bccbe98.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1106, '紫玉', 'https://img30.360buyimg.com/popshop/jfs/t4618/132/662882030/14648/87b84291/58d33ac6N934499ff.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1108, '欧蜜（OUMI）', 'https://img30.360buyimg.com/popshop/jfs/t1/953/9/552/4974/5b90c7fcE888c7d38/e380c68a4ef6fd30.png', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1110, '大胖猴', 'https://img30.360buyimg.com/popshop/jfs/t1/97196/27/14088/4087/5e6088c8Eb2253c85/340bd56c1129d2d4.jpg', '2020-09-02 01:10:51.000', 0, '2020-09-02 01:10:51.000', NULL);
+INSERT INTO `brands` VALUES (1111, 'TQ%0Rm', 'mailto://pdqmn.sc/mlxjmyfu', '2020-10-03 22:21:47.000', 1, '2020-10-03 22:22:26.000', NULL);
+INSERT INTO `brands` VALUES (1112, '我的品牌', 'http://mxshop-files.oss-cn-hangzhou.aliyuncs.com/mxshop-images/pic.jpg', '2020-12-24 12:10:52.000', 0, '2020-12-24 12:10:52.000', NULL);
 
 -- ----------------------------
 -- Table structure for category
 -- ----------------------------
--- DROP TABLE IF EXISTS `category`;
--- CREATE TABLE `category`  (
---   `id` int(11) NOT NULL AUTO_INCREMENT,
---   `name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
---   `parent_category_id` int(11) NULL DEFAULT NULL,
---   `level` int(11) NOT NULL DEFAULT 1,
---   `is_tab` tinyint(1) NOT NULL,
---   `add_time` datetime(3) NULL DEFAULT NULL,
---   `is_deleted` tinyint(255) NULL DEFAULT NULL,
---   `update_time` datetime(3) NULL DEFAULT NULL,
---   `deleted_at` datetime(3) NULL DEFAULT NULL,
---   PRIMARY KEY (`id`) USING BTREE,
---   INDEX `category_name`(`name`) USING BTREE,
---   INDEX `category_parent_category_id`(`parent_category_id`) USING BTREE,
---   CONSTRAINT `category_ibfk_1` FOREIGN KEY (`parent_category_id`) REFERENCES `category` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
---   CONSTRAINT `fk_category_parent_category` FOREIGN KEY (`parent_category_id`) REFERENCES `category` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
---   CONSTRAINT `fk_category_sub_category` FOREIGN KEY (`parent_category_id`) REFERENCES `category` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
--- ) ENGINE = InnoDB AUTO_INCREMENT = 238010 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
-
-
 DROP TABLE IF EXISTS `category`;
 CREATE TABLE `category`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -195,10 +190,12 @@ CREATE TABLE `category`  (
   `update_time` datetime(3) NULL DEFAULT NULL,
   `deleted_at` datetime(3) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
+  INDEX `category_name`(`name`) USING BTREE,
   INDEX `category_parent_category_id`(`parent_category_id`) USING BTREE,
-  CONSTRAINT `category_ibfk_1` FOREIGN KEY (`parent_category_id`) REFERENCES `category` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+  CONSTRAINT `category_ibfk_1` FOREIGN KEY (`parent_category_id`) REFERENCES `category` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `fk_category_parent_category` FOREIGN KEY (`parent_category_id`) REFERENCES `category` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `fk_category_sub_category` FOREIGN KEY (`parent_category_id`) REFERENCES `category` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 238010 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
-
 
 -- ----------------------------
 -- Records of category
@@ -584,7 +581,7 @@ CREATE TABLE `goods`  (
   `is_deleted` tinyint(1) NULL DEFAULT NULL,
   `update_time` datetime(0) NOT NULL,
   `category_id` int(11) NOT NULL,
-  `brand_id` int(11) NOT NULL,
+  `brands_id` int(11) NOT NULL,
   `on_sale` tinyint(1) NOT NULL,
   `goods_sn` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
@@ -602,9 +599,9 @@ CREATE TABLE `goods`  (
   `is_hot` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `goods2_category_id`(`category_id`) USING BTREE,
-  INDEX `goods2_brand_id`(`brand_id`) USING BTREE,
+  INDEX `goods2_brand_id`(`brands_id`) USING BTREE,
   CONSTRAINT `goods_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
-  CONSTRAINT `goods_ibfk_2` FOREIGN KEY (`brand_id`) REFERENCES `brand` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+  CONSTRAINT `goods_ibfk_2` FOREIGN KEY (`brands_id`) REFERENCES `brands` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 844 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -1041,17 +1038,17 @@ DROP TABLE IF EXISTS `goodscategorybrand`;
 CREATE TABLE `goodscategorybrand`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `category_id` int(11) NOT NULL,
-  `brand_id` int(11) NOT NULL,
+  `brands_id` int(11) NOT NULL,
   `add_time` datetime(0) NOT NULL,
   `is_deleted` tinyint(1) NULL DEFAULT NULL,
   `update_time` datetime(0) NOT NULL,
   `deleted_at` datetime(0) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `goodscategorybrand_category_id_brand_id`(`category_id`, `brand_id`) USING BTREE,
+  UNIQUE INDEX `goodscategorybrand_category_id_brand_id`(`category_id`, `brands_id`) USING BTREE,
   INDEX `goodscategorybrand_category_id`(`category_id`) USING BTREE,
-  INDEX `goodscategorybrand_brand_id`(`brand_id`) USING BTREE,
+  INDEX `goodscategorybrand_brand_id`(`brands_id`) USING BTREE,
   CONSTRAINT `goodscategorybrand_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `goodscategorybrand_ibfk_2` FOREIGN KEY (`brand_id`) REFERENCES `brand` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+  CONSTRAINT `goodscategorybrand_ibfk_2` FOREIGN KEY (`brands_id`) REFERENCES `brands` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 25799 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------

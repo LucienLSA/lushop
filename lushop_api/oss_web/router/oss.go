@@ -1,7 +1,7 @@
 package router
 
 import (
-	"lushopapi/oss_web/handler"
+	"ossweb/handler"
 
 	"github.com/gin-gonic/gin"
 )

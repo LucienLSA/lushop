@@ -1,7 +1,7 @@
 package global
 
 import (
-	"lushopapi/oss_web/config"
+	"ossweb/config"
 
 	ut "github.com/go-playground/universal-translator"
 	"github.com/spf13/viper"

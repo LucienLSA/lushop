@@ -2,8 +2,8 @@ package initialize
 
 import (
 	"fmt"
-	"lushopapi/oss_web/middlewares"
-	"lushopapi/oss_web/router"
+	"ossweb/middlewares"
+	"ossweb/router"
 
 	"net/http"
 

@@ -272,7 +272,7 @@ func (v *InventoryServer) Reback(ctx context.Context, req *proto.SellInfo) (*emp
 			tx.Rollback() // 回滚之前的操作
 			return nil, status.Errorf(codes.InvalidArgument, "无库存信息")
 		}
-		// 扣减
+		// 增加库存数量
 		inv.Stocks += goodInfo.Num
 		tx.Save(&inv)
 	}
@@ -318,7 +318,7 @@ func AutoReback(ctx context.Context, me ...*primitive.MessageExt) (consumer.Cons
 			return consumer.ConsumeRetryLater, nil
 		}
 		tx.Commit()
-		return consumer.ConsumeSuccess, nil
+		// return consumer.ConsumeSuccess, nil
 	}
 	return consumer.ConsumeSuccess, nil
 }

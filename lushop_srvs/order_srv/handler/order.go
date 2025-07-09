@@ -271,6 +271,48 @@ func (s *OrderServer) CreateOrder(ctx context.Context, req *proto_order.OrderReq
 	}, nil
 }
 
+// 订单超时
+func OrderTimeout(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
+	for i := range msgs {
+		var orderInfo model.OrderInfo
+		_ = json.Unmarshal(msgs[i].Body, &orderInfo)
+		fmt.Printf("获取到订单的超时消息:%v", time.Now())
+		// 查询订单的支付状态
+		// 如果已支付什么都不做，如果未支付，应该归还库存
+		var order model.OrderInfo
+		result := global.DB.Model(model.OrderInfo{}).
+			Where(model.OrderInfo{OrderSn: orderInfo.OrderSn}).
+			First(&order)
+		if result.RowsAffected == 0 {
+			return consumer.ConsumeSuccess, nil
+		}
+		if order.Status != "TRADE_SUCCESS" {
+			tx := global.DB.Begin()
+			// 归还库存 ， 发送一个普通消息到 order_reback的 topic中
+			// 修改订单的状态为已结束
+			order.Status = "TRADE_CLOSED"
+			tx.Save(&order)
+			p, err := rocketmq.NewProducer(producer.WithNameServer([]string{"192.168.226.140:9876"}))
+			if err != nil {
+				panic(err)
+			}
+			if err = p.Start(); err != nil {
+				panic(err)
+			}
+			_, err = p.SendSync(context.Background(), primitive.NewMessage("order_reback", msgs[i].Body))
+			if err != nil {
+				tx.Rollback()
+				fmt.Printf("发送失败:%s\n", err)
+				return consumer.ConsumeRetryLater, nil
+			}
+			// if err = p.Shutdown(); err != nil {
+			// 	panic(err)
+			// }
+		}
+	}
+	return consumer.ConsumeSuccess, nil
+}
+
 // 订单列表
 func (s *OrderServer) OrderList(ctx context.Context, req *proto_order.OrderFilterRequest) (*proto_order.OrderListResponse, error) {
 	var orders []model.OrderInfo
@@ -339,46 +381,4 @@ func (s *OrderServer) UpdateOrderStatus(ctx context.Context, req *proto_order.Or
 		return nil, status.Errorf(codes.NotFound, "订单不存在")
 	}
 	return &emptypb.Empty{}, nil
-}
-
-// 订单超时
-func OrderTimeout(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
-	for i := range msgs {
-		var orderInfo model.OrderInfo
-		_ = json.Unmarshal(msgs[i].Body, &orderInfo)
-		fmt.Printf("获取到订单的超时消息:%v", time.Now())
-		// 查询订单的支付状态
-		// 如果已支付什么都不做，如果未支付，应该归还库存
-		var order model.OrderInfo
-		result := global.DB.Model(model.OrderInfo{}).
-			Where(model.OrderInfo{OrderSn: orderInfo.OrderSn}).
-			First(&order)
-		if result.RowsAffected == 0 {
-			return consumer.ConsumeSuccess, nil
-		}
-		if order.Status != "TRADE_SUCCESS" {
-			tx := global.DB.Begin()
-			// 归还库存 ， 发送一个普通消息到 order_reback的 topic中
-			// 修改订单的状态为已结束
-			order.Status = "TRADE_CLOSED"
-			tx.Save(&order)
-			p, err := rocketmq.NewProducer(producer.WithNameServer([]string{"192.168.226.140:9876"}))
-			if err != nil {
-				panic(err)
-			}
-			if err = p.Start(); err != nil {
-				panic(err)
-			}
-			_, err = p.SendSync(context.Background(), primitive.NewMessage("order_reback", msgs[i].Body))
-			if err != nil {
-				tx.Rollback()
-				fmt.Printf("发送失败:%s\n", err)
-				return consumer.ConsumeRetryLater, nil
-			}
-			// if err = p.Shutdown(); err != nil {
-			// 	panic(err)
-			// }
-		}
-	}
-	return consumer.ConsumeSuccess, nil
 }

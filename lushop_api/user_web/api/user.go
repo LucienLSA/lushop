@@ -175,20 +175,28 @@ func PassWordLogin(ctx *gin.Context) {
 						Issuer:    "lucien",
 					},
 				}
-				token, err := j.CreateToken(claims)
+				accessToken, err := j.CreateToken(claims)
 				if err != nil {
 					ctx.JSON(http.StatusInternalServerError, gin.H{
 						"msg": "生成token失败",
 					})
 					return
 				}
-
+				// 生成 refresh_token，有更长的有效期
+				refreshClaims := claims
+				refreshClaims.StandardClaims.ExpiresAt = time.Now().Unix() + 7*24*3600 // 7天
+				refreshToken, err := j.CreateToken(refreshClaims)
+				if err != nil {
+					ctx.JSON(http.StatusInternalServerError, gin.H{"msg": "生成refresh_token失败"})
+					return
+				}
 				ctx.JSON(http.StatusOK, gin.H{
-					"msg":        "登录成功",
-					"id":         rsp.Id,
-					"nick_name":  rsp.NickName,
-					"token":      token,
-					"expired_at": (time.Now().Unix() + global.ServerConfig.JwtInfo.ExpireTime) * 1000,
+					"msg":           "登录成功",
+					"id":            rsp.Id,
+					"nick_name":     rsp.NickName,
+					"access_token":  accessToken,
+					"refresh_token": refreshToken,
+					"expired_at":    (time.Now().Unix() + global.ServerConfig.JwtInfo.ExpireTime) * 1000,
 				})
 			} else {
 				zap.S().Errorw("[userSrvClient.CheckPassWord] 登录【密码验证错误】")
@@ -198,6 +206,43 @@ func PassWordLogin(ctx *gin.Context) {
 			}
 		}
 	}
+}
+
+// 刷新token接口
+func RefreshToken(ctx *gin.Context) {
+	var req struct {
+		RefreshToken string `json:"refresh_token"  binding:"required"`
+	}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"msg": "参数错误"})
+		return
+	}
+
+	j := middlewares.NewJWT()
+	claims, err := j.ParseToken(req.RefreshToken)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"msg": "refresh_token无效"})
+		return
+	}
+
+	// 检查 refresh_token 是否过期
+	if claims.ExpiresAt < time.Now().Unix() {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"msg": "refresh_token已过期"})
+		return
+	}
+
+	// 生成新的 access_token
+	claims.StandardClaims.ExpiresAt = time.Now().Unix() + global.ServerConfig.JwtInfo.ExpireTime
+	accessToken, err := j.CreateToken(*claims)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"msg": "生成access_token失败"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"access_token": accessToken,
+		"expired_at":   (time.Now().Unix() + global.ServerConfig.JwtInfo.ExpireTime) * 1000,
+	})
 }
 
 // 用户注册
@@ -265,5 +310,35 @@ func Register(ctx *gin.Context) {
 		"nick_name":  user.NickName,
 		"token":      token,
 		"expired_at": (time.Now().Unix() + global.ServerConfig.JwtInfo.ExpireTime) * 1000,
+	})
+}
+
+// 更新用户信息
+func UpdateUser(ctx *gin.Context) {
+	updateUserForm := forms.UpdateUserForm{}
+	if err := ctx.ShouldBind(&updateUserForm); err != nil {
+		HandlerValidatorError(ctx, err)
+		return
+	}
+
+	claims, _ := ctx.Get("claims")
+	currentUser := claims.(*jwtClaims.CustomClaims)
+	zap.S().Infof("访问用户: %d", currentUser.ID)
+
+	//将前端传递过来的日期格式转换成int
+	loc, _ := time.LoadLocation("Local") //local的L必须大写
+	birthDay, _ := time.ParseInLocation("2006-01-02", updateUserForm.Birthday, loc)
+	_, err := global.UserSrvClient.UpdateUser(context.Background(), &proto.UpdateUserInfo{
+		Id:       int32(currentUser.ID),
+		NickName: updateUserForm.Name,
+		Gender:   updateUserForm.Gender,
+		BirthDay: uint64(birthDay.Unix()),
+	})
+	if err != nil {
+		HandleGrpcErrorToHttp(err, ctx)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"msg": "个人信息修改成功",
 	})
 }

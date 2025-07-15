@@ -74,7 +74,7 @@ type SentinelConfig struct {
 		// Name represents the name of current running service.
 		Name string `mapstructure:"name"`
 		// Type indicates the classification of the service (e.g. web service, API gateway).
-		Type int32 `mapstructure:"name"`
+		Type int32 `mapstructure:"type"`
 	}
 	// Log represents configuration items related to logging.
 	Log SentinelLogConfig `mapstructure:"log"`

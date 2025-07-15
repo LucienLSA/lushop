@@ -1,124 +1,94 @@
-var webpack = require('webpack');
-var path = require('path');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var ROOT_PATH = path.resolve(__dirname);
+const webpack = require('webpack');
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { VueLoaderPlugin } = require('vue-loader');
+const ROOT_PATH = path.resolve(__dirname);
 
 module.exports = {
-   // devtool: 'source-map', // 配置生成Source Maps 选择合适的选项
-    entry: {
-        // app: path.resolve(__dirname,'./src/main.js'),
-        index: './src/main.js',
+  entry: {
+    index: './src/main.js',
+  },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].[contenthash].entry.js',
+    chunkFilename: '[name].[contenthash].min.js',
+    publicPath: '',
+  },
+  plugins: [
+    new VueLoaderPlugin(),
+    new HtmlWebpackPlugin({
+      filename: 'index.html',
+      template: 'template.html',
+      inject: true,
+    }),
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      jQuery: 'jquery',
+      'window.jQuery': 'jquery',
+      'window.$': 'jquery',
+    }),
+  ],
+  resolve: {
+    extensions: ['.js', '.vue', '.json'],
+    alias: {
+      'vue$': 'vue/dist/vue.esm.js',
     },
-    output: {
-        // path: __dirname + '/public', // 打包后文件存放位置
-        //path: __dirname + '/dist', // 打包后文件存放位置
-        path: path.resolve(__dirname, 'dist'),
-        filename: "[name].entry.js",
-        chunkFilename: "[name].min.js",
-        publicPath: ''
-    },
-    plugins: [
-        /*
-        new webpack.DefinePlugin({
-            'process.env': {
-                NODE_ENY: '"production'
-            }
-        }), */
-        // 压缩代码
-        new webpack.optimize.UglifyJsPlugin({
-          compress: {
-            warnings: false
+  },
+  module: {
+    rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
+      {
+        test: /\.scss$/,
+        use: ['style-loader', 'css-loader', 'sass-loader'],
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg|jpg)(\?.*)?$/,
+        type: 'asset',
+        parser: {
+          dataUrlCondition: {
+            maxSize: 100 * 1024, // 100kb
           },
-          sourceMap: true
-        }),
-        // new webpack.optimize.UglifyJsPlugin({minimize: true}),
-        new HtmlWebpackPlugin({
-            filename: 'index.html',
-            template: 'template.html',
-            inject: true
-        }),
-        // new webpack.optimize.CommonsChunkPlugin({name:'vendor',filename:'vendor.bundle.js'})
-        new webpack.ProvidePlugin({
-            $: 'jquery',
-            jQuery: 'jquery',
-            'window.jQuery': 'jquery',
-            'window.$': 'jquery',
-        })
-    ],
-    resolve: {
-        // require时省略的扩展名
-        extensions: ['.js', '.vue', '.json'],
-        alias: {
-            'vue$': 'vue/dist/vue.common.js'
+        },
+        generator: {
+          filename: 'static/images/[name].[hash:7][ext]'
         }
-    },
-    /*
-    externals: {
-        jquery: 'window.$'
-    }, */
-    module: {
-        loaders: [
-            {
-                test: /\.vue$/,
-                loader: 'vue-loader',
-                /*
-                options: {
-                    loaders: {
-                        css: ExtractTextPlugin.extract({
-                            use: 'css-loader',
-                            fallback: 'vue-style-loader'
-                        })
-                    }
-                } */
-            },
-            {
-                test: /\.css$/,
-                loader: 'style-loader!css-loader'
-                /*
-
-                options: {
-                    loaders: {
-                        css: ExtractTextPlugin.extract({
-                            use: 'css-loader'
-                        })
-                    }
-                } */
-            },
-            {
-                test: /\.scss$/,
-                loader: 'style-loader!css-loader!sass-loader'
-            },
-            {
-                test: /\.json$/,
-                loader: 'json-loader'
-            },
-            {
-                test: /\.(png|jpe?g|gif|svg|jpg)(\?.*)?$/,
-                loader: 'url-loader',
-                options: {
-                    limit: 100000,
-                    name: '/static/images/[name].[hash:7].[ext]'
-                }
-            },
-            {
-                test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-                loader: 'url-loader',
-                options: {
-                    limit: 10000,
-                    name: 'static/fonts/[name].[hash:7].[ext]'
-                }
-            },
-            {
-                test: /\.js$/,
-                loader: 'babel-loader',
-                query: {
-                    compact: false
-                }
-            },
-            {
-                test: /\.exec\.js$/,
-                use: [ 'script-loader' ]
-            }
-        ]
-    },
-}
+      },
+      {
+        test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
+        type: 'asset',
+        parser: {
+          dataUrlCondition: {
+            maxSize: 10 * 1024,
+          },
+        },
+        generator: {
+          filename: 'static/fonts/[name].[hash:7][ext]'
+        }
+      },
+      {
+        test: /\.js$/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            compact: false,
+          },
+        },
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.exec\.js$/,
+        use: ['script-loader'],
+      },
+    ],
+  },
+  optimization: {
+    minimize: true,
+  },
+};

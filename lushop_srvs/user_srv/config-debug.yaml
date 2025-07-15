@@ -1,23 +1,23 @@
-# name: 'user_srv'
-# host: '10.99.192.85'
-# tags: ['user_srv','grpc','lushop_srv','lucien']
+name: 'user_srv'
+host: '10.99.195.125'
+tags: ['user_srv','grpc','lushop_srv','lucien']
 
-# mysql:
-#   host: '127.0.0.1'
-#   port: '3306'
-#   user: "root"
-#   password: "123456"
-#   db_name: 'lushop_user_srv'
+mysql:
+  host: '127.0.0.1'
+  port: '3306'
+  user: "root"
+  password: "123456"
+  db_name: 'lushop_user_srv'
 
-# consul:
-#   host: '192.168.226.140'
-#   port: '8500'
-
-nacos:
+consul:
   host: '192.168.226.140'
-  port: '8848'
-  namespace: '4da0930f-5769-446a-b916-7195bd731fed'
-  user: 'nacos'
-  password: 'nacos'
-  dataid: 'user_srv.json'
-  group: 'dev'
+  port: '8500'
+
+# nacos:
+#   host: '192.168.226.140'
+#   port: '8848'
+#   namespace: '4da0930f-5769-446a-b916-7195bd731fed'
+#   user: 'nacos'
+#   password: 'nacos'
+#   dataid: 'user_srv.json'
+#   group: 'dev'

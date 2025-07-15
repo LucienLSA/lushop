@@ -214,7 +214,6 @@ func Delete(ctx *gin.Context) {
 		return
 	}
 	ctx.Status(http.StatusOK)
-	return
 }
 
 func Stocks(ctx *gin.Context) {
@@ -226,7 +225,14 @@ func Stocks(ctx *gin.Context) {
 	}
 
 	//TODO 商品的库存
-	return
+	// var invInfo *proto.GoodsInvInfo
+	// if invInfo, err = global.InvSrvClient.InvDetail(context.Background(), &proto.GoodsInvInfo{
+	// 	GoodsId: int32(GoodsId),
+	// }); err != nil {
+	// 	api.HandleGrpcErrorToHttp(err, ctx)
+	// 	return
+	// }
+	// ctx.JSON(http.StatusOK, gin.H{"goodsId": invInfo.GoodsId, "num": invInfo.Num})
 }
 
 // 更新商品状态

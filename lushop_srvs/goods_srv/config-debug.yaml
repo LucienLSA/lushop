@@ -1,27 +1,27 @@
-# name: 'goods_srv'
-# host: '10.99.192.85'
-# tags: ['goods_srv','grpc','lushop_srv','lucien']
+name: 'goods_srv'
+host: '10.99.195.125'
+tags: ['goods_srv','grpc','lushop_srv','lucien']
 
-# mysql:
-#   host: '127.0.0.1'
-#   port: '3306'
-#   user: "root"
-#   password: "123456"
-#   db_name: 'lushop_goods_srv'
+mysql:
+  host: '127.0.0.1'
+  port: '3306'
+  user: "root"
+  password: "123456"
+  db_name: 'lushop_goods_srv'
 
-# consul:
-#   host: '192.168.226.140'
-#   port: '8500'
-
-# es:
-#   host: '192.168.226.140'
-#   port: '9200'
-
-nacos:
+consul:
   host: '192.168.226.140'
-  port: '8848'
-  namespace: 'd44bc5b3-42e3-4aa1-9ea7-14d6a747880c'
-  user: 'nacos'
-  password: 'nacos'
-  dataid: 'goods_srv.json'
-  group: 'dev'
+  port: '8500'
+
+es:
+  host: '192.168.226.140'
+  port: '9200'
+
+# nacos:
+#   host: '192.168.226.140'
+#   port: '8848'
+#   namespace: 'd44bc5b3-42e3-4aa1-9ea7-14d6a747880c'
+#   user: 'nacos'
+#   password: 'nacos'
+#   dataid: 'goods_srv.json'
+#   group: 'dev'

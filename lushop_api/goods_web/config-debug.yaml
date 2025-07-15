@@ -1,42 +1,42 @@
-# name: 'goods_web'
-# host: '10.99.192.85'
-# tags: ['goods_web','gin','lushop_web','lucien']
-# port: 8033
+name: 'goods_web'
+host: '10.99.195.125'
+tags: ['goods_web','gin','lushop_web','lucien']
+port: 8033
 
 
-# goods_srv:
-#   name: 'goods_srv'
-#   version: 'v1'
+goods_srv:
+  name: 'goods_srv'
+  version: 'v1'
 
 
-# jwt:
-#   key: 'lushop_secret_key'
-#   expired_time: 2592000
+jwt:
+  key: 'lushop_secret_key'
+  expired_time: 2592000
 
-# ali_sms:
-#   api_key: 'Ali_ApiKey'
-#   api_secret: 'Ali_ApiSecret'
-#   sign_name: '阿里云短信测试'
-#   template_code: 'SMS_154950909'
-#   phone_number: '19821216806'
-#   region_id: 'cn-hangzhou'
-#   expire: 600
+ali_sms:
+  api_key: 'Ali_ApiKey'
+  api_secret: 'Ali_ApiSecret'
+  sign_name: '阿里云短信测试'
+  template_code: 'SMS_154950909'
+  phone_number: '19821216806'
+  region_id: 'cn-hangzhou'
+  expire: 600
 
-# redis:
-#   host: '127.0.0.1'
-#   port: '6379'
-#   db: 4
-#   password: ''
-#   pool_size: 10
+redis:
+  host: '127.0.0.1'
+  port: '6379'
+  db: 4
+  password: ''
+  pool_size: 10
 
-# consul:
-#   host: '192.168.226.140'
-#   port: '8500'
+consul:
+  host: '192.168.226.140'
+  port: '8500'
 
 
-# jaeger:
-#   service_name: goods_web
-#   jaeger_gin_endpoint: '192.168.226.140:4317'
+jaeger:
+  service_name: 'goods_web'
+  jaeger_gin_endpoint: '192.168.226.140:4318'
 
 
 sentinel:
@@ -54,23 +54,23 @@ sentinel:
     system:
       collectIntervalMs: 1000
 
-# log:
-#   level: "debug"
-#   filepath: "./temp/logs/"
-#   filename: "goods_web.log"
-#   max_size: 200
-#   max_age: 30
-#   max_backups: 7
+log:
+  level: "debug"
+  filepath: "./temp/logs/"
+  filename: "goods_web.log"
+  max_size: 200
+  max_age: 30
+  max_backups: 7
 
 
 
-nacos:
-  host: '192.168.226.140'
-  port: '8848'
-  namespace: 'd44bc5b3-42e3-4aa1-9ea7-14d6a747880c'
-  user: 'nacos'
-  password: 'nacos'
-  dataid: 'goods_web.json'
-  group: 'dev'
+# nacos:
+#   host: '192.168.226.140'
+#   port: '8848'
+#   namespace: 'd44bc5b3-42e3-4aa1-9ea7-14d6a747880c'
+#   user: 'nacos'
+#   password: 'nacos'
+#   dataid: 'goods_web.json'
+#   group: 'dev'
 
 

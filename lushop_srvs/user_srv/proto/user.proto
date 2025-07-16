@@ -1,15 +1,17 @@
 syntax = "proto3";
-import "google/protobuf/empty.proto";
-option go_package = ".;proto";
+// import "google/protobuf/empty.proto";
+option go_package = ".;v2userproto";
 
 service User {
     rpc GetUserList(PageInfo) returns (UserListResponse); // 用户列表
     rpc GetUserByMobile(MobileRequest) returns (UserInfoResponse); // 根据手机号获取用户信息
     rpc GetUserById(IdRequest) returns (UserInfoResponse); // 根据id获取用户信息
     rpc CreateUser(CreateUserInfo) returns (UserInfoResponse); // 创建用户
-    rpc UpdateUser(UpdateUserInfo) returns (google.protobuf.Empty); // 更新用户信息
+    rpc UpdateUser(UpdateUserInfo) returns (Empty); // 更新用户信息
     rpc CheckPassWord(PasswordCheckInfo) returns (CheckResponse);// 校验密码
 }
+
+message Empty{}
 message PasswordCheckInfo{
     string passWord = 1;
     string encryptedPassWord = 2;

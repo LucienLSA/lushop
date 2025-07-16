@@ -3,27 +3,25 @@ package handler
 import (
 	"context"
 
-	"google.golang.org/protobuf/types/known/emptypb"
-
 	"useropsrv/global"
 	"useropsrv/model"
-	proto_userfav "useropsrv/proto/gen/userfav"
+	proto "useropsrv/proto"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-func (*UserOpServer) GetFavList(ctx context.Context, req *proto_userfav.UserFavRequest) (*proto_userfav.UserFavListResponse, error) {
-	var rsp proto_userfav.UserFavListResponse
+func (*UserOpServer) GetFavList(ctx context.Context, req *proto.UserFavRequest) (*proto.UserFavListResponse, error) {
+	var rsp proto.UserFavListResponse
 	var userFavs []model.UserFav
-	var userFavList []*proto_userfav.UserFavResponse
+	var userFavList []*proto.UserFavResponse
 	//查询用户的收藏记录
 	//查询某件商品被哪些用户收藏了
 	result := global.DB.Where(&model.UserFav{User: req.UserId, Goods: req.GoodsId}).Find(&userFavs)
 	rsp.Total = int32(result.RowsAffected)
 
 	for _, userFav := range userFavs {
-		userFavList = append(userFavList, &proto_userfav.UserFavResponse{
+		userFavList = append(userFavList, &proto.UserFavResponse{
 			UserId:  userFav.User,
 			GoodsId: userFav.Goods,
 		})
@@ -32,7 +30,7 @@ func (*UserOpServer) GetFavList(ctx context.Context, req *proto_userfav.UserFavR
 	return &rsp, nil
 }
 
-func (*UserOpServer) AddUserFav(ctx context.Context, req *proto_userfav.UserFavRequest) (*emptypb.Empty, error) {
+func (*UserOpServer) AddUserFav(ctx context.Context, req *proto.UserFavRequest) (*proto.Empty, error) {
 	var userFav model.UserFav
 
 	userFav.User = req.UserId
@@ -40,20 +38,20 @@ func (*UserOpServer) AddUserFav(ctx context.Context, req *proto_userfav.UserFavR
 
 	global.DB.Save(&userFav)
 
-	return &emptypb.Empty{}, nil
+	return &proto.Empty{}, nil
 }
 
-func (*UserOpServer) DeleteUserFav(ctx context.Context, req *proto_userfav.UserFavRequest) (*emptypb.Empty, error) {
+func (*UserOpServer) DeleteUserFav(ctx context.Context, req *proto.UserFavRequest) (*proto.Empty, error) {
 	if result := global.DB.Unscoped().Where("goods=? and user=?", req.GoodsId, req.UserId).Delete(&model.UserFav{}); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "收藏记录不存在")
 	}
-	return &emptypb.Empty{}, nil
+	return &proto.Empty{}, nil
 }
 
-func (*UserOpServer) GetUserFavDetail(ctx context.Context, req *proto_userfav.UserFavRequest) (*emptypb.Empty, error) {
+func (*UserOpServer) GetUserFavDetail(ctx context.Context, req *proto.UserFavRequest) (*proto.Empty, error) {
 	var userfav model.UserFav
 	if result := global.DB.Where("goods=? and user=?", req.GoodsId, req.UserId).Find(&userfav); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "收藏记录不存在")
 	}
-	return &emptypb.Empty{}, nil
+	return &proto.Empty{}, nil
 }

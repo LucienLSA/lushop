@@ -5,17 +5,18 @@ import (
 	"fmt"
 	"usersrv/global"
 	"usersrv/model"
-	"usersrv/proto"
+	proto "usersrv/proto"
 
 	"time"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 )
 
-type UserServer struct{}
+type UserServer struct {
+	proto.UnimplementedUserServer
+}
 
 func ModelToResponse(user *model.User) *proto.UserInfoResponse {
 	// grpc中的message中字段有默认值，不能随意赋值nil，会错
@@ -76,15 +77,21 @@ func (s *UserServer) GetUserList(ctx context.Context, req *proto.PageInfo) (*pro
 	// if result.Error != nil {
 	// 	return nil, result.Error
 	// }
-	rsp := &proto.UserListResponse{}
-	// rsp.Total = int32(result.RowsAffected)
-	// global.DB.Scopes(Paginate(int(req.Pn), int(req.PSize))).Find(&users)
-	var total int64
-	err := global.DB.Model(&model.User{}).Count(&total).Error
-	if err != nil {
-		return nil, status.Errorf(codes.NotFound, "用户不存在")
+	// rsp := &proto.UserListResponse{}
+	// // rsp.Total = int32(result.RowsAffected)
+	// // global.DB.Scopes(Paginate(int(req.Pn), int(req.PSize))).Find(&users)
+	// var total int64
+	// err := global.DB.Model(&model.User{}).Count(&total).Error
+	// if err != nil {
+	// 	return nil, status.Errorf(codes.NotFound, "用户不存在")
+	// }
+	// rsp.Total = int32(total)
+	result := global.DB.Find(&users)
+	if result.Error != nil {
+		return nil, result.Error
 	}
-	rsp.Total = int32(total)
+	rsp := &proto.UserListResponse{}
+	rsp.Total = int32(result.RowsAffected)
 	global.DB.Scopes(Paginate(int(req.Pn), int(req.PSize))).Find(&users)
 	for _, user := range users {
 		userInfoRsp := ModelToResponse(&user)
@@ -130,24 +137,25 @@ func (s *UserServer) CreateUser(ctx context.Context, req *proto.CreateUserInfo) 
 	var user model.User
 	// db := global.NewDBClient(ctx)
 	// db := global.DB
-	var count int64
-	err := global.DB.Model(&model.User{}).Where("mobile=?", req.Mobile).Count(&count).Error
-	// if result.RowsAffected >= 1 {
+	// var count int64
+	// err := global.DB.Model(&model.User{}).Where("mobile=?", req.Mobile).Count(&count).Error
+	// if count > 0 {
 	// 	return nil, status.Errorf(codes.AlreadyExists, "用户已存在")
 	// }
-	if count > 0 {
+	result := global.DB.Where(&model.User{Mobile: req.Mobile}).First(&user)
+	if result.RowsAffected == 1 {
 		return nil, status.Errorf(codes.AlreadyExists, "用户已存在")
 	}
 
 	user.Mobile = req.Mobile
 	user.NickName = req.NickName
 	// 密码加密
-	err = user.SetPassword(req.PassWord)
+	err := user.SetPassword(req.PassWord)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 	// 保存到数据库
-	result := global.DB.Create(&user)
+	result = global.DB.Create(&user)
 	if result.Error != nil {
 		return nil, status.Errorf(codes.Internal, result.Error.Error())
 	}
@@ -155,7 +163,7 @@ func (s *UserServer) CreateUser(ctx context.Context, req *proto.CreateUserInfo) 
 	return userInfoRsp, nil
 }
 
-func (s *UserServer) UpdateUser(ctx context.Context, req *proto.UpdateUserInfo) (*empty.Empty, error) {
+func (s *UserServer) UpdateUser(ctx context.Context, req *proto.UpdateUserInfo) (*proto.Empty, error) {
 	var user model.User
 	// db := global.NewDBClient(ctx)
 	// db := global.DB
@@ -171,7 +179,7 @@ func (s *UserServer) UpdateUser(ctx context.Context, req *proto.UpdateUserInfo) 
 	if result.Error != nil {
 		return nil, status.Errorf(codes.Internal, result.Error.Error())
 	}
-	return &empty.Empty{}, nil
+	return &proto.Empty{}, nil
 }
 
 // 检验密码，传入的是请求中的原密码

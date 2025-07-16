@@ -10,7 +10,7 @@ import (
 	"usersrv/global"
 	"usersrv/handler"
 	"usersrv/initialize"
-	"usersrv/proto"
+	proto "usersrv/proto"
 	"usersrv/utils/addr"
 	"usersrv/utils/register/consul"
 
@@ -88,9 +88,9 @@ func main() {
 	register_client := consul.NewRegistryClient(global.ServerConfig.ConsulInfo.Host, consulPortInt)
 	err = register_client.Register(global.ServerConfig.Host, *Port, global.ServerConfig.Name, global.ServerConfig.Tags, serviceId)
 	if err != nil {
-		zap.S().Panic("服务注册失败", err.Error())
+		zap.S().Panic("【用户服务-srv】服务注册失败", err.Error())
 	}
-	zap.S().Debugf("init grpc user service success,port:%d", *Port)
+	zap.S().Debugf("【用户服务-srv】注册成功,port:%d", *Port)
 	go func() {
 		err = server.Serve(lis)
 		if err != nil {
@@ -105,7 +105,7 @@ func main() {
 	// err = client.Agent().ServiceDeregister(serviceID);
 	err = register_client.DeRegister(serviceId)
 	if err != nil {
-		zap.S().Info("注销失败")
+		zap.S().Info("【用户服务-srv】服务注销失败")
 	}
-	zap.S().Info("注销成功")
+	zap.S().Info("【用户服务-srv】注销成功")
 }

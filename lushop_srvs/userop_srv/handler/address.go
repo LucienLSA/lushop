@@ -4,25 +4,24 @@ import (
 	"context"
 	"useropsrv/global"
 	"useropsrv/model"
-	proto_address "useropsrv/proto/gen/address"
+	proto "useropsrv/proto"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // 获取地址列表
-func (*UserOpServer) GetAddressList(ctx context.Context, req *proto_address.AddressRequest) (*proto_address.AddressListResponse, error) {
+func (*UserOpServer) GetAddressList(ctx context.Context, req *proto.AddressRequest) (*proto.AddressListResponse, error) {
 	var addresses []model.Address
-	var rsp proto_address.AddressListResponse
-	var addressResponse []*proto_address.AddressResponse
+	var rsp proto.AddressListResponse
+	var addressResponse []*proto.AddressResponse
 
 	if result := global.DB.Where(&model.Address{User: req.UserId}).Find(&addresses); result.RowsAffected != 0 {
 		rsp.Total = int32(result.RowsAffected)
 	}
 
 	for _, address := range addresses {
-		addressResponse = append(addressResponse, &proto_address.AddressResponse{
+		addressResponse = append(addressResponse, &proto.AddressResponse{
 			Id:           address.ID,
 			UserId:       address.User,
 			Province:     address.Province,
@@ -37,7 +36,7 @@ func (*UserOpServer) GetAddressList(ctx context.Context, req *proto_address.Addr
 	return &rsp, nil
 }
 
-func (*UserOpServer) CreateAddress(ctx context.Context, req *proto_address.AddressRequest) (*proto_address.AddressResponse, error) {
+func (*UserOpServer) CreateAddress(ctx context.Context, req *proto.AddressRequest) (*proto.AddressResponse, error) {
 	var address model.Address
 
 	address.User = req.UserId
@@ -50,17 +49,17 @@ func (*UserOpServer) CreateAddress(ctx context.Context, req *proto_address.Addre
 
 	global.DB.Save(&address)
 
-	return &proto_address.AddressResponse{Id: address.ID}, nil
+	return &proto.AddressResponse{Id: address.ID}, nil
 }
 
-func (*UserOpServer) DeleteAddress(ctx context.Context, req *proto_address.AddressRequest) (*emptypb.Empty, error) {
+func (*UserOpServer) DeleteAddress(ctx context.Context, req *proto.AddressRequest) (*proto.Empty, error) {
 	if result := global.DB.Where("id=? and user=?", req.Id, req.UserId).Delete(&model.Address{}); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "收货地址不存在")
 	}
-	return &emptypb.Empty{}, nil
+	return &proto.Empty{}, nil
 }
 
-func (*UserOpServer) UpdateAddress(ctx context.Context, req *proto_address.AddressRequest) (*emptypb.Empty, error) {
+func (*UserOpServer) UpdateAddress(ctx context.Context, req *proto.AddressRequest) (*proto.Empty, error) {
 	var address model.Address
 
 	if result := global.DB.Where("id=? and user=?", req.Id, req.UserId).First(&address); result.RowsAffected == 0 {
@@ -93,5 +92,5 @@ func (*UserOpServer) UpdateAddress(ctx context.Context, req *proto_address.Addre
 
 	global.DB.Save(&address)
 
-	return &emptypb.Empty{}, nil
+	return &proto.Empty{}, nil
 }

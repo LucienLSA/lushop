@@ -6,15 +6,16 @@ import (
 	"fmt"
 	"goodssrv/global"
 	"goodssrv/model"
-	"goodssrv/proto"
+	proto "goodssrv/proto"
+	"time"
 
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // 商品分类
-func (s *GoodsServer) GetAllCategorysList(ctx context.Context, req *emptypb.Empty) (*proto.CategoryListResponse, error) {
+func (s *GoodsServer) GetAllCategorysList(ctx context.Context, req *proto.Empty) (*proto.CategoryListResponse, error) {
 	/*
 		[
 			{
@@ -33,14 +34,33 @@ func (s *GoodsServer) GetAllCategorysList(ctx context.Context, req *emptypb.Empt
 			}
 		]
 	*/
+	// 将 Total Data  JsonData 分别获取存入到结构体中，得到嵌套的输出结构体
+	categoryRsp := proto.CategoryListResponse{}
 	var categorys []model.Category
-	global.DB.Where(&model.Category{Level: 1}).Preload("SubCategory.SubCategory").Find(&categorys)
+	if result := global.DB.Where(&model.Category{Level: 1}).Preload("SubCategory.SubCategory").Find(&categorys); result.Error != nil {
+		return nil, result.Error
+	}
 	b, _ := json.Marshal(&categorys)
-	return &proto.CategoryListResponse{JsonData: string(b)}, nil
-	// for _, category := range categorys {
-	// 	fmt.Println(category.Name)
-	// }
-	// return nil, nil
+	categoryRsp.JsonData = string(b)
+
+	var categorys_proto []model.Category
+	result := global.DB.Find(&categorys_proto)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	categoryRsp.Total = int32(result.RowsAffected)
+	for _, category := range categorys_proto {
+		categoryInfo := proto.CategoryInfoResponse{}
+		categoryInfo.Id = category.ID
+		categoryInfo.Name = category.Name
+		categoryInfo.ParentCategory = category.ParentCategoryID
+		categoryInfo.Level = category.Level
+		categoryInfo.IsTab = category.IsTab
+		categoryRsp.Data = append(categoryRsp.Data, &categoryInfo)
+	}
+	return &categoryRsp, nil
+
 }
 
 // 获取子分类
@@ -55,7 +75,7 @@ func (s *GoodsServer) GetSubCategory(ctx context.Context, req *proto.CategoryLis
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "商品分类不存在")
 	}
-	// 父分类
+	// 父分类返回响应
 	categoryListRsp.Info = &proto.CategoryInfoResponse{
 		Id:             category.ID,
 		Name:           category.Name,
@@ -63,12 +83,7 @@ func (s *GoodsServer) GetSubCategory(ctx context.Context, req *proto.CategoryLis
 		IsTab:          category.IsTab,
 		ParentCategory: category.ParentCategoryID,
 	}
-	// 检查数据库连接是否正常
-	if err := global.DB.Exec("SELECT 1").Error; err != nil {
-		fmt.Println("DB connection error:", err)
-	}
-	// 检查数据库的事务是否开启
-	fmt.Println("Is DB in transaction?", global.DB.Statement.ConnPool != global.DB.ConnPool)
+
 	// // 2. 单独查询子分类（不带预加载）
 	// if err := db.Where("parent_category_id = ?", req.Id).Find(&subCategorys).Error; err != nil {
 	// 	return nil, err
@@ -87,9 +102,13 @@ func (s *GoodsServer) GetSubCategory(ctx context.Context, req *proto.CategoryLis
 		preloads = "SubCategory.SubCategory"
 	}
 	fmt.Println(preloads)
+	// 但本实现只查直接子分类。
 	// 如果查询的等级不为1，根据父类的id查询子分类
-	global.DB.Where(&model.Category{ParentCategoryID: req.Id}).Preload(preloads).Find(&subCategorys)
-	// global.DB.Where("parent_category_id=? AND deleted_at IS NULL", req.Id).Find(&subCategorys)
+	// global.DB.Where(&model.Category{ParentCategoryID: req.Id}).Preload(preloads).Find(&subCategorys)
+	if result := global.DB.Where(&model.Category{ParentCategoryID: req.Id}).Find(&subCategorys); result.Error != nil {
+		return nil, result.Error
+	}
+	// 子分类信息存入响应
 	for _, subCategory := range subCategorys {
 		subCategoryRsp = append(subCategoryRsp, &proto.CategoryInfoResponse{
 			Id:             subCategory.ID,
@@ -103,7 +122,7 @@ func (s *GoodsServer) GetSubCategory(ctx context.Context, req *proto.CategoryLis
 	return &categoryListRsp, nil
 }
 
-func (s *GoodsServer) CreateCategory(ctx context.Context, req *proto.CategoryInfoRequest) (*proto.CategoryInfoResponse, error) {
+func (s *GoodsServer) CreateCategory1(ctx context.Context, req *proto.CategoryInfoRequest) (*proto.CategoryInfoResponse, error) {
 	category := model.Category{}
 	category.Name = req.Name
 	category.Level = req.Level
@@ -115,18 +134,47 @@ func (s *GoodsServer) CreateCategory(ctx context.Context, req *proto.CategoryInf
 	global.DB.Save(&category)
 	return &proto.CategoryInfoResponse{Id: int32(category.ID)}, nil
 }
-func (s *GoodsServer) DeleteCategory(ctx context.Context, req *proto.DeleteCategoryRequest) (*emptypb.Empty, error) {
+
+// 新建商品分类
+func (s *GoodsServer) CreateCategory(ctx context.Context, req *proto.CategoryInfoRequest) (*proto.CategoryInfoResponse, error) {
+	category := model.Category{}
+	cMap := map[string]interface{}{}
+	cMap["add_time"] = time.Now()
+	cMap["name"] = req.Name
+	cMap["level"] = req.Level
+	cMap["is_tab"] = req.IsTab
+	if req.Level != 1 {
+		//去查询父类目是否存在
+		cMap["parent_category_id"] = req.ParentCategory
+	}
+	if result := global.DB.Model(&category).Create(cMap); result.Error != nil {
+		zap.S().Error("新建商品分类失败！")
+	}
+	//fmt.Println(tx)
+	rsp := proto.CategoryInfoResponse{
+		Id:             category.ID,
+		Name:           category.Name,
+		Level:          category.Level,
+		IsTab:          category.IsTab,
+		ParentCategory: category.ParentCategoryID,
+	}
+	return &rsp, nil
+}
+
+// 删除商品分类
+func (s *GoodsServer) DeleteCategory(ctx context.Context, req *proto.DeleteCategoryRequest) (*proto.Empty, error) {
 	result := global.DB.Delete(&model.Category{}, req.Id)
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "商品分类不存在")
 	}
-	return &emptypb.Empty{}, nil
+	return &proto.Empty{}, nil
 }
-func (s *GoodsServer) UpdateCategory(ctx context.Context, req *proto.CategoryInfoRequest) (*emptypb.Empty, error) {
+
+// 更新商品分类
+func (s *GoodsServer) UpdateCategory(ctx context.Context, req *proto.CategoryInfoRequest) (*proto.Empty, error) {
 	category := model.Category{}
-	result := global.DB.First(&category, req.Id)
-	if result.RowsAffected == 0 {
-		return nil, status.Errorf(codes.InvalidArgument, "品牌已存在")
+	if result := global.DB.First(&category, req.Id); result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.NotFound, "商品分类不存在")
 	}
 	if req.Name != "" {
 		category.Name = req.Name
@@ -137,6 +185,12 @@ func (s *GoodsServer) UpdateCategory(ctx context.Context, req *proto.CategoryInf
 	if req.Level != 0 {
 		category.Level = req.Level
 	}
-	global.DB.Save(&category)
-	return &emptypb.Empty{}, nil
+	if req.IsTab {
+		category.IsTab = req.IsTab
+	}
+	if result := global.DB.Save(&category); result.Error != nil {
+		zap.S().Error("更新商品分类失败", result.Error)
+		return nil, status.Errorf(codes.Internal, "更新商品分类失败")
+	}
+	return &proto.Empty{}, nil
 }

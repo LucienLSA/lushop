@@ -6,7 +6,7 @@ import (
 	"inventorysrv/global"
 	"inventorysrv/handler"
 	"inventorysrv/initialize"
-	"inventorysrv/proto"
+	proto "inventorysrv/proto"
 	"inventorysrv/utils/addr"
 	"inventorysrv/utils/register/consul"
 

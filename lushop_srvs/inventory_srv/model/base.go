@@ -4,6 +4,8 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type GoodsDetail struct {
@@ -24,9 +26,9 @@ func (g GormDetailList) Value() (driver.Value, error) {
 }
 
 type BaseModel struct {
-	ID        int32     `gorm:"primarykey;type:int" json:"id"`
-	CreatedAt time.Time `gorm:"column:add_time" json:"-"`
-	IsDeleted bool      `json:"-"`
-	UpdatedAt time.Time `gorm:"column:update_time" json:"-"`
-	// DeletedAt gorm.DeletedAt `json:"-"`
+	ID        int32          `gorm:"primarykey;type:int" json:"id"`
+	CreatedAt time.Time      `gorm:"column:add_time" json:"-"`
+	IsDeleted bool           `json:"-"`
+	UpdatedAt time.Time      `gorm:"column:update_time" json:"-"`
+	DeletedAt gorm.DeletedAt `json:"-"`
 }

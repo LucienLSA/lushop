@@ -25,12 +25,14 @@ type InventorySrvConfig struct {
 }
 
 type ServerConfig struct {
-	Name       string       `mapstructure:"name" json:"name"`
-	Host       string       `mapstructure:"host" json:"host"`
-	Tags       []string     `mapstructure:"tags" json:"tags"`
-	MySQLInfo  MySQLConfig  `mapstructure:"mysql" json:"mysql"`
-	ConsulInfo ConsulConfig `mapstructure:"consul" json:"consul"`
-	RedisInfo  RedisConfig  `mapstructure:"redis" json:"redis"`
+	Name           string         `mapstructure:"name" json:"name"`
+	Host           string         `mapstructure:"host" json:"host"`
+	Tags           []string       `mapstructure:"tags" json:"tags"`
+	MySQLInfo      MySQLConfig    `mapstructure:"mysql" json:"mysql"`
+	ConsulInfo     ConsulConfig   `mapstructure:"consul" json:"consul"`
+	RedisInfo      RedisConfig    `mapstructure:"redis" json:"redis"`
+	JaegerInfo     JaegerConfig   `mapstructure:"jaeger" json:"jaeger"`
+	RocketMQConfig RocketMQConfig `mapstructure:"rocketmq" json:"rocketmq"`
 
 	GoodsSrvInfo     GoodsSrvConfig     `mapstructure:"goods_srv" json:"goods_srv"`
 	InventorySrvInfo InventorySrvConfig `mapstructure:"inventory_srv" json:"inventory_srv"`
@@ -43,6 +45,17 @@ type ConsulConfig struct {
 
 type NacosConfig struct {
 	NacosInfo NacosInfo `mapstructure:"nacos"`
+}
+
+type JaegerConfig struct {
+	Host string `mapstructure:"host" json:"host"`
+	Port string `mapstructure:"port" json:"port"`
+	Name string `mapstructure:"name" json:"name"`
+}
+type RocketMQConfig struct {
+	Host string `mapstructure:"host" json:"host"`
+	Port string `mapstructure:"port" json:"port"`
+	Name string `mapstructure:"name" json:"name"`
 }
 
 type NacosInfo struct {

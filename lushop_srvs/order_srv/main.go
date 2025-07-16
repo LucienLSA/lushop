@@ -7,7 +7,7 @@ import (
 	"ordersrv/global"
 	"ordersrv/handler"
 	"ordersrv/initialize"
-	proto_order "ordersrv/proto/gen/order"
+	v2orderproto "ordersrv/proto/order"
 	"ordersrv/utils/addr"
 	"ordersrv/utils/register/consul"
 	"os"
@@ -53,7 +53,7 @@ func main() {
 	}
 	zap.S().Info("port:", *Port)
 	server := grpc.NewServer()
-	proto_order.RegisterOrderServer(server, &handler.OrderServer{})
+	v2orderproto.RegisterOrderServer(server, &handler.OrderServer{})
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", *IP, *Port))
 	if err != nil {
 		zap.S().Errorf("ip:", *IP)

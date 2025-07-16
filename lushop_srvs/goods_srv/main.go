@@ -6,7 +6,7 @@ import (
 	"goodssrv/global"
 	"goodssrv/handler"
 	"goodssrv/initialize"
-	"goodssrv/proto"
+	proto "goodssrv/proto"
 	"goodssrv/utils/addr"
 
 	"net"

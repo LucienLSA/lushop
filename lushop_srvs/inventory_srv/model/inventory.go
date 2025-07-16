@@ -8,9 +8,9 @@ package model
 
 type Inventory struct {
 	BaseModel
-	Goods   int32 `gorm:"type:int;index"`
-	Stocks  int32 `gorm:"type:int"`
-	Version int32 `gorm:"type:int"` // 分布式锁的乐观锁
+	Goods   int32 `gorm:"type:int;index;comment:商品id"`
+	Stocks  int32 `gorm:"type:int;comment:仓库"`
+	Version int32 `gorm:"type:int;comment:分布式锁-乐观锁"` // 分布式锁的乐观锁
 }
 type InventoryNew struct {
 	BaseModel
@@ -28,9 +28,9 @@ type Delivery struct {
 }
 
 type StockSellDetail struct {
-	OrderSn string         `gorm:"type:varchar(200);index:idx_order_sn,unique;"`
-	Status  int32          `gorm:"type:varchar(200)"` // 1.代表已扣减，2.代表已归还，3.失败
-	Detail  GormDetailList `gorm:"type:varchar(200)"`
+	OrderSn string         `gorm:"type:varchar(200);index:idx_order_sn,unique;comment:订单编号"`
+	Status  int32          `gorm:"type:varchar(200);comment:1.已扣减,2.已归还"` // 1.代表已扣减，2.代表已归还，3.失败
+	Detail  GormDetailList `gorm:"type:varchar(200);comment:详细商品"`
 }
 
 func (StockSellDetail) TableName() string {

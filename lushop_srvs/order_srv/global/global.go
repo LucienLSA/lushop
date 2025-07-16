@@ -2,9 +2,10 @@ package global
 
 import (
 	"ordersrv/config"
-	proto_goods "ordersrv/proto/gen/goods"
-	proto_inventory "ordersrv/proto/gen/inventory"
+	v2goods "ordersrv/proto/goods"
+	v2inventory "ordersrv/proto/inventory"
 
+	"github.com/apache/rocketmq-client-go/v2"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
@@ -16,8 +17,12 @@ var (
 	ServerConfig config.ServerConfig
 	NacosConfig  config.NacosConfig
 
-	GoodsSrvClient     proto_goods.GoodsClient
-	InventorySrvClient proto_inventory.InventoryClient
+	GoodsSrvClient     v2goods.GoodsClient
+	InventorySrvClient v2inventory.InventoryClient
+
+	MQPushClient     rocketmq.PushConsumer        // 消息消费者，用于订阅并消费消息
+	MQSendTranClient rocketmq.TransactionProducer // 事务消息生产者，用于发送分布式事务消息。
+	MQSendClient     rocketmq.Producer            // 普通消息生产者，用于发送普通消息到消息队列。
 )
 
 const Mode = "LUSHOP_DEBUG"

@@ -12,9 +12,8 @@ import (
 	"useropsrv/handler"
 
 	"useropsrv/initialize"
-	proto_address "useropsrv/proto/gen/address"
-	proto_message "useropsrv/proto/gen/message"
-	proto_userfav "useropsrv/proto/gen/userfav"
+	proto "useropsrv/proto"
+
 	"useropsrv/utils/addr"
 	"useropsrv/utils/register/consul"
 
@@ -35,11 +34,11 @@ func main() {
 	// 初始化Mysql
 	initialize.MySQL()
 	zap.S().Info("init MySQL sucess")
-	// 初始化redis
-	if err := initialize.Redis(); err != nil {
-		zap.S().Panic("初始化redis失败", err.Error())
-	}
-	zap.S().Info("init Redis sucess")
+	// // 初始化redis
+	// if err := initialize.Redis(); err != nil {
+	// 	zap.S().Panic("初始化redis失败", err.Error())
+	// }
+	// zap.S().Info("init Redis sucess")
 
 	zap.S().Info(global.ServerConfig)
 	IP := flag.String("ip", "0.0.0.0", "ip地址")
@@ -51,9 +50,10 @@ func main() {
 	}
 	zap.S().Info("port:", *Port)
 	server := grpc.NewServer()
-	proto_message.RegisterMessageServer(server, &handler.UserOpServer{})
-	proto_address.RegisterAddressServer(server, &handler.UserOpServer{})
-	proto_userfav.RegisterUserFavServer(server, &handler.UserOpServer{})
+	// proto_message.RegisterMessageServer(server, &handler.UserOpServer{})
+	// proto_address.RegisterAddressServer(server, &handler.UserOpServer{})
+	// proto_userfav.RegisterUserFavServer(server, &handler.UserOpServer{})
+	proto.RegisterUserOpServer(server, &handler.UserOpServer{})
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", *IP, *Port))
 	if err != nil {
 		zap.S().Errorf("ip:", *IP)

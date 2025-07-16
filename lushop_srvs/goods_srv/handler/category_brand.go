@@ -4,12 +4,10 @@ import (
 	"context"
 	"goodssrv/global"
 	"goodssrv/model"
-	"goodssrv/proto"
+	proto "goodssrv/proto"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/emptypb"
-	"gorm.io/gorm"
 )
 
 // 获取品牌与商品分类列表
@@ -39,6 +37,7 @@ func (s *GoodsServer) CategoryBrandList(ctx context.Context, req *proto.Category
 				Name: categoryBrand.Brand.Name,
 				Logo: categoryBrand.Brand.Logo,
 			},
+			Id: categoryBrand.ID,
 		})
 	}
 	categoryBrandListRsp.Data = categoryBrandRsp
@@ -47,19 +46,25 @@ func (s *GoodsServer) CategoryBrandList(ctx context.Context, req *proto.Category
 
 // 通过商品分类获取品牌
 func (s *GoodsServer) GetCategoryBrandList(ctx context.Context, req *proto.CategoryInfoRequest) (*proto.BrandListResponse, error) {
-	// 在需要的地方创建无事务的会话
-	db := global.DB.Session(&gorm.Session{SkipDefaultTransaction: true})
+	// // 在需要的地方创建无事务的会话
+	// db := global.DB.Session(&gorm.Session{SkipDefaultTransaction: true})
 	brandListRsp := proto.BrandListResponse{}
 	var category model.Category
 	// 查询品牌分类是否存在
-	result := db.First(&category, req.Id)
-	if result.RowsAffected == 0 {
+	// result := db.First(&category, req.Id)
+	// if result.RowsAffected == 0 {
+	// 	return nil, status.Errorf(codes.InvalidArgument, "商品分类不存在")
+	// }
+	if result := global.DB.Find(&category, req.Id).First(&category); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "商品分类不存在")
 	}
 	// 根据商品分类查询品牌商品分类表
 	var categoryBrands []model.GoodsCategoryBrand
-	result = db.Preload("Brands").Where(&model.GoodsCategoryBrand{CategoryID: category.ID}).Find(&categoryBrands)
-	if result.RowsAffected > 0 {
+	// result = db.Preload("Brands").Where(&model.GoodsCategoryBrand{CategoryID: category.ID}).Find(&categoryBrands)
+	// if result.RowsAffected > 0 {
+	// 	brandListRsp.Total = int32(result.RowsAffected)
+	// }
+	if result := global.DB.Preload("Brands").Where(&model.GoodsCategoryBrand{CategoryID: req.Id}).Find(&categoryBrands); result.RowsAffected > 0 {
 		brandListRsp.Total = int32(result.RowsAffected)
 	}
 	// 查询到的品牌结果与响应返回绑定
@@ -96,15 +101,15 @@ func (s *GoodsServer) CreateCategoryBrand(ctx context.Context, req *proto.Catego
 	}, nil
 }
 
-func (s *GoodsServer) DeleteCategoryBrand(ctx context.Context, req *proto.CategoryBrandRequest) (*emptypb.Empty, error) {
+func (s *GoodsServer) DeleteCategoryBrand(ctx context.Context, req *proto.CategoryBrandRequest) (*proto.Empty, error) {
 	result := global.DB.Delete(&model.GoodsCategoryBrand{}, req.Id)
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "商品分类不存在")
 	}
-	return &emptypb.Empty{}, nil
+	return &proto.Empty{}, nil
 }
 
-func (s *GoodsServer) UpdateCategoryBrand(ctx context.Context, req *proto.CategoryBrandRequest) (*emptypb.Empty, error) {
+func (s *GoodsServer) UpdateCategoryBrand(ctx context.Context, req *proto.CategoryBrandRequest) (*proto.Empty, error) {
 	var categoryBrand model.GoodsCategoryBrand
 	result := global.DB.First(&categoryBrand, req.Id)
 	if result.RowsAffected == 0 {
@@ -125,5 +130,5 @@ func (s *GoodsServer) UpdateCategoryBrand(ctx context.Context, req *proto.Catego
 	categoryBrand.CategoryID = req.CategoryId
 	categoryBrand.BrandID = req.BrandId
 	global.DB.Save(&categoryBrand)
-	return &emptypb.Empty{}, nil
+	return &proto.Empty{}, nil
 }

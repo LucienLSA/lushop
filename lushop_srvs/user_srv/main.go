@@ -34,19 +34,19 @@ func main() {
 	initialize.Logger()
 	zap.S().Info("init Logger sucess")
 	zap.S().Info(global.ServerConfig)
-	IP := flag.String("ip", "0.0.0.0", "ip地址")
+	// IP := flag.String("ip", "0.0.0.0", "ip地址")
 	Port := flag.Int("port", 0, "端口号")
 	flag.Parse()
-	zap.S().Info("ip:", *IP)
+	// zap.S().Info("ip:", *IP)
 	if *Port == 0 {
 		*Port, _ = addr.GetFreeport()
 	}
 	zap.S().Info("port:", *Port)
 	server := grpc.NewServer()
 	proto.RegisterUserServer(server, &handler.UserServer{})
-	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", *IP, *Port))
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", global.ServerConfig.Host, *Port))
 	if err != nil {
-		zap.S().Errorf("ip:", *IP)
+		zap.S().Errorf("ip:", global.ServerConfig.Host)
 		panic("failed to listen:" + err.Error())
 	}
 	// 注册grpc服务健康检查

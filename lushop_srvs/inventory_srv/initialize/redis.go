@@ -28,7 +28,7 @@ func Redis() (err error) {
 
 	_, err = global.Rdb.Ping(context.Background()).Result()
 	if err != nil {
-		zap.L().Error("connect redis failed, err:%v\n", zap.Error(err))
+		zap.S().Error("connect redis failed, err:%v\n", zap.Error(err))
 		return
 	}
 	return nil

@@ -2,16 +2,16 @@ package main
 
 import (
 	"context"
-	proto_address "useropsrv/proto/gen/address"
-	proto_message "useropsrv/proto/gen/message"
-	proto_userfav "useropsrv/proto/gen/userfav"
+
+	proto "useropsrv/proto"
 
 	"google.golang.org/grpc"
 )
 
-var mClient proto_message.MessageClient
-var aClient proto_address.AddressClient
-var uClient proto_userfav.UserFavClient
+// var mClient proto_message.MessageClient
+// var aClient proto_address.AddressClient
+// var uClient proto_userfav.UserFavClient
+var client proto.UserOpClient
 var conn *grpc.ClientConn
 
 func InitClient() {
@@ -21,13 +21,14 @@ func InitClient() {
 	if err != nil {
 		panic(err)
 	}
-	aClient = proto_address.NewAddressClient(conn)
-	mClient = proto_message.NewMessageClient(conn)
-	uClient = proto_userfav.NewUserFavClient(conn)
+	// aClient = proto_address.NewAddressClient(conn)
+	// mClient = proto_message.NewMessageClient(conn)
+	// uClient = proto_userfav.NewUserFavClient(conn)
+	client = proto.NewUserOpClient(conn)
 }
 
 func TestAddressList() {
-	_, err := aClient.GetAddressList(context.Background(), &proto_address.AddressRequest{
+	_, err := client.GetAddressList(context.Background(), &proto.AddressRequest{
 		UserId: 1,
 	})
 	if err != nil {
@@ -36,7 +37,7 @@ func TestAddressList() {
 }
 
 func TestMessageList() {
-	_, err := mClient.MessageList(context.Background(), &proto_message.MessageRequest{
+	_, err := client.MessageList(context.Background(), &proto.MessageRequest{
 		UserId: 1,
 	})
 	if err != nil {
@@ -45,7 +46,7 @@ func TestMessageList() {
 }
 
 func TestUserFavList() {
-	_, err := uClient.GetFavList(context.Background(), &proto_userfav.UserFavRequest{
+	_, err := client.GetFavList(context.Background(), &proto.UserFavRequest{
 		UserId: 1,
 	})
 	if err != nil {

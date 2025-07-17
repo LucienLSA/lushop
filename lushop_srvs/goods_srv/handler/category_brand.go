@@ -95,7 +95,9 @@ func (s *GoodsServer) CreateCategoryBrand(ctx context.Context, req *proto.Catego
 		CategoryID: req.CategoryId,
 		BrandID:    req.BrandId,
 	}
-	global.DB.Save(&categoryBrand)
+	if result := global.DB.Save(&categoryBrand); result.Error != nil {
+		return nil, status.Errorf(codes.NotFound, "创建商品分类品牌失败")
+	}
 	return &proto.CategoryBrandResponse{
 		Id: categoryBrand.ID,
 	}, nil
@@ -129,6 +131,8 @@ func (s *GoodsServer) UpdateCategoryBrand(ctx context.Context, req *proto.Catego
 	}
 	categoryBrand.CategoryID = req.CategoryId
 	categoryBrand.BrandID = req.BrandId
-	global.DB.Save(&categoryBrand)
+	if result := global.DB.Save(&categoryBrand); result.Error != nil {
+		return nil, status.Errorf(codes.NotFound, "更新商品分类品牌失败")
+	}
 	return &proto.Empty{}, nil
 }

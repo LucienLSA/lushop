@@ -131,7 +131,9 @@ func (s *GoodsServer) CreateCategory1(ctx context.Context, req *proto.CategoryIn
 		category.ParentCategoryID = req.ParentCategory
 	}
 	category.IsTab = req.IsTab
-	global.DB.Save(&category)
+	if result := global.DB.Save(&category); result.Error != nil {
+		return nil, status.Errorf(codes.NotFound, "创建商品分类失败")
+	}
 	return &proto.CategoryInfoResponse{Id: int32(category.ID)}, nil
 }
 

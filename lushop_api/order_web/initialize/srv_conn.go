@@ -18,9 +18,13 @@ import (
 
 func SrvConn() {
 	consulInfo := global.ServerConfig.ConsulInfo
+	// 连接订单服务
 	var opts []grpc.DialOption
-	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`))
+	opts = append(opts,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`),
+		// grpc.WithStatsHandler(otelgrpc.NewClientHandler()), // 设置 StatsHandler
+	)
 	retryOpts := []grpc_retry.CallOption{
 		grpc_retry.WithMax(3),                           // 最大重试次数
 		grpc_retry.WithPerRetryTimeout(1 * time.Second), // 每次超时最大时间
@@ -37,7 +41,7 @@ func SrvConn() {
 	}
 	OrderSrvClient := proto_order.NewOrderClient(orderConn)
 	global.OrderSrvClient = OrderSrvClient
-
+	// 连接商品服务
 	goodsConn, err := grpc.Dial(
 		fmt.Sprintf("consul://%s:%s/%s?wait=14s", consulInfo.Host, consulInfo.Port, global.ServerConfig.GoodsSrvInfo.Name),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -48,7 +52,7 @@ func SrvConn() {
 	}
 	GoodsSrvClient := proto_goods.NewGoodsClient(goodsConn)
 	global.GoodsSrvClient = GoodsSrvClient
-
+	// 连接库存服务
 	inventoryConn, err := grpc.Dial(
 		fmt.Sprintf("consul://%s:%s/%s?wait=14s", consulInfo.Host, consulInfo.Port, global.ServerConfig.InventorySrvInfo.Name),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),

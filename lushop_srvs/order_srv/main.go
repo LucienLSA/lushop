@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"net"
@@ -15,9 +16,9 @@ import (
 	"strconv"
 	"syscall"
 
-	"github.com/apache/rocketmq-client-go/v2"
 	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/google/uuid"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -27,36 +28,56 @@ import (
 func main() {
 	// 初始化日志
 	initialize.Logger()
-	zap.S().Info("init Logger sucess")
+	zap.S().Info("init Logger success")
 	// 初始化Config
 	initialize.Config()
-	zap.S().Info("init config sucess")
+	zap.S().Info("init config success")
 	// 初始化Mysql
 	initialize.MySQL()
-	zap.S().Info("init MySQL sucess")
-	// 初始化redis
-	if err := initialize.Redis(); err != nil {
-		zap.S().Panic("初始化redis失败", err.Error())
-	}
-	zap.S().Info("init Redis sucess")
+	zap.S().Info("init MySQL success")
+	// // 初始化redis
+	// if err := initialize.Redis(); err != nil {
+	// 	zap.S().Panic("初始化redis失败", err.Error())
+	// }
+	// zap.S().Info("init Redis sucess")
 	// 初始化跨服务连接
 	initialize.SrvConn()
-	zap.S().Info("init SrvConn sucess")
+	zap.S().Info("init SrvConn success")
+	// 初始化RocketMQ()
+	initialize.InitRocketMQ()
+	zap.S().Info("init RocketMQ success")
+	// 初始化Jaeger
+	ctx := context.Background()
+	tp, err := initialize.Tracer(ctx)
+	if err != nil {
+		zap.S().Errorf("init Tracer error: %s", err.Error())
+	}
+	zap.S().Info("init Tracer success")
+	defer func() {
+		if err := tp.Shutdown(ctx); err != nil {
+			zap.S().Errorf("Error shutting down tracer provider: %v", err.Error())
+		}
+	}()
 
 	zap.S().Info(global.ServerConfig)
-	IP := flag.String("ip", "0.0.0.0", "ip地址")
-	Port := flag.Int("port", 8022, "端口号")
+	// IP := flag.String("ip", "0.0.0.0", "ip地址")
+	Port := flag.Int("port", 50053, "端口号")
 	flag.Parse()
-	zap.S().Info("ip:", *IP)
+	// zap.S().Info("ip:", *IP)
 	if *Port == 0 {
 		*Port, _ = addr.GetFreeport()
 	}
 	zap.S().Info("port:", *Port)
-	server := grpc.NewServer()
+
+	// 设置 StatsHandler
+	server := grpc.NewServer(
+		grpc.StatsHandler(otelgrpc.NewServerHandler()),
+	)
+
 	v2orderproto.RegisterOrderServer(server, &handler.OrderServer{})
-	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", *IP, *Port))
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", global.ServerConfig.Host, *Port))
 	if err != nil {
-		zap.S().Errorf("ip:", *IP)
+		zap.S().Errorf("ip:", global.ServerConfig.Host)
 		panic("failed to listen:" + err.Error())
 	}
 	// 注册grpc服务健康检查
@@ -102,47 +123,62 @@ func main() {
 	register_client := consul.NewRegistryClient(global.ServerConfig.ConsulInfo.Host, consulPortInt)
 	err = register_client.Register(global.ServerConfig.Host, *Port, global.ServerConfig.Name, global.ServerConfig.Tags, serviceId)
 	if err != nil {
-		zap.S().Panic("服务注册失败", err.Error())
-	}
-	zap.S().Debugf("init grpc orderservice success,port:%d", *Port)
-
-	//监听订单超时topic
-	c, err := rocketmq.NewPushConsumer(
-		consumer.WithNameServer([]string{"192.168.226.140:9876"}),
-		consumer.WithGroupName("lushop-order"),
-	)
-	if err != nil {
-		zap.S().Panic("创建pushconsumer失败", err.Error())
-	}
-	err = c.Subscribe("order_timeout", consumer.MessageSelector{}, handler.OrderTimeout)
-	if err != nil {
-		zap.S().Panic("读取消息失败", err.Error())
-	}
-	err = c.Start()
-	if err != nil {
-		zap.S().Panic("启动监听消息失败", err.Error())
+		zap.S().Panic("【订单和购物车服务-srv】服务注册失败:", err.Error())
+	} else {
+		zap.S().Info("ip:", global.ServerConfig.Host, ":", *Port)
+		zap.S().Info("【订单和购物车服务-srv】注册成功")
 	}
 
+	//启动服务
 	go func() {
 		err = server.Serve(lis)
 		if err != nil {
-			zap.S().Errorf("failed to start grpc:" + err.Error())
+			panic("failed to start grpc:" + err.Error())
 		}
 	}()
+
+	// c, err := rocketmq.NewPushConsumer(
+	// 	consumer.WithNameServer([]string{"192.168.226.140:9876"}),
+	// 	consumer.WithGroupName("lushop-order"),
+	// )
+	// if err != nil {
+	// 	zap.S().Panic("创建pushconsumer失败", err.Error())
+	// }
+	// err = c.Subscribe("order_timeout", consumer.MessageSelector{}, handler.OrderTimeout)
+	// if err != nil {
+	// 	zap.S().Panic("读取消息失败", err.Error())
+	// }
+	// err = c.Start()
+	// if err != nil {
+	// 	zap.S().Panic("启动监听消息失败", err.Error())
+	// }
+	//监听订单超时topic
+	// "order_timeout"
+	if err = global.MQPushClient.Subscribe(global.ServerConfig.RocketMQConfig.TopicTimeOut, consumer.MessageSelector{}, handler.OrderTimeout); err != nil {
+		zap.S().Debugf("读取消息失败", err.Error())
+		fmt.Println("读取消息失败")
+	}
+	err = global.MQPushClient.Start()
+	if err != nil {
+		zap.S().Debugf("启动监听消息失败", err.Error())
+		fmt.Println(err.Error())
+	}
 
 	// 接收终止信号，优雅退出
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	err = c.Shutdown()
-	if err != nil {
-		zap.S().Panic("关闭consumer监听协程失败", err.Error())
-	}
+	// err = c.Shutdown()
+	// if err != nil {
+	// 	zap.S().Panic("关闭consumer监听协程失败", err.Error())
+	// }
 	err = register_client.DeRegister(serviceId)
 	// client.Agent().ServiceDeregister(serviceID)
-	if err != nil {
-		zap.S().Info("注销失败:", err.Error())
+	initialize.DeregisterMQ()
+	zap.S().Info("init DeregisterMQ success")
+	if err = register_client.DeRegister(serviceId); err != nil {
+		zap.S().Panic("【订单和购物车服务-srv】注销失败:", err.Error())
 	} else {
-		zap.S().Info("注销成功:")
+		zap.S().Info("【订单和购物车服务-srv】注销成功")
 	}
 }

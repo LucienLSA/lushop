@@ -21,16 +21,17 @@ redis:
   pool_size: 10
 
 rocketmq:
- name: order_reback
  host: '192.168.226.140'
  port: '9876'
- group: lushop-inventory
- suborder1: order_reback
+ group_name: lushop_order
+ topic_reback: order_reback
+ topic_timeout: order_timeout
 
 jaeger:
  host: '192.168.226.140'
- port: '6831'
- name: v1order_srv
+ port: '4317'
+ service_name: order_srv
+ tracer_name: order_grpc_server
 
 goods_srv:
   name: 'goods_srv'

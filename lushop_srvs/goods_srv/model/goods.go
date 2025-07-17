@@ -43,7 +43,7 @@ func (GoodsCategoryBrand) TableName() string {
 
 type Banner struct {
 	BaseModel
-	Image string `gorm:"type:varchar(200);not null"`
+	Image string `gorm:"type:varchar(200);not null;comment:轮播图"`
 	Url   string `gorm:"type:varchar(200);not null;comment:'图片链接'"`
 	Index int32  `gorm:"type:int;default:1;not null;comment:'轮播图的索引'"`
 }

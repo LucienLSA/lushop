@@ -33,7 +33,10 @@ func (s *GoodsServer) CreateBanner(ctx context.Context, req *proto.BannerRequest
 	banner.Image = req.Image
 	banner.Index = req.Index
 	banner.Url = req.Url
-	global.DB.Save(&banner)
+
+	if result := global.DB.Save(&banner); result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "创建轮播图失败")
+	}
 	return &proto.BannerResponse{Id: banner.ID}, nil
 }
 func (s *GoodsServer) DeleteBanner(ctx context.Context, req *proto.BannerRequest) (*proto.Empty, error) {
@@ -57,6 +60,8 @@ func (s *GoodsServer) UpdateBanner(ctx context.Context, req *proto.BannerRequest
 	if req.Index != 0 {
 		banner.Index = req.Index
 	}
-	global.DB.Save(&banner)
+	if result := global.DB.Save(&banner); result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "更新轮播图失败")
+	}
 	return &proto.Empty{}, nil
 }

@@ -48,14 +48,17 @@ type NacosConfig struct {
 }
 
 type JaegerConfig struct {
-	Host string `mapstructure:"host" json:"host"`
-	Port string `mapstructure:"port" json:"port"`
-	Name string `mapstructure:"name" json:"name"`
+	Host        string `mapstructure:"host" json:"host"`
+	Port        string `mapstructure:"port" json:"port"`
+	ServiceName string `mapstructure:"service_name" json:"service_name"`
+	TracerName  string `mapstructure:"tracer_name" json:"tracer_name"`
 }
 type RocketMQConfig struct {
-	Host string `mapstructure:"host" json:"host"`
-	Port string `mapstructure:"port" json:"port"`
-	Name string `mapstructure:"name" json:"name"`
+	Host         string `mapstructure:"host" json:"host"`
+	Port         string `mapstructure:"port" json:"port"`
+	TopicReback  string `mapstructure:"topic_reback" json:"topic_reback"`
+	TopicTimeOut string `mapstructure:"topic_timeout" json:"topic_timeout"`
+	Group        string `mapstructure:"group" json:"group"`
 }
 
 type NacosInfo struct {

@@ -36,7 +36,9 @@ func (*UserOpServer) AddUserFav(ctx context.Context, req *proto.UserFavRequest) 
 	userFav.User = req.UserId
 	userFav.Goods = req.GoodsId
 
-	global.DB.Save(&userFav)
+	if result := global.DB.Save(&userFav); result.Error != nil {
+		return nil, result.Error
+	}
 
 	return &proto.Empty{}, nil
 }

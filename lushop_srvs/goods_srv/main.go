@@ -63,7 +63,11 @@ func main() {
 		global.ServerConfig.ConsulInfo.Port)
 	client, err := api.NewClient(cfg)
 	if err != nil {
+		zap.S().Panic("【商品服务-srv】注册失败")
 		panic(err)
+	} else {
+		zap.S().Info("ip:", *IP, ":", *Port)
+		zap.S().Info("【商品服务-srv】注册成功")
 	}
 	// 生成对应的检查对象
 	check := &api.AgentServiceCheck{
@@ -100,7 +104,8 @@ func main() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 	if err = client.Agent().ServiceDeregister(serviceID); err != nil {
-		zap.S().Info("注销失败")
+		zap.S().Panic("【商品服务-srv】注销失败")
+	} else {
+		zap.S().Info("【商品服务-srv】注销成功")
 	}
-	zap.S().Info("注销成功")
 }

@@ -362,7 +362,7 @@ func (s *GoodsServer) CreateGoods(ctx context.Context, req *proto.CreateGoodsInf
 	tx := global.DB.Begin()
 	if result := tx.Save(&goods); result.Error != nil {
 		tx.Rollback()
-		return nil, result.Error
+		return nil, status.Errorf(codes.Internal, "新增商品失败")
 	}
 	tx.Commit()
 	goodsDetailResponse := ModelToResponse(goods)
@@ -407,11 +407,13 @@ func (s *GoodsServer) UpdateGoods1(ctx context.Context, req *proto.CreateGoodsIn
 	goods.IsNew = req.IsNew
 	goods.IsHot = req.IsHot
 	goods.OnSale = req.OnSale
-	global.DB.Save(&goods)
+	if result := global.DB.Save(&goods); result.Error != nil {
+		return nil, status.Error(codes.Internal, "更新商品失败")
+	}
 	return &proto.Empty{}, nil
 }
 
-// 事务更新
+// 事务更新商品
 func (s *GoodsServer) UpdateGoods(ctx context.Context, req *proto.CreateGoodsInfo) (*proto.Empty, error) {
 	var goods model.Goods
 	// 如果请求中没有传递 CategoryId 和 BrandId，只更新商品的 IsNew、IsHot、OnSale 这三个布尔字段。

@@ -12,7 +12,7 @@ var (
 	DB           *gorm.DB
 	Rdb          *redis.Client
 	ServerConfig config.ServerConfig
-	NacosConfig  config.NacosConfig
+	// NacosConfig  config.NacosConfig
 )
 
 const Mode = "LUSHOP_DEBUG"

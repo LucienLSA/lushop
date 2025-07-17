@@ -41,7 +41,7 @@ func (v *InventoryServer) SetInv(ctx context.Context, req *proto.GoodsInvInfo) (
 	inv.Goods = req.GoodsId
 	inv.Stocks = req.Num
 	if result := global.DB.Save(&inv); result.Error != nil {
-		return nil, result.Error
+		return nil, status.Errorf(codes.Internal, "设置库存失败")
 	}
 	return &proto.Empty{}, nil
 }

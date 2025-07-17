@@ -15,19 +15,18 @@ var (
 	DB           *gorm.DB
 	Rdb          *redis.Client
 	ServerConfig config.ServerConfig
-	NacosConfig  config.NacosConfig
+	// NacosConfig  config.NacosConfig
 
 	GoodsSrvClient     v2goods.GoodsClient
 	InventorySrvClient v2inventory.InventoryClient
 
+	// MQ客户端声明
 	MQPushClient     rocketmq.PushConsumer        // 消息消费者，用于订阅并消费消息
 	MQSendTranClient rocketmq.TransactionProducer // 事务消息生产者，用于发送分布式事务消息。
 	MQSendClient     rocketmq.Producer            // 普通消息生产者，用于发送普通消息到消息队列。
 )
 
 const Mode = "LUSHOP_DEBUG"
-
-// 以上未初始化对象，在init中依赖注入方式初始化
 
 func GetEnvInfoBool(env string) bool {
 	viper.AutomaticEnv()

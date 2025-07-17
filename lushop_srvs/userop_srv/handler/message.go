@@ -40,7 +40,9 @@ func (*UserOpServer) CreateMessage(ctx context.Context, req *proto.MessageReques
 	message.Message = req.Message
 	message.File = req.File
 
-	global.DB.Save(&message)
+	if result := global.DB.Create(&message); result.Error != nil {
+		return nil, result.Error
+	}
 
 	return &proto.MessageResponse{Id: message.ID}, nil
 }

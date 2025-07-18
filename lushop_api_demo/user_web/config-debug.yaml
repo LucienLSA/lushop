@@ -1,0 +1,44 @@
+name: 'user_web'
+host: '10.99.195.125'
+tags: ['user_web','gin','lushop_web','lucien']
+port: 8023
+
+
+user_srv:
+  name: 'user_srv'
+  version: 'v1'
+
+
+jwt:
+  key: 'lushop_secret_key'
+  expired_time: 2592000
+
+ali_sms:
+  api_key: 'Ali_ApiKey'
+  api_secret: 'Ali_ApiSecret'
+  sign_name: '阿里云短信测试'
+  template_code: 'SMS_154950909'
+  phone_number: '19821216806'
+  region_id: 'cn-hangzhou'
+  expire: 600
+
+redis:
+  host: '127.0.0.1'
+  port: '6379'
+  db: 4
+  password: ''
+  pool_size: 10
+
+consul:
+  host: '192.168.226.140'
+  port: '8500'
+
+
+# nacos:
+#   host: '192.168.226.140'
+#   port: '8848'
+#   namespace: '4da0930f-5769-446a-b916-7195bd731fed'
+#   user: 'nacos'
+#   password: 'nacos'
+#   dataid: 'user_web.json'
+#   group: 'dev'

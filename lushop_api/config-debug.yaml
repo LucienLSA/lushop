@@ -1,0 +1,101 @@
+name: v2lushopapi   # 服务器名称
+host: '10.99.195.125'   # 服务器主机
+port: 8101         # 服务器端口
+version: v2
+tags:
+  - gin
+  - lushop
+  - api
+
+jwt:
+  key: 'lushop_secret_key'
+  expired_time: 2592000
+
+ali_sms:
+  api_key: 'Ali_ApiKey'
+  api_secret: 'Ali_ApiSecret'
+  sign_name: '阿里云短信测试'
+  template_code: 'SMS_154950909'
+  phone_number: '19821216806'
+  region_id: 'cn-hangzhou'
+  expire: 600
+
+redis:
+  host: '127.0.0.1'
+  port: '6379'
+  db: 4
+  password: ''
+  pool_size: 10
+
+consul:
+  host: '192.168.226.140'
+  port: '8500'
+
+jaeger:
+  service_name: 'goods_web'
+  jaeger_gin_endpoint: '192.168.226.140:4318'
+
+sentinel:
+  app:
+    name: v2lushop_api
+    type: 0
+  log:
+    dir: "./temp/csp"
+    pid: false
+    metric:
+      maxFileCount: 14
+      flushIntervalSec: 1
+  stat:
+    globalStatisticIntervalMsTotal: 6000
+    system:
+      collectIntervalMs: 1000
+
+log:
+  level: "debug"
+  filepath: "./temp/logs/"
+  filename: "v2lushopapi.log"
+  max_size: 200
+  max_age: 30
+  max_backups: 7
+
+oss: 
+  api_key: 'OSS_ACCESS_KEY_ID'
+  api_secrect: 'OSS_ACCESS_KEY_SECRET'
+  host: 'http://lushop666.oss-cn-shanghai.aliyuncs.com'
+  callback_url: 'https://379430pt29xz.vicp.fun/oss/v1/oss/callback'
+  upload_dir: 'lushop_images/'
+  expired_time: 3000
+
+alipay:
+  app_id: 'AliPay_Id'
+  private_key: 'Lushop_Private_Key'
+  ali_public_key: 'AliPay_Public_Key'
+  notify_url: ''
+  return_url: ''
+  product_code: 'FAST_INSTANT_TRADE_PAY'
+
+user_srv:
+  #    host: 127.0.0.1   # 用户服务主机 直连使用
+  #    port: 9090         # 用户服务端口 直连使用
+  name: v2user_srv   # 用户服务名称
+
+userop_srv:
+  #    host: 127.0.0.1  
+  #    port: 9090        
+  name: v2uesrop_srv   # 用户服务名称
+
+goods_srv:
+  #    host: 127.0.0.1   
+  #    port: 9090         
+  name: v2goods_srv   # 商品服务名称
+
+order_srv:
+  #    host: 127.0.0.1   # 
+  #    port: 9090        
+  name: v2order_srv   # 订单服务名称
+
+inventory_srv:
+  #    host: 127.0.0.1  
+  #    port: 9090        
+  name: v2inventory_srv   # 库存服务名称
+

@@ -1,0 +1,29 @@
+name: 'oss_web'
+host: '10.99.195.125'
+tags: ['oss_web','gin','lushop_web','lucien',oss]
+port: 8043
+
+oss: 
+  api_key: 'OSS_ACCESS_KEY_ID'
+  api_secrect: 'OSS_ACCESS_KEY_SECRET'
+  host: 'http://lushop666.oss-cn-shanghai.aliyuncs.com'
+  callback_url: 'https://379430pt29xz.vicp.fun/oss/v1/oss/callback'
+  upload_dir: 'lushop_images/'
+  expired_time: 3000
+
+jwt:
+  key: 'lushop_secret_key'
+  expired_time: 2592000
+
+consul:
+  host: '192.168.226.140'
+  port: '8500'
+
+# nacos:
+#   host: '192.168.226.140'
+#   port: '8848'
+#   namespace: 'd44bc5b3-42e3-4aa1-9ea7-14d6a747880c'
+#   user: 'nacos'
+#   password: 'nacos'
+#   dataid: 'oss_web.json'
+#   group: 'dev'

@@ -23,7 +23,9 @@ redis:
 rocketmq:
  host: '192.168.226.140'
  port: '9876'
- group_name: lushop_order
+ consumer_group: lushop_order
+ producer_group_delay: lushop_order_delay
+ producer_group_tran: lushop_order_transaction
  topic_reback: order_reback
  topic_timeout: order_timeout
 

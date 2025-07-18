@@ -11,6 +11,7 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"gorm.io/gorm"
 )
 
@@ -163,7 +164,7 @@ func (s *UserServer) CreateUser(ctx context.Context, req *proto.CreateUserInfo) 
 	return userInfoRsp, nil
 }
 
-func (s *UserServer) UpdateUser(ctx context.Context, req *proto.UpdateUserInfo) (*proto.Empty, error) {
+func (s *UserServer) UpdateUser(ctx context.Context, req *proto.UpdateUserInfo) (*emptypb.Empty, error) {
 	var user model.User
 	// db := global.NewDBClient(ctx)
 	// db := global.DB
@@ -179,7 +180,7 @@ func (s *UserServer) UpdateUser(ctx context.Context, req *proto.UpdateUserInfo) 
 	if result.Error != nil {
 		return nil, status.Errorf(codes.Internal, result.Error.Error())
 	}
-	return &proto.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // 检验密码，传入的是请求中的原密码

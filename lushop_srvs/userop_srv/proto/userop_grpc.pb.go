@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -37,14 +38,14 @@ const (
 type UserOpClient interface {
 	GetAddressList(ctx context.Context, in *AddressRequest, opts ...grpc.CallOption) (*AddressListResponse, error)
 	CreateAddress(ctx context.Context, in *AddressRequest, opts ...grpc.CallOption) (*AddressResponse, error)
-	DeleteAddress(ctx context.Context, in *AddressRequest, opts ...grpc.CallOption) (*Empty, error)
-	UpdateAddress(ctx context.Context, in *AddressRequest, opts ...grpc.CallOption) (*Empty, error)
+	DeleteAddress(ctx context.Context, in *AddressRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpdateAddress(ctx context.Context, in *AddressRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	MessageList(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*MessageListResponse, error)
 	CreateMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*MessageResponse, error)
 	GetFavList(ctx context.Context, in *UserFavRequest, opts ...grpc.CallOption) (*UserFavListResponse, error)
-	AddUserFav(ctx context.Context, in *UserFavRequest, opts ...grpc.CallOption) (*Empty, error)
-	DeleteUserFav(ctx context.Context, in *UserFavRequest, opts ...grpc.CallOption) (*Empty, error)
-	GetUserFavDetail(ctx context.Context, in *UserFavRequest, opts ...grpc.CallOption) (*Empty, error)
+	AddUserFav(ctx context.Context, in *UserFavRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteUserFav(ctx context.Context, in *UserFavRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetUserFavDetail(ctx context.Context, in *UserFavRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type userOpClient struct {
@@ -75,9 +76,9 @@ func (c *userOpClient) CreateAddress(ctx context.Context, in *AddressRequest, op
 	return out, nil
 }
 
-func (c *userOpClient) DeleteAddress(ctx context.Context, in *AddressRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *userOpClient) DeleteAddress(ctx context.Context, in *AddressRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Empty)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, UserOp_DeleteAddress_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -85,9 +86,9 @@ func (c *userOpClient) DeleteAddress(ctx context.Context, in *AddressRequest, op
 	return out, nil
 }
 
-func (c *userOpClient) UpdateAddress(ctx context.Context, in *AddressRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *userOpClient) UpdateAddress(ctx context.Context, in *AddressRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Empty)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, UserOp_UpdateAddress_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -125,9 +126,9 @@ func (c *userOpClient) GetFavList(ctx context.Context, in *UserFavRequest, opts 
 	return out, nil
 }
 
-func (c *userOpClient) AddUserFav(ctx context.Context, in *UserFavRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *userOpClient) AddUserFav(ctx context.Context, in *UserFavRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Empty)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, UserOp_AddUserFav_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -135,9 +136,9 @@ func (c *userOpClient) AddUserFav(ctx context.Context, in *UserFavRequest, opts 
 	return out, nil
 }
 
-func (c *userOpClient) DeleteUserFav(ctx context.Context, in *UserFavRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *userOpClient) DeleteUserFav(ctx context.Context, in *UserFavRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Empty)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, UserOp_DeleteUserFav_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -145,9 +146,9 @@ func (c *userOpClient) DeleteUserFav(ctx context.Context, in *UserFavRequest, op
 	return out, nil
 }
 
-func (c *userOpClient) GetUserFavDetail(ctx context.Context, in *UserFavRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *userOpClient) GetUserFavDetail(ctx context.Context, in *UserFavRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Empty)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, UserOp_GetUserFavDetail_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -161,14 +162,14 @@ func (c *userOpClient) GetUserFavDetail(ctx context.Context, in *UserFavRequest,
 type UserOpServer interface {
 	GetAddressList(context.Context, *AddressRequest) (*AddressListResponse, error)
 	CreateAddress(context.Context, *AddressRequest) (*AddressResponse, error)
-	DeleteAddress(context.Context, *AddressRequest) (*Empty, error)
-	UpdateAddress(context.Context, *AddressRequest) (*Empty, error)
+	DeleteAddress(context.Context, *AddressRequest) (*emptypb.Empty, error)
+	UpdateAddress(context.Context, *AddressRequest) (*emptypb.Empty, error)
 	MessageList(context.Context, *MessageRequest) (*MessageListResponse, error)
 	CreateMessage(context.Context, *MessageRequest) (*MessageResponse, error)
 	GetFavList(context.Context, *UserFavRequest) (*UserFavListResponse, error)
-	AddUserFav(context.Context, *UserFavRequest) (*Empty, error)
-	DeleteUserFav(context.Context, *UserFavRequest) (*Empty, error)
-	GetUserFavDetail(context.Context, *UserFavRequest) (*Empty, error)
+	AddUserFav(context.Context, *UserFavRequest) (*emptypb.Empty, error)
+	DeleteUserFav(context.Context, *UserFavRequest) (*emptypb.Empty, error)
+	GetUserFavDetail(context.Context, *UserFavRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedUserOpServer()
 }
 
@@ -185,10 +186,10 @@ func (UnimplementedUserOpServer) GetAddressList(context.Context, *AddressRequest
 func (UnimplementedUserOpServer) CreateAddress(context.Context, *AddressRequest) (*AddressResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAddress not implemented")
 }
-func (UnimplementedUserOpServer) DeleteAddress(context.Context, *AddressRequest) (*Empty, error) {
+func (UnimplementedUserOpServer) DeleteAddress(context.Context, *AddressRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteAddress not implemented")
 }
-func (UnimplementedUserOpServer) UpdateAddress(context.Context, *AddressRequest) (*Empty, error) {
+func (UnimplementedUserOpServer) UpdateAddress(context.Context, *AddressRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateAddress not implemented")
 }
 func (UnimplementedUserOpServer) MessageList(context.Context, *MessageRequest) (*MessageListResponse, error) {
@@ -200,13 +201,13 @@ func (UnimplementedUserOpServer) CreateMessage(context.Context, *MessageRequest)
 func (UnimplementedUserOpServer) GetFavList(context.Context, *UserFavRequest) (*UserFavListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFavList not implemented")
 }
-func (UnimplementedUserOpServer) AddUserFav(context.Context, *UserFavRequest) (*Empty, error) {
+func (UnimplementedUserOpServer) AddUserFav(context.Context, *UserFavRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddUserFav not implemented")
 }
-func (UnimplementedUserOpServer) DeleteUserFav(context.Context, *UserFavRequest) (*Empty, error) {
+func (UnimplementedUserOpServer) DeleteUserFav(context.Context, *UserFavRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteUserFav not implemented")
 }
-func (UnimplementedUserOpServer) GetUserFavDetail(context.Context, *UserFavRequest) (*Empty, error) {
+func (UnimplementedUserOpServer) GetUserFavDetail(context.Context, *UserFavRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserFavDetail not implemented")
 }
 func (UnimplementedUserOpServer) mustEmbedUnimplementedUserOpServer() {}

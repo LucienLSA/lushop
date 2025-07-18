@@ -9,6 +9,7 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func (*UserOpServer) GetFavList(ctx context.Context, req *proto.UserFavRequest) (*proto.UserFavListResponse, error) {
@@ -30,7 +31,7 @@ func (*UserOpServer) GetFavList(ctx context.Context, req *proto.UserFavRequest) 
 	return &rsp, nil
 }
 
-func (*UserOpServer) AddUserFav(ctx context.Context, req *proto.UserFavRequest) (*proto.Empty, error) {
+func (*UserOpServer) AddUserFav(ctx context.Context, req *proto.UserFavRequest) (*emptypb.Empty, error) {
 	var userFav model.UserFav
 
 	userFav.User = req.UserId
@@ -40,20 +41,20 @@ func (*UserOpServer) AddUserFav(ctx context.Context, req *proto.UserFavRequest) 
 		return nil, result.Error
 	}
 
-	return &proto.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }
 
-func (*UserOpServer) DeleteUserFav(ctx context.Context, req *proto.UserFavRequest) (*proto.Empty, error) {
+func (*UserOpServer) DeleteUserFav(ctx context.Context, req *proto.UserFavRequest) (*emptypb.Empty, error) {
 	if result := global.DB.Unscoped().Where("goods=? and user=?", req.GoodsId, req.UserId).Delete(&model.UserFav{}); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "收藏记录不存在")
 	}
-	return &proto.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }
 
-func (*UserOpServer) GetUserFavDetail(ctx context.Context, req *proto.UserFavRequest) (*proto.Empty, error) {
+func (*UserOpServer) GetUserFavDetail(ctx context.Context, req *proto.UserFavRequest) (*emptypb.Empty, error) {
 	var userfav model.UserFav
 	if result := global.DB.Where("goods=? and user=?", req.GoodsId, req.UserId).Find(&userfav); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "收藏记录不存在")
 	}
-	return &proto.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }

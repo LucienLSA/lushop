@@ -8,6 +8,7 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // 获取品牌列表
@@ -70,15 +71,15 @@ func (s *GoodsServer) CreateBrand(ctx context.Context, req *proto.BrandRequest) 
 	}, nil
 }
 
-func (s *GoodsServer) DeleteBrand(ctx context.Context, req *proto.BrandRequest) (*proto.Empty, error) {
+func (s *GoodsServer) DeleteBrand(ctx context.Context, req *proto.BrandRequest) (*emptypb.Empty, error) {
 	result := global.DB.Delete(&model.Brand{}, req.Id)
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "品牌不存在")
 	}
-	return &proto.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }
 
-func (s *GoodsServer) UpdateBrand(ctx context.Context, req *proto.BrandRequest) (*proto.Empty, error) {
+func (s *GoodsServer) UpdateBrand(ctx context.Context, req *proto.BrandRequest) (*emptypb.Empty, error) {
 	brands := model.Brand{}
 	if result := global.DB.Where(&model.Brand{BaseModel: model.BaseModel{ID: req.Id}}).First(&brands); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "品牌不存在")
@@ -92,5 +93,5 @@ func (s *GoodsServer) UpdateBrand(ctx context.Context, req *proto.BrandRequest) 
 	if result := global.DB.Save(&brands); result.Error != nil {
 		return nil, status.Errorf(codes.Internal, "创建品牌失败")
 	}
-	return &proto.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }

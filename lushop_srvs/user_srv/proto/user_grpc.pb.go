@@ -4,13 +4,14 @@
 // - protoc             v3.15.5
 // source: user.proto
 
-package v2proto
+package v2userproto
 
 import (
 	context "context"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -35,7 +36,7 @@ type UserClient interface {
 	GetUserByMobile(ctx context.Context, in *MobileRequest, opts ...grpc.CallOption) (*UserInfoResponse, error)
 	GetUserById(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*UserInfoResponse, error)
 	CreateUser(ctx context.Context, in *CreateUserInfo, opts ...grpc.CallOption) (*UserInfoResponse, error)
-	UpdateUser(ctx context.Context, in *UpdateUserInfo, opts ...grpc.CallOption) (*Empty, error)
+	UpdateUser(ctx context.Context, in *UpdateUserInfo, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	CheckPassWord(ctx context.Context, in *PasswordCheckInfo, opts ...grpc.CallOption) (*CheckResponse, error)
 }
 
@@ -87,9 +88,9 @@ func (c *userClient) CreateUser(ctx context.Context, in *CreateUserInfo, opts ..
 	return out, nil
 }
 
-func (c *userClient) UpdateUser(ctx context.Context, in *UpdateUserInfo, opts ...grpc.CallOption) (*Empty, error) {
+func (c *userClient) UpdateUser(ctx context.Context, in *UpdateUserInfo, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Empty)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, User_UpdateUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -115,7 +116,7 @@ type UserServer interface {
 	GetUserByMobile(context.Context, *MobileRequest) (*UserInfoResponse, error)
 	GetUserById(context.Context, *IdRequest) (*UserInfoResponse, error)
 	CreateUser(context.Context, *CreateUserInfo) (*UserInfoResponse, error)
-	UpdateUser(context.Context, *UpdateUserInfo) (*Empty, error)
+	UpdateUser(context.Context, *UpdateUserInfo) (*emptypb.Empty, error)
 	CheckPassWord(context.Context, *PasswordCheckInfo) (*CheckResponse, error)
 	mustEmbedUnimplementedUserServer()
 }
@@ -139,7 +140,7 @@ func (UnimplementedUserServer) GetUserById(context.Context, *IdRequest) (*UserIn
 func (UnimplementedUserServer) CreateUser(context.Context, *CreateUserInfo) (*UserInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
 }
-func (UnimplementedUserServer) UpdateUser(context.Context, *UpdateUserInfo) (*Empty, error) {
+func (UnimplementedUserServer) UpdateUser(context.Context, *UpdateUserInfo) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
 }
 func (UnimplementedUserServer) CheckPassWord(context.Context, *PasswordCheckInfo) (*CheckResponse, error) {

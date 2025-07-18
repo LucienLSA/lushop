@@ -8,6 +8,7 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // 获取品牌与商品分类列表
@@ -103,15 +104,15 @@ func (s *GoodsServer) CreateCategoryBrand(ctx context.Context, req *proto.Catego
 	}, nil
 }
 
-func (s *GoodsServer) DeleteCategoryBrand(ctx context.Context, req *proto.CategoryBrandRequest) (*proto.Empty, error) {
+func (s *GoodsServer) DeleteCategoryBrand(ctx context.Context, req *proto.CategoryBrandRequest) (*emptypb.Empty, error) {
 	result := global.DB.Delete(&model.GoodsCategoryBrand{}, req.Id)
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "商品分类不存在")
 	}
-	return &proto.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }
 
-func (s *GoodsServer) UpdateCategoryBrand(ctx context.Context, req *proto.CategoryBrandRequest) (*proto.Empty, error) {
+func (s *GoodsServer) UpdateCategoryBrand(ctx context.Context, req *proto.CategoryBrandRequest) (*emptypb.Empty, error) {
 	var categoryBrand model.GoodsCategoryBrand
 	result := global.DB.First(&categoryBrand, req.Id)
 	if result.RowsAffected == 0 {
@@ -134,5 +135,5 @@ func (s *GoodsServer) UpdateCategoryBrand(ctx context.Context, req *proto.Catego
 	if result := global.DB.Save(&categoryBrand); result.Error != nil {
 		return nil, status.Errorf(codes.NotFound, "更新商品分类品牌失败")
 	}
-	return &proto.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }

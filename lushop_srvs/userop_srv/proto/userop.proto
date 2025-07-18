@@ -1,22 +1,23 @@
 syntax = "proto3";
 // package v1userop;
+import "google/protobuf/empty.proto";
 option go_package = ".;v2useropproto";
 
 service UserOp{
   rpc GetAddressList(AddressRequest) returns(AddressListResponse); //查看地址
   rpc CreateAddress(AddressRequest) returns(AddressResponse); //新增地址
-  rpc DeleteAddress(AddressRequest) returns(Empty); //删除地址
-  rpc UpdateAddress(AddressRequest) returns(Empty); //修改地址
+  rpc DeleteAddress(AddressRequest) returns(google.protobuf.Empty); //删除地址
+  rpc UpdateAddress(AddressRequest) returns(google.protobuf.Empty); //修改地址
 
   rpc MessageList(MessageRequest) returns(MessageListResponse); //批量获取留言信息
   rpc CreateMessage(MessageRequest) returns(MessageResponse); //添加留言
 
   rpc GetFavList(UserFavRequest) returns(UserFavListResponse); //过滤收藏信息
-  rpc AddUserFav(UserFavRequest) returns(Empty); //添加收藏
-  rpc DeleteUserFav(UserFavRequest) returns(Empty); //删除收藏
-  rpc GetUserFavDetail(UserFavRequest) returns(Empty); //查看用户是否已经收藏某件商品
+  rpc AddUserFav(UserFavRequest) returns(google.protobuf.Empty); //添加收藏
+  rpc DeleteUserFav(UserFavRequest) returns(google.protobuf.Empty); //删除收藏
+  rpc GetUserFavDetail(UserFavRequest) returns(google.protobuf.Empty); //查看用户是否已经收藏某件商品
 }
-message Empty{}
+// message Empty{}
 message AddressRequest{
   int32 id = 1;
   int32 userId = 2;

@@ -28,28 +28,27 @@ func main() {
 	zap.S().Info("init Logger sucess")
 	// 初始化Config
 	initialize.Config()
-	zap.S().Info("init config sucess")
+	zap.S().Info("init Config sucess")
 	// 初始化Mysql
 	initialize.MySQL()
 	zap.S().Info("init MySQL sucess")
 	// 初始化es
 	initialize.Es()
-	zap.S().Info("init Es sucess")
+	zap.S().Info("init ES sucess")
 
 	zap.S().Info(global.ServerConfig)
-	IP := flag.String("ip", "0.0.0.0", "ip地址")
-	Port := flag.Int("port", 0, "端口号")
+	// IP := flag.String("ip", "0.0.0.0", "ip地址")
+	Port := flag.Int("port", 50051, "端口号")
 	flag.Parse()
-	zap.S().Info("ip:", *IP)
+	// zap.S().Info("ip:", *IP)
 	if *Port == 0 {
 		*Port, _ = addr.GetFreeport()
 	}
-	zap.S().Info("port:", *Port)
+	// zap.S().Info("port:", *Port)
 	server := grpc.NewServer()
 	proto.RegisterGoodsServer(server, &handler.GoodsServer{})
-	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", *IP, *Port))
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", global.ServerConfig.Host, *Port))
 	if err != nil {
-		zap.S().Errorf("ip:", *IP)
 		panic("failed to listen:" + err.Error())
 	}
 	// 注册grpc服务健康检查
@@ -66,7 +65,7 @@ func main() {
 		zap.S().Panic("【商品服务-srv】注册失败")
 		panic(err)
 	} else {
-		zap.S().Info("ip:", *IP, ":", *Port)
+		zap.S().Info("ip:", global.ServerConfig.Host, ":", *Port)
 		zap.S().Info("【商品服务-srv】注册成功")
 	}
 	// 生成对应的检查对象

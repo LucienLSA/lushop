@@ -12,30 +12,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func InitMQ() {
-	//test
-	global.GroupInventory = producer.WithGroupName("mxshop-inventory")
-	global.GroupOrder = producer.WithGroupName("mxshop-order")
-
-	socket := fmt.Sprintf("%s:%d", global.ServerConfig.MqInfo.Host, global.ServerConfig.MqInfo.Port)
-	fmt.Println(socket)
-	global.MQInventory = InitMQNewProducer(global.GroupInventory, socket)
-	global.MQOrder = InitMQNewProducer(global.GroupOrder, socket)
-}
-
-func InitMQNewProducer(Producer producer.Option, Socket string) rocketmq.Producer {
-	p, err := rocketmq.NewProducer(producer.WithNameServer([]string{Socket}),
-		Producer)
-	if err != nil {
-		zap.S().Errorf("初始化生产者失败%s", err)
-	}
-	if err = p.Start(); err != nil {
-		zap.S().Errorf("启动生产者失败%s", err)
-	}
-	return p
-}
-
-func InitRocketMQ() {
+func RocketMQ() {
 	// 生产者
 	//发送事务消息 加入到事务组
 	var err error
@@ -43,7 +20,7 @@ func InitRocketMQ() {
 	global.MQSendTranClient, err = rocketmq.NewTransactionProducer(
 		&handler.OrderListener{},
 		producer.WithNameServer([]string{fmt.Sprintf("%s:%s", global.ServerConfig.RocketMQConfig.Host, global.ServerConfig.RocketMQConfig.Port)}),
-		producer.WithGroupName("transaction"),
+		producer.WithGroupName(global.ServerConfig.RocketMQConfig.ProducerGroupTran),
 	)
 	if err != nil {
 		fmt.Printf("【事务消息】生成producer失败: %s\n", err.Error())
@@ -61,7 +38,7 @@ func InitRocketMQ() {
 	//发送延时消息 加入到延迟组
 	global.MQSendClient, err = rocketmq.NewProducer(
 		producer.WithNsResolver(primitive.NewPassthroughResolver([]string{fmt.Sprintf("%s:%s", global.ServerConfig.RocketMQConfig.Host, global.ServerConfig.RocketMQConfig.Port)})),
-		producer.WithGroupName("delay"),
+		producer.WithGroupName(global.ServerConfig.RocketMQConfig.ProducerGroupDelay),
 	)
 	if err != nil {
 		fmt.Printf("【同步消息】生成producer失败: %s\n", err.Error())
@@ -76,13 +53,13 @@ func InitRocketMQ() {
 	//订阅消息 - 订单超时
 	global.MQPushClient, err = rocketmq.NewPushConsumer(
 		consumer.WithNameServer([]string{fmt.Sprintf("%s:%s", global.ServerConfig.RocketMQConfig.Host, global.ServerConfig.RocketMQConfig.Port)}),
-		consumer.WithGroupName(global.ServerConfig.RocketMQConfig.Group),
+		consumer.WithGroupName(global.ServerConfig.RocketMQConfig.ConsumerGroup),
 	)
 	if err != nil {
 		fmt.Printf("【订阅消息】生成producer失败: %s\n", err.Error())
 		panic(err.Error())
 	}
-	if err = global.MQPushClient.Subscribe("order_timeout", consumer.MessageSelector{}, handler.OrderTimeout); err != nil {
+	if err = global.MQPushClient.Subscribe(global.ServerConfig.RocketMQConfig.TopicTimeOut, consumer.MessageSelector{}, handler.OrderTimeout); err != nil {
 		fmt.Printf("【订阅消息】失败：%s\n", err.Error())
 		panic(err.Error())
 	}

@@ -12,10 +12,11 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // 商品分类
-func (s *GoodsServer) GetAllCategorysList(ctx context.Context, req *proto.Empty) (*proto.CategoryListResponse, error) {
+func (s *GoodsServer) GetAllCategorysList(ctx context.Context, req *emptypb.Empty) (*proto.CategoryListResponse, error) {
 	/*
 		[
 			{
@@ -164,16 +165,16 @@ func (s *GoodsServer) CreateCategory(ctx context.Context, req *proto.CategoryInf
 }
 
 // 删除商品分类
-func (s *GoodsServer) DeleteCategory(ctx context.Context, req *proto.DeleteCategoryRequest) (*proto.Empty, error) {
+func (s *GoodsServer) DeleteCategory(ctx context.Context, req *proto.DeleteCategoryRequest) (*emptypb.Empty, error) {
 	result := global.DB.Delete(&model.Category{}, req.Id)
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "商品分类不存在")
 	}
-	return &proto.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // 更新商品分类
-func (s *GoodsServer) UpdateCategory(ctx context.Context, req *proto.CategoryInfoRequest) (*proto.Empty, error) {
+func (s *GoodsServer) UpdateCategory(ctx context.Context, req *proto.CategoryInfoRequest) (*emptypb.Empty, error) {
 	category := model.Category{}
 	if result := global.DB.First(&category, req.Id); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "商品分类不存在")
@@ -194,5 +195,5 @@ func (s *GoodsServer) UpdateCategory(ctx context.Context, req *proto.CategoryInf
 		zap.S().Error("更新商品分类失败", result.Error)
 		return nil, status.Errorf(codes.Internal, "更新商品分类失败")
 	}
-	return &proto.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }

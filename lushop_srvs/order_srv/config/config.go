@@ -54,11 +54,13 @@ type JaegerConfig struct {
 	TracerName  string `mapstructure:"tracer_name" json:"tracer_name"`
 }
 type RocketMQConfig struct {
-	Host         string `mapstructure:"host" json:"host"`
-	Port         string `mapstructure:"port" json:"port"`
-	TopicReback  string `mapstructure:"topic_reback" json:"topic_reback"`
-	TopicTimeOut string `mapstructure:"topic_timeout" json:"topic_timeout"`
-	Group        string `mapstructure:"group" json:"group"`
+	Host               string `mapstructure:"host" json:"host"`
+	Port               string `mapstructure:"port" json:"port"`
+	TopicReback        string `mapstructure:"topic_reback" json:"topic_reback"`
+	TopicTimeOut       string `mapstructure:"topic_timeout" json:"topic_timeout"`
+	ConsumerGroup      string `mapstructure:"consumer_group" json:"consumer_group"`
+	ProducerGroupDelay string `mapstructure:"producer_group_delay" json:"producer_group_delay"`
+	ProducerGroupTran  string `mapstructure:"producer_group_tran" json:"producer_group_tran"`
 }
 
 type NacosInfo struct {

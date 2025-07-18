@@ -16,8 +16,6 @@ import (
 	"strconv"
 	"syscall"
 
-	"github.com/apache/rocketmq-client-go/v2"
-	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -28,19 +26,21 @@ import (
 func main() {
 	// 初始化日志
 	initialize.Logger()
-	zap.S().Info("init Logger sucess")
+	zap.S().Info("init Logger success")
 	// 初始化Config
 	initialize.Config()
-	zap.S().Info("init config sucess")
+	zap.S().Info("init config success")
 	// 初始化Mysql
 	initialize.MySQL()
-	zap.S().Info("init MySQL sucess")
+	zap.S().Info("init MySQL success")
 	// 初始化redis
 	if err := initialize.Redis(); err != nil {
 		zap.S().Panic("初始化redis失败", err.Error())
 	}
-	zap.S().Info("init Redis sucess")
-
+	zap.S().Info("init Redis success")
+	// 初始化rocketMQ
+	initialize.RocketMQ()
+	zap.S().Info("init RocketMQ success")
 	zap.S().Info(global.ServerConfig)
 	// IP := flag.String("ip", "0.0.0.0", "ip地址")
 	Port := flag.Int("port", 50052, "端口号")
@@ -106,26 +106,36 @@ func main() {
 		zap.S().Info("【库存服务-srv】注册成功")
 	}
 
-	//订阅rocketMQ消息队列，监听库存归还topic
+	//订阅rocketMQ消息队列，监听库存归还topicreback
 	//启动recketmq并设置负载均衡的Group
-	c, err := rocketmq.NewPushConsumer(
-		//consumer.WithNameServer([]string{"192.168.10.130:9876"}),
-		consumer.WithNameServer([]string{fmt.Sprintf("%s:%s", global.ServerConfig.RocketMQConfig.Host, global.ServerConfig.RocketMQConfig.Port)}),
-		//consumer.WithGroupName("mxshop-inventory"),
-		consumer.WithGroupName(global.ServerConfig.RocketMQConfig.Group),
-	)
-	if err != nil {
-		zap.S().Panic("创建pushconsumer失败", err.Error())
-	}
-	//订阅消息
-	if err = c.Subscribe(global.ServerConfig.RocketMQConfig.SubInv1, consumer.MessageSelector{}, handler.AutoReback); err != nil {
-		zap.S().Panic("订阅消息失败", err.Error())
-	}
-	//启动
-	err = c.Start()
-	if err != nil {
-		zap.S().Panic("启动监听消息失败", err.Error())
-	}
+	// c, err := rocketmq.NewPushConsumer(
+	// 	//consumer.WithNameServer([]string{"192.168.10.130:9876"}),
+	// 	consumer.WithNameServer([]string{fmt.Sprintf("%s:%s", global.ServerConfig.RocketMQConfig.Host, global.ServerConfig.RocketMQConfig.Port)}),
+	// 	//consumer.WithGroupName("mxshop-inventory"),
+	// 	consumer.WithGroupName(global.ServerConfig.RocketMQConfig.Group),
+	// )
+	// if err != nil {
+	// 	zap.S().Panic("创建pushconsumer失败", err.Error())
+	// }
+	// //订阅消息
+	// if err = c.Subscribe(global.ServerConfig.RocketMQConfig.SubInv1, consumer.MessageSelector{}, handler.AutoReback); err != nil {
+	// 	zap.S().Panic("订阅消息失败", err.Error())
+	// }
+	// //启动
+	// err = c.Start()
+	// if err != nil {
+	// 	zap.S().Panic("启动监听消息失败", err.Error())
+	// }
+
+	// if err = global.MQPushClient.Subscribe(global.ServerConfig.RocketMQConfig.TopicReback, consumer.MessageSelector{}, handler.AutoReback); err != nil {
+	// 	zap.S().Debugf("读取消息失败", err.Error())
+	// 	fmt.Println("读取消息失败")
+	// }
+	// err = global.MQPushClient.Start()
+	// if err != nil {
+	// 	zap.S().Debugf("启动监听消息失败", err.Error())
+	// 	fmt.Println(err.Error())
+	// }
 
 	// 启动服务
 	go func() {
@@ -139,10 +149,15 @@ func main() {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	err = c.Shutdown()
-	if err != nil {
-		zap.S().Panic("关闭consumer监听协程失败", err.Error())
-	}
+	// err = c.Shutdown()
+	// if err != nil {
+	// 	zap.S().Panic("关闭consumer监听协程失败", err.Error())
+	// }
+
+	// 释放 rocketMQ
+	initialize.DeregisterMQ()
+	zap.S().Info("init DeregisterMQ success")
+	// 服务注销
 	err = register_client.DeRegister(serviceId)
 	// client.Agent().ServiceDeregister(serviceID)
 	if err != nil {

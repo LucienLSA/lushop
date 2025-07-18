@@ -32,7 +32,7 @@ var _ proto.InventoryServer = &InventoryServer{}
 // }
 
 // 设置库存
-func (v *InventoryServer) SetInv(ctx context.Context, req *proto.GoodsInvInfo) (*proto.Empty, error) {
+func (v *InventoryServer) SetInv(ctx context.Context, req *proto.GoodsInvInfo) (*emptypb.Empty, error) {
 	var inv model.Inventory
 	// invDB := v.db.WithContext(ctx)
 	// invDB := initialize.NewDBClient(ctx)
@@ -43,7 +43,7 @@ func (v *InventoryServer) SetInv(ctx context.Context, req *proto.GoodsInvInfo) (
 	if result := global.DB.Save(&inv); result.Error != nil {
 		return nil, status.Errorf(codes.Internal, "设置库存失败")
 	}
-	return &proto.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // 库存详情查询
@@ -102,8 +102,8 @@ func (v *InventoryServer) InvDetail(ctx context.Context, req *proto.GoodsInvInfo
 //		return &emptypb.Empty{}, nil
 //	}
 //
-// 使用go-redsync 分布式锁包
-func (v *InventoryServer) Sell(ctx context.Context, req *proto.SellInfo) (*proto.Empty, error) {
+// 使用go-redsync 分布式锁包 实现库存扣减
+func (v *InventoryServer) Sell(ctx context.Context, req *proto.SellInfo) (*emptypb.Empty, error) {
 	// client := goredislib.NewClient(&goredislib.Options{
 	// 	Addr: fmt.Sprintf("%s:%s", global.ServerConfig.RedisInfo.Host, global.ServerConfig.RedisInfo.Port),
 	// 	// Addr: "localhost:6379",
@@ -152,7 +152,7 @@ func (v *InventoryServer) Sell(ctx context.Context, req *proto.SellInfo) (*proto
 	if err := tx.Commit().Error; err != nil {
 		return nil, status.Errorf(codes.Internal, "提交事务失败")
 	} // 必须手动提交
-	return &proto.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // TCC 方案
@@ -277,7 +277,7 @@ func (v *InventoryServer) CancelSell(ctx context.Context, req *proto.SellInfo) (
 // 2. 订单创建失败，归还之前扣减的库存
 // 3. 手动归还
 // 这里的归还方案废除，由下面的AutoReback重构
-func (v *InventoryServer) Reback(ctx context.Context, req *proto.SellInfo) (*proto.Empty, error) {
+func (v *InventoryServer) Reback(ctx context.Context, req *proto.SellInfo) (*emptypb.Empty, error) {
 	tx := global.DB.Begin()
 	for _, goodInfo := range req.GoodsInfo {
 		var inv model.Inventory
@@ -290,7 +290,7 @@ func (v *InventoryServer) Reback(ctx context.Context, req *proto.SellInfo) (*pro
 		tx.Save(&inv)
 	}
 	tx.Commit() // 必须手动提交
-	return &proto.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // 自动归还库存，放在consumer监听库存中

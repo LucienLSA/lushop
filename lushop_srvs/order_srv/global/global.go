@@ -20,8 +20,9 @@ var (
 	GoodsSrvClient     v2goods.GoodsClient
 	InventorySrvClient v2inventory.InventoryClient
 
-	// MQ客户端声明
-	MQPushClient     rocketmq.PushConsumer        // 消息消费者，用于订阅并消费消息
+	// MQ消费者
+	MQPushClient rocketmq.PushConsumer // 消息消费者，用于订阅并消费消息
+	// MQ生产者
 	MQSendTranClient rocketmq.TransactionProducer // 事务消息生产者，用于发送分布式事务消息。
 	MQSendClient     rocketmq.Producer            // 普通消息生产者，用于发送普通消息到消息队列。
 )

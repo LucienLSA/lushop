@@ -36,11 +36,11 @@ type NacosConfig struct {
 }
 
 type RocketMQConfig struct {
-	Host    string `mapstructure:"host" json:"host"`
-	Port    string `mapstructure:"port" json:"port"`
-	Name    string `mapstructure:"name" json:"name"`
-	Group   string `mapstructure:"group" json:"group"`
-	SubInv1 string `mapstructure:"subinv1" json:"subinv1"`
+	Host        string `mapstructure:"host" json:"host"`
+	Port        string `mapstructure:"port" json:"port"`
+	Name        string `mapstructure:"name" json:"name"`
+	GroupName   string `mapstructure:"consumer_group" json:"consumer_group"`
+	TopicReback string `mapstructure:"topic_reback" json:"topic_reback"`
 }
 
 type NacosInfo struct {

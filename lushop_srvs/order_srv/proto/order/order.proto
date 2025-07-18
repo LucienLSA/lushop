@@ -1,5 +1,6 @@
 syntax = "proto3";
-// import "google/protobuf/empty.proto";
+// import "common.proto";
+import "google/protobuf/empty.proto";
 option go_package = ".;v2orderproto";
 
 
@@ -7,16 +8,16 @@ service Order {
     // 购物车
     rpc CartItemList(UserInfo) returns(CartItemListResponse); // 获取用户购物车信息
     rpc CreateCartItem(CartItemRequest) returns(ShopCartInfoResponse);// 添加商品购物车
-    rpc UpdateCartItem(CartItemRequest) returns(Empty); // 更新商品到购物车
-    rpc DeleteCartItem(CartItemRequest) returns(Empty); //删除购物车条目
+    rpc UpdateCartItem(CartItemRequest) returns(google.protobuf.Empty); // 更新商品到购物车
+    rpc DeleteCartItem(CartItemRequest) returns(google.protobuf.Empty); //删除购物车条目
 
     // 订单
     rpc CreateOrder(OrderRequest) returns(OrderInfoResponse); // 创建订单
     rpc OrderList(OrderFilterRequest) returns (OrderListResponse); // 订单列表
     rpc OrderDetail(OrderRequest) returns (OrderInfoDetailResponse); // 订单详情
-    rpc UpdateOrderStatus(OrderStatus) returns (Empty); // 修改订单状态
+    rpc UpdateOrderStatus(OrderStatus) returns (google.protobuf.Empty); // 修改订单状态
 }
-message Empty{}
+// message Empty{}
 // 用户信息id请求
 message UserInfo{
     int32 id = 1;

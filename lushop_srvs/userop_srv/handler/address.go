@@ -8,6 +8,7 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // 获取地址列表
@@ -56,17 +57,17 @@ func (*UserOpServer) CreateAddress(ctx context.Context, req *proto.AddressReques
 	return &proto.AddressResponse{Id: address.ID}, nil
 }
 
-func (*UserOpServer) DeleteAddress(ctx context.Context, req *proto.AddressRequest) (*proto.Empty, error) {
+func (*UserOpServer) DeleteAddress(ctx context.Context, req *proto.AddressRequest) (*emptypb.Empty, error) {
 	if result := global.DB.Where(&model.Address{BaseModel: model.BaseModel{ID: req.Id}}).First(&model.Address{}); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "收货地址不存在")
 	}
 	if result := global.DB.Where(&model.Address{BaseModel: model.BaseModel{ID: req.Id}}).Delete(&model.Address{}); result.Error != nil {
 		return nil, result.Error
 	}
-	return &proto.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }
 
-func (*UserOpServer) UpdateAddress(ctx context.Context, req *proto.AddressRequest) (*proto.Empty, error) {
+func (*UserOpServer) UpdateAddress(ctx context.Context, req *proto.AddressRequest) (*emptypb.Empty, error) {
 	var address model.Address
 
 	if result := global.DB.Where("id=? and user=?", req.Id, req.UserId).First(&address); result.RowsAffected == 0 {
@@ -101,5 +102,5 @@ func (*UserOpServer) UpdateAddress(ctx context.Context, req *proto.AddressReques
 		return nil, result.Error
 	}
 
-	return &proto.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }

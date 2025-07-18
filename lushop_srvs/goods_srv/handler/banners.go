@@ -8,10 +8,11 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // 轮播图
-func (s *GoodsServer) BannerList(ctx context.Context, req *proto.Empty) (*proto.BannerListResponse, error) {
+func (s *GoodsServer) BannerList(ctx context.Context, req *emptypb.Empty) (*proto.BannerListResponse, error) {
 	bannerListRsp := proto.BannerListResponse{}
 	var banners []model.Banner
 	result := global.DB.Find(&banners)
@@ -39,14 +40,14 @@ func (s *GoodsServer) CreateBanner(ctx context.Context, req *proto.BannerRequest
 	}
 	return &proto.BannerResponse{Id: banner.ID}, nil
 }
-func (s *GoodsServer) DeleteBanner(ctx context.Context, req *proto.BannerRequest) (*proto.Empty, error) {
+func (s *GoodsServer) DeleteBanner(ctx context.Context, req *proto.BannerRequest) (*emptypb.Empty, error) {
 	result := global.DB.Delete(&model.Banner{}, req.Id)
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "轮播图不存在")
 	}
-	return &proto.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }
-func (s *GoodsServer) UpdateBanner(ctx context.Context, req *proto.BannerRequest) (*proto.Empty, error) {
+func (s *GoodsServer) UpdateBanner(ctx context.Context, req *proto.BannerRequest) (*emptypb.Empty, error) {
 	var banner model.Banner
 	if result := global.DB.First(&banner, req.Id); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "轮播图不存在")
@@ -63,5 +64,5 @@ func (s *GoodsServer) UpdateBanner(ctx context.Context, req *proto.BannerRequest
 	if result := global.DB.Save(&banner); result.Error != nil {
 		return nil, status.Errorf(codes.Internal, "更新轮播图失败")
 	}
-	return &proto.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }

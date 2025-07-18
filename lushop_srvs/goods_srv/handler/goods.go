@@ -9,6 +9,7 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type GoodsServer struct {
@@ -370,16 +371,16 @@ func (s *GoodsServer) CreateGoods(ctx context.Context, req *proto.CreateGoodsInf
 }
 
 // 删除商品
-func (s *GoodsServer) DeleteGoods(ctx context.Context, req *proto.DeleteGoodsInfo) (*proto.Empty, error) {
+func (s *GoodsServer) DeleteGoods(ctx context.Context, req *proto.DeleteGoodsInfo) (*emptypb.Empty, error) {
 	result := global.DB.Delete(&model.Goods{BaseModel: model.BaseModel{ID: req.Id}})
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "商品不存在")
 	}
-	return &proto.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // 更新商品以及部分更新
-func (s *GoodsServer) UpdateGoods1(ctx context.Context, req *proto.CreateGoodsInfo) (*proto.Empty, error) {
+func (s *GoodsServer) UpdateGoods1(ctx context.Context, req *proto.CreateGoodsInfo) (*emptypb.Empty, error) {
 	var category model.Category
 	result := global.DB.First(&category, req.CategoryId)
 	if result.RowsAffected == 0 {
@@ -410,11 +411,11 @@ func (s *GoodsServer) UpdateGoods1(ctx context.Context, req *proto.CreateGoodsIn
 	if result := global.DB.Save(&goods); result.Error != nil {
 		return nil, status.Error(codes.Internal, "更新商品失败")
 	}
-	return &proto.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // 事务更新商品
-func (s *GoodsServer) UpdateGoods(ctx context.Context, req *proto.CreateGoodsInfo) (*proto.Empty, error) {
+func (s *GoodsServer) UpdateGoods(ctx context.Context, req *proto.CreateGoodsInfo) (*emptypb.Empty, error) {
 	var goods model.Goods
 	// 如果请求中没有传递 CategoryId 和 BrandId，只更新商品的 IsNew、IsHot、OnSale 这三个布尔字段。
 	if req.CategoryId == 0 && req.BrandId == 0 {
@@ -430,7 +431,7 @@ func (s *GoodsServer) UpdateGoods(ctx context.Context, req *proto.CreateGoodsInf
 			return nil, result.Error
 		}
 		tx.Commit()
-		return &proto.Empty{}, nil
+		return &emptypb.Empty{}, nil
 	}
 	// 如果要更新商品的分类或品牌，先检查数据库中是否存在对应的分类和品牌。
 	var category model.Category
@@ -468,5 +469,5 @@ func (s *GoodsServer) UpdateGoods(ctx context.Context, req *proto.CreateGoodsInf
 		return nil, result.Error
 	}
 	tx.Commit()
-	return &proto.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }

@@ -16,7 +16,6 @@ import (
 	"strconv"
 	"syscall"
 
-	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/google/uuid"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/zap"
@@ -44,7 +43,7 @@ func main() {
 	initialize.SrvConn()
 	zap.S().Info("init SrvConn success")
 	// 初始化RocketMQ()
-	initialize.InitRocketMQ()
+	initialize.RocketMQ()
 	zap.S().Info("init RocketMQ success")
 	// 初始化Jaeger
 	ctx := context.Background()
@@ -129,14 +128,6 @@ func main() {
 		zap.S().Info("【订单和购物车服务-srv】注册成功")
 	}
 
-	//启动服务
-	go func() {
-		err = server.Serve(lis)
-		if err != nil {
-			panic("failed to start grpc:" + err.Error())
-		}
-	}()
-
 	// c, err := rocketmq.NewPushConsumer(
 	// 	consumer.WithNameServer([]string{"192.168.226.140:9876"}),
 	// 	consumer.WithGroupName("lushop-order"),
@@ -152,17 +143,26 @@ func main() {
 	// if err != nil {
 	// 	zap.S().Panic("启动监听消息失败", err.Error())
 	// }
-	//监听订单超时topic
-	// "order_timeout"
-	if err = global.MQPushClient.Subscribe(global.ServerConfig.RocketMQConfig.TopicTimeOut, consumer.MessageSelector{}, handler.OrderTimeout); err != nil {
-		zap.S().Debugf("读取消息失败", err.Error())
-		fmt.Println("读取消息失败")
-	}
-	err = global.MQPushClient.Start()
-	if err != nil {
-		zap.S().Debugf("启动监听消息失败", err.Error())
-		fmt.Println(err.Error())
-	}
+
+	// //监听订单超时topic消息
+	// // 消费者监听 "order_timeout"
+	// if err = global.MQPushClient.Subscribe(global.ServerConfig.RocketMQConfig.TopicTimeOut, consumer.MessageSelector{}, handler.OrderTimeout); err != nil {
+	// 	zap.S().Debugf("读取消息失败", err.Error())
+	// 	fmt.Println("读取消息失败")
+	// }
+	// err = global.MQPushClient.Start()
+	// if err != nil {
+	// 	zap.S().Debugf("启动监听消息失败", err.Error())
+	// 	fmt.Println(err.Error())
+	// }
+
+	//启动服务
+	go func() {
+		err = server.Serve(lis)
+		if err != nil {
+			panic("failed to start grpc:" + err.Error())
+		}
+	}()
 
 	// 接收终止信号，优雅退出
 	quit := make(chan os.Signal)
@@ -172,10 +172,11 @@ func main() {
 	// if err != nil {
 	// 	zap.S().Panic("关闭consumer监听协程失败", err.Error())
 	// }
-	err = register_client.DeRegister(serviceId)
 	// client.Agent().ServiceDeregister(serviceID)
+	// 释放MQ
 	initialize.DeregisterMQ()
 	zap.S().Info("init DeregisterMQ success")
+	// 注销服务
 	if err = register_client.DeRegister(serviceId); err != nil {
 		zap.S().Panic("【订单和购物车服务-srv】注销失败:", err.Error())
 	} else {

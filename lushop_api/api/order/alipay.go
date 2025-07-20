@@ -31,7 +31,10 @@ func Notify(ctx *gin.Context) {
 	}
 	noti, err := client.GetTradeNotification(ctx.Request)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{})
+		zap.S().Errorw("[alipay] VerifySign 方法验证签名失败")
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"msg": err.Error(),
+		})
 		return
 	}
 	_, err = global.OrderSrvClient.UpdateOrderStatus(context.Background(), &v2orderproto.OrderStatus{
@@ -39,9 +42,12 @@ func Notify(ctx *gin.Context) {
 		Status:  string(noti.TradeStatus),
 	})
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{})
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"msg": "不合法的通知",
+		})
 		return
 	}
-	//alipay.AckNotification(rep) // 确认收到通知消息
+	// 如果通知消息没有问题，我们需要确认收到通知消息，不然支付宝后续会继续推送相同的消息
+	//alipay.AckNotification(rep)
 	ctx.String(http.StatusOK, "success")
 }

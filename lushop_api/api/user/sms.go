@@ -40,13 +40,15 @@ func SendSmsAli(ctx *gin.Context) {
 		v2base.HandleValidatorError(ctx, err)
 		return
 	}
+	fmt.Println("ApiSecret:", global.ServerConfig.AliSmsInfo.ApiSecret)
+	fmt.Println("GetEnvInfoStr(ApiSecret):", global.GetEnvInfoStr(global.ServerConfig.AliSmsInfo.ApiSecret))
 	config := &openapi.Config{
 		// 您的AccessKey ID
 		// AccessKeyId: tea.String(global.ServerConfig.AliSmsInfo.ApiKey),
 		AccessKeyId: tea.String(global.GetEnvInfoStr(global.ServerConfig.AliSmsInfo.ApiKey)),
 		// 您的AccessKey Secret
 		// AccessKeySecret: tea.String(global.ServerConfig.AliSmsInfo.ApiSecrect),
-		AccessKeySecret: tea.String(global.GetEnvInfoStr(global.ServerConfig.AliSmsInfo.ApiSecrect)),
+		AccessKeySecret: tea.String(global.GetEnvInfoStr(global.ServerConfig.AliSmsInfo.ApiSecret)),
 		RegionId:        tea.String(global.ServerConfig.AliSmsInfo.RegionId),
 	}
 	// 访问的域名

@@ -72,7 +72,7 @@ func PassWorldLogin(c *gin.Context) {
 		base.HandleValidatorError(c, err)
 		return
 	}
-	if !store.Verify(passwordLoginForm.CaptchaId, passwordLoginForm.Captcha, true) {
+	if !store.Verify(passwordLoginForm.CaptchaId, passwordLoginForm.CaptchaAns, true) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"captcha": "验证码错误",
 		})
@@ -151,7 +151,7 @@ func Register(c *gin.Context) {
 	}
 	//验证码
 	rdb := redis.NewClient(&redis.Options{
-		Addr: fmt.Sprintf("%s:%d", global.ServerConfig.RedisInfo.Host, global.ServerConfig.RedisInfo.Port),
+		Addr: fmt.Sprintf("%s:%s", global.ServerConfig.RedisInfo.Host, global.ServerConfig.RedisInfo.Port),
 	})
 	value, err := rdb.Get(context.Background(), registerForm.Mobile).Result()
 	if err == redis.Nil {

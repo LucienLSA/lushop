@@ -50,7 +50,7 @@ type JwtConfig struct {
 
 type AliSmsConfig struct {
 	ApiKey       string `mapstructure:"api_key" json:"api_key"`
-	ApiSecrect   string `mapstructure:"api_secret" json:"api_secret"`
+	ApiSecret    string `mapstructure:"api_secret" json:"api_secret"`
 	SignName     string `mapstructure:"sign_name" json:"sign_name"`
 	PhoneNumber  string `mapstructure:"phone_number" json:"phone_number"`
 	TemplateCode string `mapstructure:"template_code" json:"template_code"`

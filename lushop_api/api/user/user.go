@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 	"lushopapi/api/base"
 	"lushopapi/utils/jwtClaims"
 	"net/http"
@@ -90,7 +91,7 @@ func PassWorldLogin(c *gin.Context) {
 			default:
 				//zap.S().Error(err)
 				c.JSON(http.StatusInternalServerError, map[string]string{
-					"mobile": "登录失败-1",
+					"mobile": "登录失败",
 					"code":   strconv.Itoa(int(e.Code())),
 				})
 			}
@@ -99,8 +100,8 @@ func PassWorldLogin(c *gin.Context) {
 	} else {
 		//只是查询到用户了而已，并没有检查密码
 		if passRsp, pasErr := global.UserSrvClient.CheckPassWord(context.Background(), &v2userproto.PasswordCheckInfo{
-			PassWord:          passwordLoginForm.PassWord,
-			EncryptedPassWord: rsp.PassWord,
+			PassWord:          passwordLoginForm.PassWord, // 前端用户传入的密码
+			EncryptedPassWord: rsp.PassWord,               // 数据库中查询到的用户设置的密码
 		}); pasErr != nil {
 			c.JSON(http.StatusInternalServerError, map[string]string{
 				"password": "密码错误",
@@ -223,12 +224,41 @@ func Register(c *gin.Context) {
 // 	})
 // }
 
+func toInt32(val interface{}) int32 {
+	switch v := val.(type) {
+	case string:
+		i, _ := strconv.Atoi(v)
+		return int32(i)
+	case int:
+		return int32(v)
+	case int32:
+		return v
+	}
+	return 0
+}
+
 func GetUserDetail(c *gin.Context) {
-	claims, _ := c.Get("claims")
-	currentUser := claims.(*jwtClaims.CustomClaims)
-	zap.S().Infof("访问用户：%d", currentUser)
+	// claims, _ := c.Get("claims")
+	// currentUser := claims.(*jwtClaims.CustomClaims)
+	// zap.S().Infof("访问用户：%d", currentUser)
+
+	userID, exists := c.Get("client_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "未登录"})
+		return
+	}
+	mobile := userID.(string)
+	// 这里才去找用户的实际id
+	user, err := global.UserSrvClient.GetUserByMobile(context.Background(), &v2userproto.MobileRequest{
+		Mobile: mobile,
+	})
+	if err != nil {
+		base.HandleGrpcErrorToHttp(err, c)
+		return
+	}
 	rsp, err := global.UserSrvClient.GetUserById(context.Background(), &v2userproto.IdRequest{
-		Id: int32(currentUser.ID),
+		// Id: int32(currentUser.ID),
+		Id: int32(user.Id),
 	})
 	if err != nil {
 		base.HandleGrpcErrorToHttp(err, c)
@@ -249,15 +279,38 @@ func UpdateUser(ctx *gin.Context) {
 		base.HandleValidatorError(ctx, err)
 		return
 	}
-	claims, _ := ctx.Get("claims")
-	currentUser := claims.(*jwtClaims.CustomClaims)
-	zap.S().Infof("访问用户：%d", currentUser)
-
+	// claims, _ := ctx.Get("claims")
+	// currentUser := claims.(*jwtClaims.CustomClaims)
+	// zap.S().Infof("访问用户：%d", currentUser)
+	userID, exists := ctx.Get("client_id")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "未登录"})
+		return
+	}
+	mobile := userID.(string)
+	// 这里才去找用户的实际id
+	user, err := global.UserSrvClient.GetUserByMobile(context.Background(), &v2userproto.MobileRequest{
+		Mobile: mobile,
+	})
+	if err != nil {
+		base.HandleGrpcErrorToHttp(err, ctx)
+		return
+	}
+	fmt.Println(user)
+	// rsp, err := global.UserSrvClient.GetUserById(context.Background(), &v2userproto.IdRequest{
+	// 	// Id: int32(currentUser.ID),
+	// 	Id: int32(user.Id),
+	// })
+	// if err != nil {
+	// 	base.HandleGrpcErrorToHttp(err, ctx)
+	// 	return
+	// }
 	//将前端传递过来的日期格式转换成int类型
 	loc, _ := time.LoadLocation("Local")                                            // L必须大写
 	birthDay, _ := time.ParseInLocation("2006-01-02", updateUserForm.Birthday, loc) //必须是2006-01-02
-	_, err := global.UserSrvClient.UpdateUser(context.Background(), &v2userproto.UpdateUserInfo{
-		Id:       int32(currentUser.ID),
+	_, err = global.UserSrvClient.UpdateUser(context.Background(), &v2userproto.UpdateUserInfo{
+		// Id:       int32(currentUser.ID),
+		Id:       user.Id,
 		NickName: updateUserForm.Name,
 		Gender:   updateUserForm.Gender,
 		BirthDay: uint64(birthDay.Unix()),

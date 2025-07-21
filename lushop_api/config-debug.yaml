@@ -24,14 +24,14 @@ oauth2:
   client:
 
       # 客户端id 必须全局唯一
-    - id: test_client_1
+    - id: '15383660176'
       # 客户端 secret
-      secret: test_secret_1
+      secret: '123456'
       # 应用名 在页面上必要时进行显示
       name: 测试应用1
       # 客户端 domain
       # !!注意 http/https 不要写错!!
-      domain: http://localhost:9093
+      domain: http://10.99.195.125:8101
       # 权限范围
       # 数组类型
       # 可以配置多个权限 
@@ -46,7 +46,7 @@ oauth2:
     - id: test_client_2
       secret: test_secret_2
       name: 测试应用2 
-      domain: http://localhost:9094
+      domain: http://10.99.195.125:8101
       scope:
         - id: all
           title: 用户账号, 手机, 权限, 角色等信息

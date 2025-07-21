@@ -47,6 +47,14 @@ func main() {
 	zap.S().Info("init redis success")
 	defer global.RedisClient.Close()
 
+	// 初始化OAuth2认证
+	initialize.OAuth2()
+	zap.S().Info("init OAuth2 success")
+
+	// 初始化session
+	initialize.Session()
+	zap.S().Info("init session success")
+
 	//  初始化trace
 	ctx := context.Background()
 	tp, err := track.Tracer(ctx)

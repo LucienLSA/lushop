@@ -1,12 +1,63 @@
 name: v2lushopapi   # 服务器名称
-# host: '10.99.195.125'   # 服务器主机
-host: '10.101.178.90'
+host: '10.99.195.125'   # 服务器主机
+# host: '10.101.178.90'
 port: 8101         # 服务器端口
 version: v2
 tags:
   - gin
   - lushop
   - api
+
+oauth2:
+  # access_token 过期时间
+  # refresh_token 刷新token的refresh过期事件
+  # 单位小时
+  # 默认2小时
+  access_token_exp: 2
+  refresh_token_exp: 12
+  # 签名 jwt access_token 时所用 key
+  jwt_signed_key: "k2bjI75JJHolp0i"
+  
+  # oauth2 客户端配置
+  # 数组类型
+  # 可配置多客户端
+  client:
+
+      # 客户端id 必须全局唯一
+    - id: test_client_1
+      # 客户端 secret
+      secret: test_secret_1
+      # 应用名 在页面上必要时进行显示
+      name: 测试应用1
+      # 客户端 domain
+      # !!注意 http/https 不要写错!!
+      domain: http://localhost:9093
+      # 权限范围
+      # 数组类型
+      # 可以配置多个权限 
+      # 颁发的 access_token 中会包含该值 资源方可以对该值进行验证
+      scope:
+          # 权限范围 id 唯一
+        - id: all
+          # 权限范围名称
+          # 会在页面（登录页面）进行展示
+          title: "用户账号、手机、权限、角色等信息"
+
+    - id: test_client_2
+      secret: test_secret_2
+      name: 测试应用2 
+      domain: http://localhost:9094
+      scope:
+        - id: all
+          title: 用户账号, 手机, 权限, 角色等信息
+
+session:
+  name: session_id
+  secret_key: "kkoiybh1ah6rbh0"
+  # 过期时间
+  # 单位秒
+  # 默认20分钟
+  max_age: 1200
 
 jwt:
   key: 'lushop_secret_key'
@@ -78,25 +129,25 @@ alipay:
 user_srv:
   #    host: 127.0.0.1   # 用户服务主机 直连使用
   #    port: 9090         # 用户服务端口 直连使用
-  name: v2user_srv   # 用户服务名称
+  name: user_srv   # 用户服务名称
 
 userop_srv:
   #    host: 127.0.0.1  
   #    port: 9090        
-  name: v2uesrop_srv   # 用户服务名称
+  name: uesrop_srv   # 用户服务名称
 
 goods_srv:
   #    host: 127.0.0.1   
   #    port: 9090         
-  name: v2goods_srv   # 商品服务名称
+  name: goods_srv   # 商品服务名称
 
 order_srv:
   #    host: 127.0.0.1   # 
   #    port: 9090        
-  name: v2order_srv   # 订单服务名称
+  name: order_srv   # 订单服务名称
 
 inventory_srv:
   #    host: 127.0.0.1  
   #    port: 9090        
-  name: v2inventory_srv   # 库存服务名称
+  name: inventory_srv   # 库存服务名称
 

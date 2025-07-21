@@ -1,6 +1,6 @@
 name: 'userop_srv'
-# host: '10.99.195.125'
-host: '10.101.178.90'
+host: '10.99.195.125'
+# host: '10.101.178.90'
 tags: ['userop_srv','grpc','lushop_srv','lucien','userop','address','message','userfav']
 
 mysql:

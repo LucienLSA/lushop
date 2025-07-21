@@ -23,7 +23,7 @@ func ModelToResponse(user *model.User) *proto.UserInfoResponse {
 	// grpc中的message中字段有默认值，不能随意赋值nil，会错
 	// 哪些字段是有默认值的
 	userInfoRsp := &proto.UserInfoResponse{
-		Id:       user.ID,
+		Id:       int32(user.ID),
 		PassWord: user.Password,
 		Mobile:   user.Mobile,
 		NickName: user.NickName,
@@ -136,29 +136,31 @@ func (s *UserServer) GetUserById(ctx context.Context, req *proto.IdRequest) (*pr
 func (s *UserServer) CreateUser(ctx context.Context, req *proto.CreateUserInfo) (*proto.UserInfoResponse, error) {
 	// 新建用户
 	var user model.User
-	// db := global.NewDBClient(ctx)
-	// db := global.DB
-	// var count int64
-	// err := global.DB.Model(&model.User{}).Where("mobile=?", req.Mobile).Count(&count).Error
-	// if count > 0 {
-	// 	return nil, status.Errorf(codes.AlreadyExists, "用户已存在")
-	// }
-	result := global.DB.Where(&model.User{Mobile: req.Mobile}).First(&user)
-	if result.RowsAffected == 1 {
+	var count int64
+	err := global.DB.Model(&model.User{}).Where("mobile=?", req.Mobile).Count(&count).Error
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "数据库错误: %v", err)
+	}
+	if count > 0 {
 		return nil, status.Errorf(codes.AlreadyExists, "用户已存在")
 	}
-
+	// result := global.DB.Where(&model.User{Mobile: req.Mobile}).First(&user)
+	// if result.RowsAffected == 1 {
+	// 	return nil, status.Errorf(codes.AlreadyExists, "用户已存在")
+	// }
+	// if result.Error != nil && !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+	// 	return nil, status.Errorf(codes.Internal, "数据库错误: %v", result.Error)
+	// }
+	// 构造新用户
 	user.Mobile = req.Mobile
 	user.NickName = req.NickName
-	// 密码加密
-	err := user.SetPassword(req.PassWord)
-	if err != nil {
+	if err := user.SetPassword(req.PassWord); err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
+
 	// 保存到数据库
-	result = global.DB.Create(&user)
-	if result.Error != nil {
-		return nil, status.Errorf(codes.Internal, result.Error.Error())
+	if err := global.DB.Create(&user).Error; err != nil {
+		return nil, status.Errorf(codes.Internal, "创建用户失败: %v", err)
 	}
 	userInfoRsp := ModelToResponse(&user)
 	return userInfoRsp, nil

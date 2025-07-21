@@ -9,6 +9,7 @@ service User {
     rpc CreateUser(CreateUserInfo) returns (UserInfoResponse); // 创建用户
     rpc UpdateUser(UpdateUserInfo) returns (google.protobuf.Empty); // 更新用户信息
     rpc CheckPassWord(PasswordCheckInfo) returns (CheckResponse);// 校验密码
+    // rpc CheckUserNamePassWord(UserNamePassWordInfo) returns (CheckResponse); // 校验用户名密码
 }
 
 // message Empty{}
@@ -16,6 +17,13 @@ message PasswordCheckInfo{
     string passWord = 1;
     string encryptedPassWord = 2;
 }
+
+// message UserNamePassWordInfo{
+//     string passWord = 1;
+//     string encryptedPassWord = 2;
+//     string nickName = 3;
+// }
+
 message CheckResponse{
     bool success = 1;
 }

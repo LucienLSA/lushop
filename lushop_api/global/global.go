@@ -8,10 +8,13 @@ import (
 	v2userproto "lushopapi/proto/user"
 	v2useropproto "lushopapi/proto/userop"
 
+	"github.com/go-oauth2/oauth2/v4/manage"
+	"github.com/go-oauth2/oauth2/v4/server"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-redsync/redsync/v4"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
+	"gopkg.in/boj/redistore.v1"
 )
 
 var (
@@ -25,6 +28,10 @@ var (
 	//NacosConfig   *config.NacosConfig = &config.NacosConfig{}
 	RedisClient *redis.Client
 	RedisSync   *redsync.Redsync
+	Redistore   *redistore.RediStore
+
+	Srv *server.Server
+	Mgr *manage.Manager
 )
 
 const Mode = "LUSHOP_DEBUG"

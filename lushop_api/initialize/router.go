@@ -21,5 +21,6 @@ func Routers() *gin.Engine {
 	router.InitGoodsRouter(Router)  //商品相关
 	router.InitOrderRouter(Router)  //订单相关
 	router.InitOssRouter(Router)    //oss相关
+	router.InitOAuth2Router(Router) // oauth2相关
 	return Router
 }

@@ -164,6 +164,7 @@ type ServerConfig struct {
 	SentinelInfo     SentinelConfig     `mapstructure:"sentinel" json:"sentinel"`
 	LogInfo          LogConfig          `mapstructure:"log" json:"log"`
 	NacosInfo        NacosConfig        `mapstructure:"nacos" json:"nacos"`
+	Oauth2Info       Oauth2Config       `mapstructure:"oauth2" json:"oauth2"`
 }
 
 type SessionConfig struct {
@@ -180,4 +181,33 @@ type NacosConfig struct {
 	Password  string `mapstructure:"password" json:"password"`
 	DataId    string `mapstructure:"dataid" json:"dataid"`
 	Group     string `mapstructure:"group" json:"group"`
+}
+
+// Oauth2ScopeConfig 表示单个权限范围配置
+// 对应yaml: oauth2.client.scope
+// 例如：- id: all, title: "用户账号、手机、权限、角色等信息"
+type Oauth2ScopeConfig struct {
+	Id    string `mapstructure:"id" json:"id"`
+	Title string `mapstructure:"title" json:"title"`
+}
+
+// Oauth2ClientConfig 表示单个oauth2客户端配置
+// 对应yaml: oauth2.client
+// 例如：- id: test_client_1, secret: test_secret_1, ...
+type Oauth2ClientConfig struct {
+	Id     string              `mapstructure:"id" json:"id"`
+	Secret string              `mapstructure:"secret" json:"secret"`
+	Name   string              `mapstructure:"name" json:"name"`
+	Domain string              `mapstructure:"domain" json:"domain"`
+	Scope  []Oauth2ScopeConfig `mapstructure:"scope" json:"scope"`
+}
+
+// Oauth2Config 表示oauth2整体配置
+// 对应yaml: oauth2
+// 包含access_token/refresh_token过期时间、签名key、客户端列表等
+type Oauth2Config struct {
+	AccessTokenExp  int                  `mapstructure:"access_token_exp" json:"access_token_exp"`   // access_token 过期时间（小时）
+	RefreshTokenExp int                  `mapstructure:"refresh_token_exp" json:"refresh_token_exp"` // refresh_token 过期时间（小时）
+	JwtSignedKey    string               `mapstructure:"jwt_signed_key" json:"jwt_signed_key"`       // JWT签名key
+	Client          []Oauth2ClientConfig `mapstructure:"client" json:"client"`                       // 客户端列表
 }

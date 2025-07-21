@@ -12,13 +12,15 @@ func InitUserRouter(Router *gin.Engine) {
 	UserRouer := Router.Group("user")
 	zap.S().Info("配置用户相关的url")
 	{
-		UserRouer.GET("list", middlewares.JWTAuth(), middlewares.IsAdminAuth(), user.GetUserList)
-		//UserRouer.GET("list", api.GetUserList)
-		UserRouer.POST("pwd_login", user.PassWorldLogin)
-		UserRouer.POST("register", user.Register)
+		// UserRouer.GET("list", middlewares.JWTAuth(), middlewares.IsAdminAuth(), user.GetUserList)
+		// UserRouer.POST("pwd_login", user.PassWorldLogin)
+		// UserRouer.POST("register", user.Register)
+		// UserRouer.GET("detail", middlewares.JWTAuth(), user.GetUserDetail)
+		// UserRouer.PATCH("update", middlewares.JWTAuth(), user.UpdateUser)
 
-		UserRouer.GET("detail", middlewares.JWTAuth(), user.GetUserDetail)
-		UserRouer.PATCH("update", middlewares.JWTAuth(), user.UpdateUser)
-		// UserRouer.POST("refresh", )
+		UserRouer.GET("list", middlewares.AuthMiddleware(), user.GetUserList)
+		UserRouer.POST("register", user.Register)
+		UserRouer.GET("detail", middlewares.AuthMiddleware(), user.GetUserDetail)
+		UserRouer.PATCH("update", middlewares.AuthMiddleware(), user.UpdateUser)
 	}
 }

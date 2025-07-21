@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"fmt"
 	"lushopapi/api/base"
 	"lushopapi/utils/jwtClaims"
 	"net/http"
@@ -136,7 +135,7 @@ func PassWorldLogin(c *gin.Context) {
 				})
 			} else {
 				c.JSON(http.StatusBadRequest, map[string]string{
-					"msg": "登陆失败-2",
+					"msg": "登陆失败",
 				})
 			}
 		}
@@ -150,13 +149,13 @@ func Register(c *gin.Context) {
 		return
 	}
 	//验证码
-	rdb := redis.NewClient(&redis.Options{
-		Addr: fmt.Sprintf("%s:%s", global.ServerConfig.RedisInfo.Host, global.ServerConfig.RedisInfo.Port),
-	})
-	value, err := rdb.Get(context.Background(), registerForm.Mobile).Result()
+	// rdb := redis.NewClient(&redis.Options{
+	// 	Addr: fmt.Sprintf("%s:%s", global.ServerConfig.RedisInfo.Host, global.ServerConfig.RedisInfo.Port),
+	// })
+	value, err := global.RedisClient.Get(context.Background(), registerForm.Mobile).Result()
 	if err == redis.Nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"code": "验证码错误",
+			"code": "验证码为空",
 		})
 		return
 	} else {
@@ -169,7 +168,7 @@ func Register(c *gin.Context) {
 	}
 
 	//生成grpc的client并调用接口
-	user, err := global.UserSrvClient.CreateUser(context.Background(), &v2userproto.CreateUserInfo{
+	user, err := global.UserSrvClient.CreateUser(context.WithValue(context.Background(), "ginContext", c), &v2userproto.CreateUserInfo{
 		NickName: registerForm.Mobile,
 		PassWord: registerForm.PassWord,
 		Mobile:   registerForm.Mobile,
@@ -179,33 +178,51 @@ func Register(c *gin.Context) {
 		base.HandleGrpcErrorToHttp(err, c)
 		return
 	}
-	//生成token
-	j := middlewares.NewJWT()
-	claims := jwtClaims.CustomClaims{
-		ID:          uint(user.Id),
-		NickName:    user.NickName,
-		AuthorityId: uint(user.Role),
-		StandardClaims: &jwt.StandardClaims{
-			NotBefore: time.Now().Unix(),               //签名的生效时间
-			ExpiresAt: time.Now().Unix() + 60*60*24*30, //30天过期
-			Issuer:    "ZhaiYujin",
-		},
-	}
-	token, err := j.CreateToken(claims)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"msg": "生成token失败",
-		})
-		return
-	}
+	// 用户注册完成后，需要自行登录
+	// //生成token
+	// j := middlewares.NewJWT()
+	// claims := jwtClaims.CustomClaims{
+	// 	ID:          uint(user.Id),
+	// 	NickName:    user.NickName,
+	// 	AuthorityId: uint(user.Role),
+	// 	StandardClaims: &jwt.StandardClaims{
+	// 		NotBefore: time.Now().Unix(),                                          //签名的生效时间
+	// 		ExpiresAt: time.Now().Unix() + global.ServerConfig.JwtInfo.ExpireTime, //30天过期
+	// 		Issuer:    "Lushop",
+	// 	},
+	// }
+	// token, err := j.CreateToken(claims)
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{
+	// 		"msg": "生成token失败",
+	// 	})
+	// 	return
+	// }
 
 	c.JSON(http.StatusOK, gin.H{
-		"id":          user.Id,
-		"nick_name":   user.NickName,
-		"token":       token,
-		"expiresd_at": (time.Now().Unix() + 60*60*24*30) * 1000,
+		"id":        user.Id,
+		"nick_name": user.NickName,
+		// "token":       token,
+		// "expiresd_at": (time.Now().Unix() + global.ServerConfig.JwtInfo.ExpireTime) * 1000,
 	})
 }
+
+// 注销用户
+// func DeleteUser(c *gin.Context) {
+// 	claims, _ := c.Get("claims")
+// 	currentUser := claims.(*jwtClaims.CustomClaims)
+// 	_, err := global.UserSrvClient.DeleteUser(context.Background(), &v2userproto.IdRequest{
+// 		Id: int32(currentUser.ID),
+// 	})
+// 	if err != nil {
+// 		base.HandleGrpcErrorToHttp(err, c)
+// 		return
+// 	}
+// 	c.JSON(http.StatusOK, gin.H{
+// 		"msg": "注销成功",
+// 	})
+// }
+
 func GetUserDetail(c *gin.Context) {
 	claims, _ := c.Get("claims")
 	currentUser := claims.(*jwtClaims.CustomClaims)
@@ -224,6 +241,8 @@ func GetUserDetail(c *gin.Context) {
 		"mobile":   rsp.Mobile,
 	})
 }
+
+// 更新用户
 func UpdateUser(ctx *gin.Context) {
 	updateUserForm := forms.UpdateUserForm{}
 	if err := ctx.ShouldBind(&updateUserForm); err != nil {
@@ -247,5 +266,7 @@ func UpdateUser(ctx *gin.Context) {
 		base.HandleGrpcErrorToHttp(err, ctx)
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{})
+	ctx.JSON(http.StatusOK, gin.H{
+		"msg": "更新用户信息成功",
+	})
 }

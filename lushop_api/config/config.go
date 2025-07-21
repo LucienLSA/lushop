@@ -151,6 +151,7 @@ type ServerConfig struct {
 	JwtInfo          JwtConfig          `mapstructure:"jwt" json:"jwt"`
 	AliSmsInfo       AliSmsConfig       `mapstructure:"ali_sms" json:"ali_sms"`
 	RedisInfo        RedisConfig        `mapstructure:"redis" json:"redis"`
+	SessionInfo      SessionConfig      `mapstructure:"session" json:"session"`
 	ConsulInfo       ConsulConfig       `mapstructure:"consul" json:"consul"`
 	JaegerInfo       JaegerConfig       `mapstructure:"jaeger" json:"jaeger"`
 	OssInfo          OssConfig          `mapstructure:"oss" json:"oss"`
@@ -163,6 +164,12 @@ type ServerConfig struct {
 	SentinelInfo     SentinelConfig     `mapstructure:"sentinel" json:"sentinel"`
 	LogInfo          LogConfig          `mapstructure:"log" json:"log"`
 	NacosInfo        NacosConfig        `mapstructure:"nacos" json:"nacos"`
+}
+
+type SessionConfig struct {
+	Name      string `mapstructure:"name" json:"name"`
+	MaxAge    int    `mapstructure:"max_age" json:"max_age"`
+	SecretKey string `mapstructure:"secret_key" json:"secret_key"`
 }
 
 type NacosConfig struct {

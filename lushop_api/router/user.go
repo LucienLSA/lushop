@@ -19,5 +19,6 @@ func InitUserRouter(Router *gin.Engine) {
 
 		UserRouer.GET("detail", middlewares.JWTAuth(), user.GetUserDetail)
 		UserRouer.PATCH("update", middlewares.JWTAuth(), user.UpdateUser)
+		// UserRouer.POST("refresh", )
 	}
 }

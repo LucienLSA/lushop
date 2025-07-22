@@ -132,7 +132,7 @@ func PassWorldLogin(c *gin.Context) {
 					"id":          rsp.Id,
 					"nick_name":   rsp.NickName,
 					"token":       token,
-					"expiresd_at": (time.Now().Unix() + 60*60*24*30) * 1000,
+					"expiresd_at": (time.Now().Unix() + global.ServerConfig.JwtInfo.ExpireTime) * 1000,
 				})
 			} else {
 				c.JSON(http.StatusBadRequest, map[string]string{
@@ -223,19 +223,6 @@ func Register(c *gin.Context) {
 // 		"msg": "注销成功",
 // 	})
 // }
-
-func toInt32(val interface{}) int32 {
-	switch v := val.(type) {
-	case string:
-		i, _ := strconv.Atoi(v)
-		return int32(i)
-	case int:
-		return int32(v)
-	case int32:
-		return v
-	}
-	return 0
-}
 
 func GetUserDetail(c *gin.Context) {
 	// claims, _ := c.Get("claims")

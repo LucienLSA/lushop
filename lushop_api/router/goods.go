@@ -8,10 +8,9 @@ import (
 )
 
 func InitGoodsRouter(Router *gin.Engine) {
-	GoodsRouter := Router.Group("good")
+	GoodsRouter := Router.Group("goods")
 	{
-		GoodsRouter.GET("", goods.GoodsList) //商品列表
-		//一定要注意middlewares路径
+		GoodsRouter.GET("", goods.GoodsList)                                                                 //商品列表
 		GoodsRouter.POST("", middlewares.JWTAuth(), middlewares.IsAdminAuth(), goods.GoodsCreate)            //新建商品
 		GoodsRouter.GET("/:id", goods.GoodsDetail)                                                           //商品详情
 		GoodsRouter.DELETE("/:id", middlewares.JWTAuth(), middlewares.IsAdminAuth(), goods.GoodsDelete)      //删除商品
@@ -22,7 +21,7 @@ func InitGoodsRouter(Router *gin.Engine) {
 	}
 
 	// BannerRouter := Router.Group("banner").Use(middlewares.Trace())
-	BannerRouter := Router.Group("banner")
+	BannerRouter := Router.Group("banners")
 	{
 		BannerRouter.GET("", goods.BannerList)                                                            // 轮播图列表页
 		BannerRouter.DELETE("/:id", middlewares.JWTAuth(), middlewares.IsAdminAuth(), goods.BannerDelete) // 删除轮播图
@@ -30,7 +29,7 @@ func InitGoodsRouter(Router *gin.Engine) {
 		BannerRouter.PUT("/:id", middlewares.JWTAuth(), middlewares.IsAdminAuth(), goods.BannerUpdate)    //修改轮播图信息
 	}
 
-	BrandRouter := Router.Group("brand")
+	BrandRouter := Router.Group("brands")
 	{
 		BrandRouter.GET("", goods.BrandList)          // 品牌列表页
 		BrandRouter.DELETE("/:id", goods.BrandDelete) // 删除品牌
@@ -38,7 +37,7 @@ func InitGoodsRouter(Router *gin.Engine) {
 		BrandRouter.PUT("/:id", goods.BrandUpdate)    //修改品牌信息
 	}
 
-	CategoryBrandRouter := Router.Group("categorybrand")
+	CategoryBrandRouter := Router.Group("categorybrands")
 	{
 		CategoryBrandRouter.GET("", goods.CateBrandList)          // 类别品牌列表页
 		CategoryBrandRouter.DELETE("/:id", goods.CateBrandDelete) // 删除类别品牌
@@ -47,7 +46,7 @@ func InitGoodsRouter(Router *gin.Engine) {
 		CategoryBrandRouter.GET("/:id", goods.CateGetBrandList)   //获取分类的品牌
 	}
 
-	CategoryRouter := Router.Group("category")
+	CategoryRouter := Router.Group("categorys")
 	{
 		CategoryRouter.GET("", goods.CateList)          // 商品类别列表页
 		CategoryRouter.DELETE("/:id", goods.CateDelete) // 删除分类

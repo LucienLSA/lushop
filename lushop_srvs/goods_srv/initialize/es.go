@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/olivere/elastic/v7"
+	"go.uber.org/zap"
 )
 
 func Es() {
@@ -18,19 +19,21 @@ func Es() {
 	var err error
 	global.EsClient, err = elastic.NewClient(elastic.SetURL(host), elastic.SetSniff(false),
 		elastic.SetTraceLog(logger))
+	// elasticsearch Go 客户端在执行每个 HTTP 请求时，把详细的 trace 日志（如请求内容、响应内容、耗时等）通过你自定义的 logger 输出出来
 	if err != nil {
 		panic(err)
 	}
 
 	// 新建mapping和index
+	//查询index是否存在
 	exist, err := global.EsClient.IndexExists(model.EsGoods{}.GetIndexName()).Do(context.Background())
 	if err != nil {
 		panic(err)
 	}
 	if !exist {
-		global.EsClient.CreateIndex(model.EsGoods{}.GetIndexName()).BodyString(model.EsGoods{}.GetMapping()).Do(context.Background())
-		if err != nil {
-			panic(err)
+		_, err2 := global.EsClient.CreateIndex(model.EsGoods{}.GetIndexName()).BodyString(model.EsGoods{}.GetMapping()).Do(context.Background())
+		if err2 != nil {
+			zap.S().Fatalf("创建索引%s失败：%s", model.EsGoods{}.GetIndexName(), err2.Error())
 		}
 	}
 }

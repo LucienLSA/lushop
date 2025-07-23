@@ -1,6 +1,6 @@
 syntax = "proto3";
 import "google/protobuf/empty.proto";
-option go_package = ".;proto";
+option go_package = ".;v2userproto";
 
 service User {
     rpc GetUserList(PageInfo) returns (UserListResponse); // 用户列表
@@ -9,11 +9,21 @@ service User {
     rpc CreateUser(CreateUserInfo) returns (UserInfoResponse); // 创建用户
     rpc UpdateUser(UpdateUserInfo) returns (google.protobuf.Empty); // 更新用户信息
     rpc CheckPassWord(PasswordCheckInfo) returns (CheckResponse);// 校验密码
+    // rpc CheckUserNamePassWord(UserNamePassWordInfo) returns (CheckResponse); // 校验用户名密码
 }
+
+// message Empty{}
 message PasswordCheckInfo{
     string passWord = 1;
     string encryptedPassWord = 2;
 }
+
+// message UserNamePassWordInfo{
+//     string passWord = 1;
+//     string encryptedPassWord = 2;
+//     string nickName = 3;
+// }
+
 message CheckResponse{
     bool success = 1;
 }

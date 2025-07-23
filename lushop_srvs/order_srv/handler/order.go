@@ -6,30 +6,44 @@ import (
 	"fmt"
 	"ordersrv/global"
 	"ordersrv/model"
-	proto_goods "ordersrv/proto/gen/goods"
-	proto_inventory "ordersrv/proto/gen/inventory"
-	proto_order "ordersrv/proto/gen/order"
+	v2goodsproto "ordersrv/proto/goods"
+	v2inventoryproto "ordersrv/proto/inventory"
+	v2orderproto "ordersrv/proto/order"
 	"time"
 
-	"github.com/apache/rocketmq-client-go/v2"
 	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
-	"github.com/apache/rocketmq-client-go/v2/producer"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type OrderServer struct {
-	proto_order.UnimplementedOrderServer
+	v2orderproto.UnimplementedOrderServer
 }
 
-// 购物车
-func (s *OrderServer) CartItemList(ctx context.Context, req *proto_order.UserInfo) (*proto_order.CartItemListResponse, error) {
-	// 获取用户的购物车列表
+var Tracer = otel.Tracer(global.ServerConfig.JaegerInfo.TracerName)
+
+// 获取用户的购物车列表
+func (s *OrderServer) CartItemList(ctx context.Context, req *v2orderproto.UserInfo) (*v2orderproto.CartItemListResponse, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	_, span := Tracer.Start(ctx, "CartItemList",
+		trace.WithAttributes(
+			attribute.Int64("id", int64(req.GetId())),
+			attribute.StringSlice("client-id", md.Get("client-id")),
+			attribute.StringSlice("user-id", md.Get("user-id")),
+		),
+	)
+	defer span.End()
+
 	var shopCarts []model.ShoppingCart
-	var rsp proto_order.CartItemListResponse
+	var rsp v2orderproto.CartItemListResponse
 	result := global.DB.Where(&model.ShoppingCart{User: req.Id}).Find(&shopCarts)
 	if result.Error != nil {
 		return nil, result.Error
@@ -37,7 +51,7 @@ func (s *OrderServer) CartItemList(ctx context.Context, req *proto_order.UserInf
 		rsp.Total = int32(result.RowsAffected)
 	}
 	for _, shopCart := range shopCarts {
-		rsp.Data = append(rsp.Data, &proto_order.ShopCartInfoResponse{
+		rsp.Data = append(rsp.Data, &v2orderproto.ShopCartInfoResponse{
 			Id:      shopCart.ID,
 			UserId:  shopCart.ID,
 			GoodsId: shopCart.Goods,
@@ -50,7 +64,17 @@ func (s *OrderServer) CartItemList(ctx context.Context, req *proto_order.UserInf
 
 // 将商品添加到购物车
 // 购物车中原本没有该商品。购物车中存在该商品
-func (s *OrderServer) CreateCartItem(ctx context.Context, req *proto_order.CartItemRequest) (*proto_order.ShopCartInfoResponse, error) {
+func (s *OrderServer) CreateCartItem(ctx context.Context, req *v2orderproto.CartItemRequest) (*v2orderproto.ShopCartInfoResponse, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	_, span := Tracer.Start(ctx, "CreateCartItem",
+		trace.WithAttributes(
+			attribute.Int64("id", int64(req.GetId())),
+			attribute.StringSlice("client-id", md.Get("client-id")),
+			attribute.StringSlice("user-id", md.Get("user-id")),
+		),
+	)
+	defer span.End()
+
 	var shopCart model.ShoppingCart
 	result := global.DB.Where(&model.ShoppingCart{Goods: req.GoodsId, User: req.UserId}).First(&shopCart)
 	if result.RowsAffected == 1 {
@@ -63,10 +87,24 @@ func (s *OrderServer) CreateCartItem(ctx context.Context, req *proto_order.CartI
 		shopCart.Nums = req.Nums
 		shopCart.Checked = false
 	}
-	global.DB.Save(&shopCart)
-	return &proto_order.ShopCartInfoResponse{Id: shopCart.ID}, nil
+	if result := global.DB.Save(&shopCart); result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "新建购物车记录失败")
+	}
+	return &v2orderproto.ShopCartInfoResponse{Id: shopCart.ID}, nil
 }
-func (s *OrderServer) UpdateCartItem(ctx context.Context, req *proto_order.CartItemRequest) (*emptypb.Empty, error) {
+
+// 更新购物车记录，更新数量和选中状态
+func (s *OrderServer) UpdateCartItem(ctx context.Context, req *v2orderproto.CartItemRequest) (*emptypb.Empty, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	_, span := Tracer.Start(ctx, "UpdateCartItem",
+		trace.WithAttributes(
+			attribute.Int64("id", int64(req.GetId())),
+			attribute.StringSlice("client-id", md.Get("client-id")),
+			attribute.StringSlice("user-id", md.Get("user-id")),
+		),
+	)
+	defer span.End()
+
 	var shopCart model.ShoppingCart
 	result := global.DB.Where("goods=? and user=?", req.GoodsId, req.UserId).First(&shopCart, req.Id)
 	if result.RowsAffected == 0 {
@@ -76,11 +114,24 @@ func (s *OrderServer) UpdateCartItem(ctx context.Context, req *proto_order.CartI
 	if req.Nums > 0 {
 		shopCart.Nums = req.Nums
 	}
-	global.DB.Save(&shopCart)
+	if result := global.DB.Save(&shopCart); result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "更新购物车记录失败")
+	}
 	return &emptypb.Empty{}, nil
 }
 
-func (s *OrderServer) DeleteCartItem(ctx context.Context, req *proto_order.CartItemRequest) (*emptypb.Empty, error) {
+// 删除购物车清单
+func (s *OrderServer) DeleteCartItem(ctx context.Context, req *v2orderproto.CartItemRequest) (*emptypb.Empty, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	_, span := Tracer.Start(ctx, "DeleteCartItem",
+		trace.WithAttributes(
+			attribute.Int64("id", int64(req.GetId())),
+			attribute.StringSlice("client-id", md.Get("client-id")),
+			attribute.StringSlice("user-id", md.Get("user-id")),
+		),
+	)
+	defer span.End()
+
 	result := global.DB.Where("goods=? and user=?", req.GoodsId, req.UserId).Delete(&model.ShoppingCart{})
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "购物车记录不存在")
@@ -88,6 +139,8 @@ func (s *OrderServer) DeleteCartItem(ctx context.Context, req *proto_order.CartI
 	return &emptypb.Empty{}, nil
 }
 
+// 订单业务
+// 建立订单表用于后续消息传递
 type OrderListener struct {
 	Code        codes.Code
 	Detail      string
@@ -95,16 +148,41 @@ type OrderListener struct {
 	OrderAmount float32
 }
 
-func (o *OrderListener) ExecuteLocalTransaction(msg *primitive.Message) primitive.LocalTransactionState {
-	var orderInfo model.OrderInfo
-	_ = json.Unmarshal(msg.Body, &orderInfo)
+// 实例
+var orderInfo = OrderListener{}
 
+// 用于trace上下文传递的消息结构体
+// 注意：model.OrderInfo需可序列化
+// 实现了 trace 上下文的跨进程传递：
+// handler 层用 otel.GetTextMapPropagator().Inject 把 trace 上下文写入消息体。
+// 事务监听器用 otel.GetTextMapPropagator().Extract 恢复上下文，再创建父 span 和子 span。
+// 这样 Jaeger UI 里能看到 handler 和事务监听器的 trace 在同一条链路下，trace 串联完整。
+type OrderMessage struct {
+	OrderInfo model.OrderInfo   `json:"order_info"`
+	TraceMap  map[string]string `json:"trace_map"`
+}
+
+// 执行本地事务的监听器
+func (o *OrderListener) ExecuteLocalTransaction(msg *primitive.Message) primitive.LocalTransactionState {
+	// 解析消息体，恢复trace上下文
+	var orderMsg OrderMessage
+	_ = json.Unmarshal(msg.Body, &orderMsg)
+	parentCtx := otel.GetTextMapPropagator().Extract(context.Background(), propagation.MapCarrier(orderMsg.TraceMap))
+
+	ctx, parentSpan := Tracer.Start(parentCtx, "OrderLocalTransaction",
+		trace.WithAttributes(
+			attribute.String("order_sn", orderMsg.OrderInfo.OrderSn),
+			attribute.Int64("user_id", int64(orderMsg.OrderInfo.User)),
+		),
+	)
+	defer parentSpan.End()
+
+	// 购物车清单检查
 	var goodsIds []int32
 	var shopCarts []model.ShoppingCart
 	goodsNumsMap := make(map[int32]int32)
-	result := global.DB.Where(&model.ShoppingCart{User: orderInfo.User, Checked: true}).Find(&shopCarts)
+	result := global.DB.Where(&model.ShoppingCart{User: orderMsg.OrderInfo.User, Checked: true}).Find(&shopCarts)
 	if result.RowsAffected == 0 {
-		// return nil, status.Errorf(codes.InvalidArgument, "未选中结算的商品")
 		o.Code = codes.InvalidArgument
 		o.Detail = "未选中结算的商品"
 		return primitive.RollbackMessageState
@@ -115,19 +193,21 @@ func (o *OrderListener) ExecuteLocalTransaction(msg *primitive.Message) primitiv
 		goodsNumsMap[shopCart.Goods] = shopCart.Nums
 	}
 
-	// 跨服务调用 商品
-	goods, err := global.GoodsSrvClient.BatchGetGoods(context.Background(), &proto_goods.BatchGoodsIdInfo{
+	// 子span
+	goodsSpanCtx, goodsSpan := Tracer.Start(ctx, "BatchGetGoods")
+	// 批量商品查询
+	goods, err := global.GoodsSrvClient.BatchGetGoods(goodsSpanCtx, &v2goodsproto.BatchGoodsIdInfo{
 		Id: goodsIds,
 	})
+	goodsSpan.End()
 	if err != nil {
 		o.Code = codes.Internal
 		o.Detail = "批量查询商品信息失败"
-		// return nil, status.Errorf(codes.Internal, "批量查询商品信息失败")
 		return primitive.RollbackMessageState
 	}
 	var orderAmount float32
 	var orderGoods []*model.OrderGoods
-	var goodsInvInfo []*proto_inventory.GoodsInvInfo
+	var goodsInvInfo []*v2inventoryproto.GoodsInvInfo
 	for _, good := range goods.Data {
 		orderAmount += good.ShopPrice * float32(goodsNumsMap[good.Id])
 		orderGoods = append(orderGoods, &model.OrderGoods{
@@ -137,68 +217,64 @@ func (o *OrderListener) ExecuteLocalTransaction(msg *primitive.Message) primitiv
 			GoodsPrice: good.ShopPrice,
 			Nums:       goodsNumsMap[good.Id],
 		})
-		goodsInvInfo = append(goodsInvInfo, &proto_inventory.GoodsInvInfo{
+		goodsInvInfo = append(goodsInvInfo, &v2inventoryproto.GoodsInvInfo{
 			GoodsId: good.Id,
 			Num:     goodsNumsMap[good.Id],
 		})
 	}
-	// 跨服务 库存扣减
-	_, err = global.InventorySrvClient.Sell(context.Background(),
-		&proto_inventory.SellInfo{OrderSn: orderInfo.OrderSn, GoodsInfo: goodsInvInfo})
+
+	// 子Span
+	invSpanCtx, invSpan := Tracer.Start(ctx, "InventorySell")
+	// 库存扣减
+	_, err = global.InventorySrvClient.Sell(invSpanCtx,
+		&v2inventoryproto.SellInfo{OrderSn: orderMsg.OrderInfo.OrderSn, GoodsInfo: goodsInvInfo})
+	invSpan.End()
 	if err != nil {
-		// 当遇到网络问题时，如何避免误判，对于库存服务中的sell逻辑，判断返回的状态码信息，确定是什么原因
-		// 遇到该状态码时，则返回Commit
 		o.Code = codes.ResourceExhausted
 		o.Detail = "扣减库存失败"
 		return primitive.RollbackMessageState
-		// return nil, status.Errorf(codes.ResourceExhausted, "扣减库存失败")
 	}
-
-	// 生产订单表
-	// 20250406xxx时间戳方式生成订单号
+	// 事务保存订单信息
 	tx := global.DB.Begin()
-	orderInfo.OrderMount = orderAmount
-	result = tx.Save(&orderInfo)
+	orderMsg.OrderInfo.OrderMount = orderAmount
+	result = tx.Save(&orderMsg.OrderInfo)
 	if result.RowsAffected == 0 {
 		tx.Rollback()
 		o.Code = codes.Internal
 		o.Detail = "创建订单失败"
 		return primitive.CommitMessageState
-		// return nil, status.Errorf(codes.Internal, "创建订单失败")
 	}
 
 	o.OrderAmount = orderAmount
-	o.ID = orderInfo.ID
+	o.ID = orderMsg.OrderInfo.ID
 	for _, orderGood := range orderGoods {
-		orderGood.Order = orderInfo.ID
+		orderGood.Order = orderMsg.OrderInfo.ID
 	}
-	// 批量插入orderGoods
 	if result := tx.CreateInBatches(orderGoods, 100); result.RowsAffected == 0 {
 		tx.Rollback()
 		o.Code = codes.Internal
 		o.Detail = "批量插入订单商品失败"
 		return primitive.CommitMessageState
-		// return nil, status.Errorf(codes.Internal, "创建订单失败")
 	}
-	if result := tx.Where(&model.ShoppingCart{User: orderInfo.User, Checked: true}).Delete(&model.ShoppingCart{}); result.RowsAffected == 0 {
+	if result := tx.Where(&model.ShoppingCart{User: orderMsg.OrderInfo.User, Checked: true}).Delete(&model.ShoppingCart{}); result.RowsAffected == 0 {
 		tx.Rollback()
 		o.Code = codes.Internal
 		o.Detail = "删除购物车记录失败"
 		return primitive.CommitMessageState
-		// return nil, status.Errorf(codes.Internal, "创建订单失败")
 	}
 
-	// 提交事务之前发送延迟消息
-	p, err := rocketmq.NewProducer(producer.WithNameServer([]string{"192.168.226.140:9876"}))
-	if err != nil {
-		panic(err)
-	}
-	if err = p.Start(); err != nil {
-		panic(err)
-	}
-	msg = primitive.NewMessage("order_timeout", msg.Body)
-	msg.WithDelayTimeLevel(16)
-	_, err = p.SendSync(context.Background(), msg)
+	// p, err := rocketmq.NewProducer(producer.WithNameServer([]string{"192.168.226.140:9876"}))
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// if err = p.Start(); err != nil {
+	// 	panic(err)
+	// }
+
+	// 生产者发出延时消息order_timeout
+	msg = primitive.NewMessage(global.ServerConfig.RocketMQConfig.TopicTimeOut, msg.Body)
+	msg.WithDelayTimeLevel(3)
+	_, err = global.MQSendClient.SendSync(context.Background(), msg)
 	if err != nil {
 		zap.S().Errorf("发送延迟消息失败:%s\n", err)
 		tx.Rollback()
@@ -206,15 +282,12 @@ func (o *OrderListener) ExecuteLocalTransaction(msg *primitive.Message) primitiv
 		o.Detail = "发送延迟消息失败"
 		return primitive.CommitMessageState
 	}
-	// if err = p.Shutdown(); err != nil {
-	// 	panic(err)
-	// }
-	// 提交事务
 	tx.Commit()
 	o.Code = codes.OK
 	return primitive.RollbackMessageState
 }
 
+// 事务消息回查
 func (o *OrderListener) CheckLocalTransaction(msg *primitive.MessageExt) primitive.LocalTransactionState {
 	var orderInfo model.OrderInfo
 	_ = json.Unmarshal(msg.Body, &orderInfo)
@@ -228,21 +301,16 @@ func (o *OrderListener) CheckLocalTransaction(msg *primitive.MessageExt) primiti
 }
 
 // 新建订单
-func (s *OrderServer) CreateOrder(ctx context.Context, req *proto_order.OrderRequest) (*proto_order.OrderInfoResponse, error) {
-
-	orderListener := &OrderListener{}
-	p, err := rocketmq.NewTransactionProducer(
-		&OrderListener{},
-		producer.WithNameServer([]string{"192.168.226.140:9876"}),
+func (s *OrderServer) CreateOrder(ctx context.Context, req *v2orderproto.OrderRequest) (*v2orderproto.OrderInfoResponse, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	_, span := Tracer.Start(ctx, "CreateOrder",
+		trace.WithAttributes(
+			attribute.Int64("id", int64(req.GetId())),
+			attribute.StringSlice("client-id", md.Get("client-id")),
+			attribute.StringSlice("user-id", md.Get("user-id")),
+		),
 	)
-	if err != nil {
-		zap.S().Errorf("生成producer失败: %s", err.Error())
-		return nil, err
-	}
-	if err = p.Start(); err != nil {
-		zap.S().Errorf("启动producer失败: %s", err.Error())
-		return nil, err
-	}
+	defer span.End()
 
 	order := model.OrderInfo{
 		OrderSn:      GenerateOrderSn(req.UserId),
@@ -253,21 +321,30 @@ func (s *OrderServer) CreateOrder(ctx context.Context, req *proto_order.OrderReq
 		User:         req.UserId,
 	}
 
-	jsonString, _ := json.Marshal(order)
+	// 提取trace上下文
+	traceMap := make(map[string]string)
+	otel.GetTextMapPropagator().Inject(ctx, propagation.MapCarrier(traceMap))
 
-	_, err = p.SendMessageInTransaction(context.Background(),
-		primitive.NewMessage("order_reback", jsonString))
+	// 封装消息体
+	msgBody, _ := json.Marshal(OrderMessage{
+		OrderInfo: order,
+		TraceMap:  traceMap,
+	})
+
+	// 生产者发送一个事务消息 库存回归reback的 topic中
+	_, err := global.MQSendTranClient.SendMessageInTransaction(context.Background(),
+		primitive.NewMessage(global.ServerConfig.RocketMQConfig.TopicReback, msgBody))
 	if err != nil {
 		fmt.Printf("发送失败:%s\n", err)
 		return nil, status.Error(codes.Internal, "发送消息失败")
 	}
-	if orderListener.Code != codes.OK {
-		return nil, status.Error(orderListener.Code, orderListener.Detail)
+	if orderInfo.Code != codes.OK {
+		return nil, status.Error(orderInfo.Code, orderInfo.Detail)
 	}
-	return &proto_order.OrderInfoResponse{
-		Id:      orderListener.ID,
+	return &v2orderproto.OrderInfoResponse{
+		Id:      orderInfo.ID,
 		OrderSn: order.OrderSn,
-		Total:   orderListener.OrderAmount,
+		Total:   orderInfo.OrderAmount,
 	}, nil
 }
 
@@ -286,44 +363,60 @@ func OrderTimeout(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.
 		if result.RowsAffected == 0 {
 			return consumer.ConsumeSuccess, nil
 		}
+		// 订单超时，自动归还库存
 		if order.Status != "TRADE_SUCCESS" {
 			tx := global.DB.Begin()
-			// 归还库存 ， 发送一个普通消息到 order_reback的 topic中
-			// 修改订单的状态为已结束
-			order.Status = "TRADE_CLOSED"
-			tx.Save(&order)
-			p, err := rocketmq.NewProducer(producer.WithNameServer([]string{"192.168.226.140:9876"}))
-			if err != nil {
-				panic(err)
-			}
-			if err = p.Start(); err != nil {
-				panic(err)
-			}
-			_, err = p.SendSync(context.Background(), primitive.NewMessage("order_reback", msgs[i].Body))
+			// p, err := rocketmq.NewProducer(producer.WithNameServer([]string{"192.168.226.140:9876"}))
+			// if err != nil {
+			// 	panic(err)
+			// }
+			// if err = p.Start(); err != nil {
+			// 	panic(err)
+			// }
+			// 归还库存，生产者发送一个普通消息到 reback的 topic中
+			// 通知库存服务把这笔订单占用的库存释放回去
+			_, err := global.MQSendClient.SendSync(context.Background(),
+				primitive.NewMessage(global.ServerConfig.RocketMQConfig.TopicReback, msgs[i].Body))
 			if err != nil {
 				tx.Rollback()
-				fmt.Printf("发送失败:%s\n", err)
+				zap.S().Errorf("【超时归还】发送失败: %s\n", err)
 				return consumer.ConsumeRetryLater, nil
 			}
 			// if err = p.Shutdown(); err != nil {
 			// 	panic(err)
 			// }
+			// 修改订单的状态为已支付
+			order.Status = "TRADE_CLOSED"
+			if result := tx.Save(&order); result.Error != nil {
+				tx.Rollback()
+				zap.S().Errorf("【超时归还】修改支付失败: %s\n", err)
+				return consumer.ConsumeRetryLater, nil
+			}
 		}
 	}
 	return consumer.ConsumeSuccess, nil
 }
 
 // 订单列表
-func (s *OrderServer) OrderList(ctx context.Context, req *proto_order.OrderFilterRequest) (*proto_order.OrderListResponse, error) {
+func (s *OrderServer) OrderList(ctx context.Context, req *v2orderproto.OrderFilterRequest) (*v2orderproto.OrderListResponse, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	_, span := Tracer.Start(ctx, "OrderList",
+		trace.WithAttributes(
+			attribute.StringSlice("client-id", md.Get("client-id")),
+			attribute.StringSlice("user-id", md.Get("user-id")),
+		),
+	)
+	defer span.End()
+
 	var orders []model.OrderInfo
-	var rsp proto_order.OrderListResponse
+	var rsp v2orderproto.OrderListResponse
 	var total int64
 	global.DB.Where(&model.OrderInfo{User: req.UserId}).Count(&total)
 	rsp.Total = int32(total)
 	// 分页
 	global.DB.Scopes(Paginate(int(req.Pages), int(req.PagePerNums))).Where(&model.OrderInfo{User: req.UserId}).Find(&orders)
 	for _, order := range orders {
-		rsp.Data = append(rsp.Data, &proto_order.OrderInfoResponse{
+		rsp.Data = append(rsp.Data, &v2orderproto.OrderInfoResponse{
 			UserId:  order.User,
 			Id:      order.ID,
 			OrderSn: order.OrderSn,
@@ -339,14 +432,26 @@ func (s *OrderServer) OrderList(ctx context.Context, req *proto_order.OrderFilte
 	}
 	return &rsp, nil
 }
-func (s *OrderServer) OrderDetail(ctx context.Context, req *proto_order.OrderRequest) (*proto_order.OrderInfoDetailResponse, error) {
+
+// 获取订单详情
+func (s *OrderServer) OrderDetail(ctx context.Context, req *v2orderproto.OrderRequest) (*v2orderproto.OrderInfoDetailResponse, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	_, span := Tracer.Start(ctx, "OrderDetail",
+		trace.WithAttributes(
+			attribute.Int64("id", int64(req.GetId())),
+			attribute.StringSlice("client-id", md.Get("client-id")),
+			attribute.StringSlice("user-id", md.Get("user-id")),
+		),
+	)
+	defer span.End()
+
 	var order model.OrderInfo
-	var rsp proto_order.OrderInfoDetailResponse
+	var rsp v2orderproto.OrderInfoDetailResponse
 	result := global.DB.Where("id=? AND user=?", req.Id, req.UserId).First(&order)
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "订单不存在")
 	}
-	orderInfo := proto_order.OrderInfoResponse{}
+	orderInfo := v2orderproto.OrderInfoResponse{}
 	orderInfo.Id = order.ID
 	orderInfo.UserId = order.User
 	orderInfo.OrderSn = order.OrderSn
@@ -364,7 +469,7 @@ func (s *OrderServer) OrderDetail(ctx context.Context, req *proto_order.OrderReq
 		return nil, result.Error
 	}
 	for _, orderGoods := range orderGoods {
-		rsp.Goods = append(rsp.Goods, &proto_order.OrderItemResponse{
+		rsp.Goods = append(rsp.Goods, &v2orderproto.OrderItemResponse{
 			GoodsId:    orderGoods.Goods,
 			GoodsName:  orderGoods.GoodsName,
 			GoodsImage: orderGoods.GoodsImage,
@@ -374,7 +479,18 @@ func (s *OrderServer) OrderDetail(ctx context.Context, req *proto_order.OrderReq
 	}
 	return &rsp, nil
 }
-func (s *OrderServer) UpdateOrderStatus(ctx context.Context, req *proto_order.OrderStatus) (*emptypb.Empty, error) {
+
+// 更新订单状态
+func (s *OrderServer) UpdateOrderStatus(ctx context.Context, req *v2orderproto.OrderStatus) (*emptypb.Empty, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	_, span := Tracer.Start(ctx, "UpdateOrderStatus",
+		trace.WithAttributes(
+			attribute.Int64("id", int64(req.GetId())),
+			attribute.StringSlice("client-id", md.Get("client-id")),
+			attribute.StringSlice("user-id", md.Get("user-id")),
+		),
+	)
+	defer span.End()
 	if result := global.DB.Model(&model.OrderInfo{}).
 		Where("order_sn = ?", req.OrderSn).
 		Update("status", req.Status); result.RowsAffected == 0 {

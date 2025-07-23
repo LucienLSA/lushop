@@ -3,16 +3,15 @@ package global
 import (
 	"useropsrv/config"
 
-	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
 var (
-	DB           *gorm.DB
-	Rdb          *redis.Client
+	DB *gorm.DB
+	// Rdb          *redis.Client
 	ServerConfig config.ServerConfig
-	NacosConfig  config.NacosConfig
+	// NacosConfig  config.NacosConfig
 )
 
 const Mode = "LUSHOP_DEBUG"

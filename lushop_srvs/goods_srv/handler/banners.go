@@ -4,7 +4,7 @@ import (
 	"context"
 	"goodssrv/global"
 	"goodssrv/model"
-	"goodssrv/proto"
+	proto "goodssrv/proto"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -20,9 +20,9 @@ func (s *GoodsServer) BannerList(ctx context.Context, req *emptypb.Empty) (*prot
 	var bannerRsp []*proto.BannerResponse
 	for _, banner := range banners {
 		bannerRsp = append(bannerRsp, &proto.BannerResponse{
-			Id:    int32(banner.ID),
+			Id:    banner.ID,
 			Image: banner.Image,
-			Index: int32(banner.Index),
+			Index: banner.Index,
 			Url:   banner.Url,
 		})
 	}
@@ -34,7 +34,10 @@ func (s *GoodsServer) CreateBanner(ctx context.Context, req *proto.BannerRequest
 	banner.Image = req.Image
 	banner.Index = req.Index
 	banner.Url = req.Url
-	global.DB.Save(&banner)
+
+	if result := global.DB.Save(&banner); result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "创建轮播图失败")
+	}
 	return &proto.BannerResponse{Id: banner.ID}, nil
 }
 func (s *GoodsServer) DeleteBanner(ctx context.Context, req *proto.BannerRequest) (*emptypb.Empty, error) {
@@ -45,20 +48,21 @@ func (s *GoodsServer) DeleteBanner(ctx context.Context, req *proto.BannerRequest
 	return &emptypb.Empty{}, nil
 }
 func (s *GoodsServer) UpdateBanner(ctx context.Context, req *proto.BannerRequest) (*emptypb.Empty, error) {
-	banners := model.Banner{}
-	result := global.DB.First(&banners)
-	if result.RowsAffected == 0 {
+	var banner model.Banner
+	if result := global.DB.First(&banner, req.Id); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "轮播图不存在")
 	}
 	if req.Url != "" {
-		banners.Url = req.Url
+		banner.Url = req.Url
 	}
 	if req.Image != "" {
-		banners.Image = req.Image
+		banner.Image = req.Image
 	}
 	if req.Index != 0 {
-		banners.Index = req.Index
+		banner.Index = req.Index
 	}
-	global.DB.Save(&banners)
+	if result := global.DB.Save(&banner); result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "更新轮播图失败")
+	}
 	return &emptypb.Empty{}, nil
 }

@@ -61,7 +61,8 @@ session:
 
 jwt:
   key: 'lushop_secret_key'
-  expired_time: 2592000
+  access_expired_time: 2592000 #30天
+  refresh_expired_time: 5184000 # 60天
 
 ali_sms:
   api_key: 'Ali_ApiKey'

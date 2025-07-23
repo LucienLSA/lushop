@@ -16,3 +16,7 @@ type UpdateUserForm struct {
 	Gender   string `form:"gender" json:"gender" binding:"required,oneof=female male"`
 	Birthday string `form:"birthday" json:"birthday" binding:"required,datetime=2006-01-02"`
 }
+
+type RefreshTokenForm struct {
+	RefreshToken string `form:"refresh_token" json:"refresh_token" binding:"required"`
+}

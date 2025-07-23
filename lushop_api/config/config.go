@@ -44,8 +44,9 @@ type JaegerConfig struct {
 }
 
 type JwtConfig struct {
-	SigningKey string `mapstructure:"key" json:"key"`
-	ExpireTime int64  `mapstructure:"expired_time" json:"expired_time"`
+	SigningKey        string `mapstructure:"key" json:"key"`
+	AccessExpireTime  int64  `mapstructure:"access_expired_time" json:"access_expired_time"`
+	RefreshExpireTime int64  `mapstructure:"refresh_expired_time" json:"refresh_expired_time"`
 }
 
 type AliSmsConfig struct {

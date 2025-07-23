@@ -108,31 +108,46 @@ func PassWorldLogin(c *gin.Context) {
 			})
 		} else {
 			if passRsp.Success {
-				//生成token
+				// 生成access_token
 				j := middlewares.NewJWT()
-				claims := jwtClaims.CustomClaims{
+				aclaims := jwtClaims.CustomClaims{
 					ID:          uint(rsp.Id),
 					NickName:    rsp.NickName,
 					AuthorityId: uint(rsp.Role),
 					StandardClaims: &jwt.StandardClaims{
-						NotBefore: time.Now().Unix(),                                          //签名的生效时间
-						ExpiresAt: time.Now().Unix() + global.ServerConfig.JwtInfo.ExpireTime, //30天过期
+						NotBefore: time.Now().Unix(),                                                //签名的生效时间
+						ExpiresAt: time.Now().Unix() + global.ServerConfig.JwtInfo.AccessExpireTime, //30天过期
 						Issuer:    "lucien",
 					},
 				}
-				token, err := j.CreateToken(claims)
+				AccessToken, err := j.CreateToken(aclaims)
 				if err != nil {
 					c.JSON(http.StatusInternalServerError, gin.H{
-						"msg": "生成token失败",
+						"msg": "生成access_token失败",
 					})
 					return
 				}
-
+				// 生成refresh_token 不需要保存任何用户信息
+				rclaims := jwtClaims.CustomClaims{
+					StandardClaims: &jwt.StandardClaims{
+						NotBefore: time.Now().Unix(),                                                 //签名的生效时间
+						ExpiresAt: time.Now().Unix() + global.ServerConfig.JwtInfo.RefreshExpireTime, //30天过期
+						Issuer:    "lucien",
+					},
+				}
+				RefreshToken, err := j.CreateToken(rclaims)
+				// TODO:将access_token 存入redis中 限制同一用户同一IP 同一时间只能登录一个设备
+				if err != nil {
+					c.JSON(http.StatusInternalServerError, gin.H{
+						"msg": "生成refresh_token失败",
+					})
+					return
+				}
 				c.JSON(http.StatusOK, gin.H{
-					"id":          rsp.Id,
-					"nick_name":   rsp.NickName,
-					"token":       token,
-					"expiresd_at": (time.Now().Unix() + global.ServerConfig.JwtInfo.ExpireTime) * 1000,
+					"id":            rsp.Id,
+					"nick_name":     rsp.NickName,
+					"access_token":  AccessToken,
+					"refresh_token": RefreshToken,
 				})
 			} else {
 				c.JSON(http.StatusBadRequest, map[string]string{
@@ -142,6 +157,37 @@ func PassWorldLogin(c *gin.Context) {
 		}
 	}
 }
+
+// RefreshTokenHandler 刷新accessToken
+func RefreshToken(c *gin.Context) {
+	refreshFroms := forms.RefreshTokenForm{}
+	if err := c.ShouldBind(&refreshFroms); err != nil {
+		base.HandleValidatorError(c, err)
+		return
+	}
+	authHeader := c.Request.Header.Get("x-token")
+	if authHeader == "" {
+		c.JSON(http.StatusUnauthorized, map[string]string{
+			"msg": "请求头缺少token",
+		})
+		c.Abort()
+		return
+	}
+	j := middlewares.NewJWT()
+	AccessToken, RefreshToken, err := j.RefreshToken(authHeader, refreshFroms.RefreshToken)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, map[string]string{
+			"msg": "刷新双Token失败",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"access_token":  AccessToken,
+		"refresh_token": RefreshToken,
+	})
+
+}
+
 func Register(c *gin.Context) {
 	//用户注册
 	registerForm := forms.RegisterForm{}

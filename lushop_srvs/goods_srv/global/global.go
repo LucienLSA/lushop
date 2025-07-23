@@ -11,8 +11,8 @@ import (
 var (
 	DB           *gorm.DB
 	ServerConfig config.ServerConfig
-	NacosConfig  config.NacosConfig
-	EsClient     *elastic.Client
+	// NacosConfig  config.NacosConfig
+	EsClient *elastic.Client
 )
 
 const Mode = "LUSHOP_DEBUG"

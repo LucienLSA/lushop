@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"inventorysrv/global"
 	"inventorysrv/model"
-	"inventorysrv/proto"
+	proto "inventorysrv/proto"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
@@ -25,6 +25,8 @@ type InventoryServer struct {
 	// db *gorm.DB
 }
 
+var _ proto.InventoryServer = &InventoryServer{}
+
 // func NewInventoryServer(db *gorm.DB) *InventoryServer {
 // 	return &InventoryServer{db: db}
 // }
@@ -34,13 +36,17 @@ func (v *InventoryServer) SetInv(ctx context.Context, req *proto.GoodsInvInfo) (
 	var inv model.Inventory
 	// invDB := v.db.WithContext(ctx)
 	// invDB := initialize.NewDBClient(ctx)
+	//只有是主键的情况才能直接用id   goodsid不是主键
 	global.DB.Where(&model.Inventory{Goods: req.GoodsId}).First(&inv)
 	inv.Goods = req.GoodsId
 	inv.Stocks = req.Num
-	global.DB.Save(&inv)
+	if result := global.DB.Save(&inv); result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "设置库存失败")
+	}
 	return &emptypb.Empty{}, nil
 }
 
+// 库存详情查询
 func (v *InventoryServer) InvDetail(ctx context.Context, req *proto.GoodsInvInfo) (*proto.GoodsInvInfo, error) {
 	var inv model.Inventory
 	// invDB := NewInventoryDB(ctx)
@@ -56,7 +62,7 @@ func (v *InventoryServer) InvDetail(ctx context.Context, req *proto.GoodsInvInfo
 
 // 扣减库存
 // 存在并发问题，本地事务
-// var m sync.Mutex
+// var m sync.Mutex 手动加入锁
 // func (v *InventoryServer) Sell(ctx context.Context, req *proto.SellInfo) (*emptypb.Empty, error) {
 // 	tx := global.DB.Begin()
 // 	// 通过下面的tx事务操作，默认不会自动提交
@@ -95,6 +101,8 @@ func (v *InventoryServer) InvDetail(ctx context.Context, req *proto.GoodsInvInfo
 //		} // 必须手动提交
 //		return &emptypb.Empty{}, nil
 //	}
+//
+// 使用go-redsync 分布式锁包 实现库存扣减
 func (v *InventoryServer) Sell(ctx context.Context, req *proto.SellInfo) (*emptypb.Empty, error) {
 	// client := goredislib.NewClient(&goredislib.Options{
 	// 	Addr: fmt.Sprintf("%s:%s", global.ServerConfig.RedisInfo.Host, global.ServerConfig.RedisInfo.Port),
@@ -147,6 +155,8 @@ func (v *InventoryServer) Sell(ctx context.Context, req *proto.SellInfo) (*empty
 	return &emptypb.Empty{}, nil
 }
 
+// TCC 方案
+// 尝试扣减库存，将库存预扣减 冻结库存，预留资源，防止超卖。
 func (v *InventoryServer) TrySell(ctx context.Context, req *proto.SellInfo) (*emptypb.Empty, error) {
 	// client := goredislib.NewClient(&goredislib.Options{
 	// 	Addr: fmt.Sprintf("%s:%s", global.ServerConfig.RedisInfo.Host, global.ServerConfig.RedisInfo.Port),
@@ -185,6 +195,7 @@ func (v *InventoryServer) TrySell(ctx context.Context, req *proto.SellInfo) (*em
 	return &emptypb.Empty{}, nil
 }
 
+// 订单确认，正式扣减库存并解冻。
 func (v *InventoryServer) ComfirmSell(ctx context.Context, req *proto.SellInfo) (*emptypb.Empty, error) {
 	// client := goredislib.NewClient(&goredislib.Options{
 	// 	Addr: fmt.Sprintf("%s:%s", global.ServerConfig.RedisInfo.Host, global.ServerConfig.RedisInfo.Port),
@@ -223,6 +234,7 @@ func (v *InventoryServer) ComfirmSell(ctx context.Context, req *proto.SellInfo) 
 	return &emptypb.Empty{}, nil
 }
 
+// 订单取消，解冻冻结库存，库存回滚。
 func (v *InventoryServer) CancelSell(ctx context.Context, req *proto.SellInfo) (*emptypb.Empty, error) {
 	// client := goredislib.NewClient(&goredislib.Options{
 	// 	Addr: fmt.Sprintf("%s:%s", global.ServerConfig.RedisInfo.Host, global.ServerConfig.RedisInfo.Port),
@@ -264,6 +276,7 @@ func (v *InventoryServer) CancelSell(ctx context.Context, req *proto.SellInfo) (
 // 1. 订单的超时归还
 // 2. 订单创建失败，归还之前扣减的库存
 // 3. 手动归还
+// 这里的归还方案废除，由下面的AutoReback重构
 func (v *InventoryServer) Reback(ctx context.Context, req *proto.SellInfo) (*emptypb.Empty, error) {
 	tx := global.DB.Begin()
 	for _, goodInfo := range req.GoodsInfo {
@@ -281,18 +294,30 @@ func (v *InventoryServer) Reback(ctx context.Context, req *proto.SellInfo) (*emp
 }
 
 // 自动归还库存，放在consumer监听库存中
+// 幂等性：通过扣减明细表和状态字段，确保同一订单不会被重复归还库存。
+// 事务性：归还库存和状态更新在同一事务内，保证数据一致性。
+// 自动重试：遇到数据库等临时问题时，返回 ConsumeRetryLater，消息会自动重试，保证最终归还成功。
+// 适用场景：订单取消、超时未支付等需要自动归还库存的场景。
 func AutoReback(ctx context.Context, me ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
 	type OrderInfo struct {
 		OrderSn string
 	}
 	for i := range me {
+		//既然是归还库存，那么我应该具体的知道每件商品应该归还多少,但是有一个问题是什么?重复归还的问题
+		//所以说这个接口应该确保幂等性,你不能因为消息的重复发送导致一个订单的库存归还多次,没有扣减的库存你别归还
+		//如何确保这些都没有问题，新建一张表，这张表记录了详细的订单扣减细节，以及归还细节
 		var orderInfo OrderInfo
 		err := json.Unmarshal(me[i].Body, &orderInfo)
 		if err != nil {
 			zap.S().Errorf("解析json失败:%v\n", me[i].Body)
+			//根据业务来   订单号都解析失败了，感觉是错误的信息
+			//ConsumeRetryLater 保证下次还能执行
+			//ConsumeSuccess 丢弃
 			return consumer.ConsumeSuccess, nil
 		}
 		// 将inv的库存加回去，将selldetail的status设置为2，在事务中执行
+		// 通过 StockSellDetail 表（库存扣减明细表）来判断该订单是否已经归还过库存。
+		// 只处理 Status=1（已扣减未归还）的订单，防止重复归还。
 		tx := global.DB.Begin()
 		var sellDetail model.StockSellDetail
 		if result := tx.Model(&model.StockSellDetail{}).Where(&model.
@@ -307,9 +332,12 @@ func AutoReback(ctx context.Context, me ...*primitive.MessageExt) (consumer.Cons
 				Update("stocks", gorm.Expr("stock+?", orderGood.Num))
 			if result.RowsAffected == 0 {
 				tx.Rollback()
+				//ConsumeRetryLater 保证下次还能执行
 				return consumer.ConsumeRetryLater, nil
 			}
 		}
+		// 将该订单的扣减明细状态设为2（已归还）。
+		// 如果更新失败，回滚事务，下次重试。
 		sellDetail.Status = 2
 		result := tx.Model(&model.StockSellDetail{}).Where(&model.StockSellDetail{OrderSn: orderInfo.OrderSn}).
 			Update("status", 2)

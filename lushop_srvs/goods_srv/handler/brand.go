@@ -4,7 +4,7 @@ import (
 	"context"
 	"goodssrv/global"
 	"goodssrv/model"
-	"goodssrv/proto"
+	proto "goodssrv/proto"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -41,8 +41,12 @@ func (s *GoodsServer) BrandList(ctx context.Context, req *proto.BrandFilterReque
 
 func (s *GoodsServer) CreateBrand(ctx context.Context, req *proto.BrandRequest) (*proto.BrandInfoResponse, error) {
 	// 处理重名情况
-	result := global.DB.First(&model.Brand{})
-	if result.RowsAffected == 1 {
+	// result := global.DB.First(&model.Brand{})
+	// if result.RowsAffected == 1 {
+	// 	return nil, status.Errorf(codes.InvalidArgument, "品牌已存在")
+	// }
+	brand := &model.Brand{Name: req.Name}
+	if result := global.DB.Where(&brand).First(brand); result.RowsAffected == 1 {
 		return nil, status.Errorf(codes.InvalidArgument, "品牌已存在")
 	}
 	// brand := model.Brands{}
@@ -52,13 +56,16 @@ func (s *GoodsServer) CreateBrand(ctx context.Context, req *proto.BrandRequest) 
 	// 	Name: req.Name,
 	// 	Logo: req.Logo,
 	// })
-	brand := &model.Brand{
-		Name: req.Name,
-		Logo: req.Logo,
+	// brand := &model.Brand{
+	// 	Name: req.Name,
+	// 	Logo: req.Logo,
+	// }
+	brand.Logo = req.Logo
+	if result := global.DB.Save(&brand); result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "创建品牌失败")
 	}
-	global.DB.Save(brand)
 	return &proto.BrandInfoResponse{
-		Id:   int32(brand.ID),
+		Id:   brand.ID,
 		Name: brand.Name,
 		Logo: brand.Logo,
 	}, nil
@@ -74,9 +81,8 @@ func (s *GoodsServer) DeleteBrand(ctx context.Context, req *proto.BrandRequest) 
 
 func (s *GoodsServer) UpdateBrand(ctx context.Context, req *proto.BrandRequest) (*emptypb.Empty, error) {
 	brands := model.Brand{}
-	result := global.DB.First(&brands)
-	if result.RowsAffected == 0 {
-		return nil, status.Errorf(codes.NotFound, "品牌不存在")
+	if result := global.DB.Where(&model.Brand{BaseModel: model.BaseModel{ID: req.Id}}).First(&brands); result.RowsAffected == 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "品牌不存在")
 	}
 	if req.Name != "" {
 		brands.Name = req.Name
@@ -84,6 +90,8 @@ func (s *GoodsServer) UpdateBrand(ctx context.Context, req *proto.BrandRequest) 
 	if req.Logo != "" {
 		brands.Logo = req.Logo
 	}
-	global.DB.Save(&brands)
+	if result := global.DB.Save(&brands); result.Error != nil {
+		return nil, status.Errorf(codes.Internal, "创建品牌失败")
+	}
 	return &emptypb.Empty{}, nil
 }

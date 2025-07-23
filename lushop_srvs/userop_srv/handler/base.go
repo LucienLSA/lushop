@@ -1,17 +1,16 @@
 package handler
 
 import (
-	proto_address "useropsrv/proto/gen/address"
-	proto_message "useropsrv/proto/gen/message"
-	proto_userfav "useropsrv/proto/gen/userfav"
+	proto "useropsrv/proto"
 
 	"gorm.io/gorm"
 )
 
 type UserOpServer struct {
-	proto_address.UnimplementedAddressServer
-	proto_message.UnimplementedMessageServer
-	proto_userfav.UnimplementedUserFavServer
+	// proto_address.UnimplementedAddressServer
+	// proto_message.UnimplementedMessageServer
+	// proto_userfav.UnimplementedUserFavServer
+	proto.UnimplementedUserOpServer
 }
 
 func Paginate(pageNum, pageSize int) func(db *gorm.DB) *gorm.DB {

@@ -12,9 +12,8 @@ import (
 	"useropsrv/handler"
 
 	"useropsrv/initialize"
-	proto_address "useropsrv/proto/gen/address"
-	proto_message "useropsrv/proto/gen/message"
-	proto_userfav "useropsrv/proto/gen/userfav"
+	proto "useropsrv/proto"
+
 	"useropsrv/utils/addr"
 	"useropsrv/utils/register/consul"
 
@@ -35,28 +34,28 @@ func main() {
 	// 初始化Mysql
 	initialize.MySQL()
 	zap.S().Info("init MySQL sucess")
-	// 初始化redis
-	if err := initialize.Redis(); err != nil {
-		zap.S().Panic("初始化redis失败", err.Error())
-	}
-	zap.S().Info("init Redis sucess")
+	// // 初始化redis
+	// if err := initialize.Redis(); err != nil {
+	// 	zap.S().Panic("初始化redis失败", err.Error())
+	// }
+	// zap.S().Info("init Redis sucess")
 
 	zap.S().Info(global.ServerConfig)
-	IP := flag.String("ip", "0.0.0.0", "ip地址")
-	Port := flag.Int("port", 8022, "端口号")
+	// IP := flag.String("ip", "0.0.0.0", "ip地址")
+	Port := flag.Int("port", 50054, "端口号")
 	flag.Parse()
-	zap.S().Info("ip:", *IP)
+	// zap.S().Info("ip:", *IP)
 	if *Port == 0 {
 		*Port, _ = addr.GetFreeport()
 	}
 	zap.S().Info("port:", *Port)
 	server := grpc.NewServer()
-	proto_message.RegisterMessageServer(server, &handler.UserOpServer{})
-	proto_address.RegisterAddressServer(server, &handler.UserOpServer{})
-	proto_userfav.RegisterUserFavServer(server, &handler.UserOpServer{})
-	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", *IP, *Port))
+	// proto_message.RegisterMessageServer(server, &handler.UserOpServer{})
+	// proto_address.RegisterAddressServer(server, &handler.UserOpServer{})
+	// proto_userfav.RegisterUserFavServer(server, &handler.UserOpServer{})
+	proto.RegisterUserOpServer(server, &handler.UserOpServer{})
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", global.ServerConfig.Host, *Port))
 	if err != nil {
-		zap.S().Errorf("ip:", *IP)
 		panic("failed to listen:" + err.Error())
 	}
 	// 注册grpc服务健康检查
@@ -102,9 +101,11 @@ func main() {
 	register_client := consul.NewRegistryClient(global.ServerConfig.ConsulInfo.Host, consulPortInt)
 	err = register_client.Register(global.ServerConfig.Host, *Port, global.ServerConfig.Name, global.ServerConfig.Tags, serviceId)
 	if err != nil {
-		zap.S().Panic("服务注册失败", err.Error())
+		zap.S().Panic("【用户操作服务-srv】注册失败:", err.Error())
+	} else {
+		zap.S().Info("ip:", global.ServerConfig.Host, ":", *Port)
+		zap.S().Info("【用户操作服务-srv】注册成功")
 	}
-	zap.S().Debugf("init grpc userop service success,port:%d", *Port)
 
 	go func() {
 		err = server.Serve(lis)
@@ -120,8 +121,8 @@ func main() {
 	err = register_client.DeRegister(serviceId)
 	// client.Agent().ServiceDeregister(serviceID)
 	if err != nil {
-		zap.S().Info("注销失败:", err.Error())
+		zap.S().Panic("【用户操作服务-srv】注销失败:", err.Error())
 	} else {
-		zap.S().Info("注销成功:")
+		zap.S().Info("【用户操作服务-srv】注销成功")
 	}
 }

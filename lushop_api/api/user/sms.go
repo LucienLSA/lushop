@@ -40,8 +40,8 @@ func SendSmsAli(ctx *gin.Context) {
 		v2base.HandleValidatorError(ctx, err)
 		return
 	}
-	fmt.Println("ApiSecret:", global.ServerConfig.AliSmsInfo.ApiSecret)
-	fmt.Println("GetEnvInfoStr(ApiSecret):", global.GetEnvInfoStr(global.ServerConfig.AliSmsInfo.ApiSecret))
+	// fmt.Println("ApiSecret:", global.ServerConfig.AliSmsInfo.ApiSecret)
+	// fmt.Println("GetEnvInfoStr(ApiSecret):", global.GetEnvInfoStr(global.ServerConfig.AliSmsInfo.ApiSecret))
 	config := &openapi.Config{
 		// 您的AccessKey ID
 		// AccessKeyId: tea.String(global.ServerConfig.AliSmsInfo.ApiKey),

@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+	"go.uber.org/zap"
 )
 
 func JWTAuth() gin.HandlerFunc {
@@ -108,17 +109,23 @@ func (j *JWT) RefreshToken(atoken, rtoken string) (newAtoken, newRtoken string, 
 	}
 	// 从旧access token 中解析出claims数据
 	var aclaim *jwtClaims.CustomClaims
-	if aclaim, err = j.ParseToken(atoken); err != nil {
+	aclaim, aErr := j.ParseToken(atoken)
+	if aErr != nil {
+		// 判断错误是不是因为access token 正常过期导致的
+		if v, ok := aErr.(*jwt.ValidationError); ok {
+			if v.Errors == jwt.ValidationErrorExpired {
+				// 刷新生成新的access_token
+				NewAccess, _ := j.CreateToken(*aclaim)
+				NewRefresh, _ := j.CreateToken(*rclaim)
+				return NewAccess, NewRefresh, nil
+			}
+		}
+		// 其他错误直接返回
+		err = aErr
 		return
 	}
-	// 判断错误是不是因为access token 正常过期导致的
-	v, _ := err.(*jwt.ValidationError)
-	if v.Errors == jwt.ValidationErrorExpired {
-		// 刷新生成新的access_token
-		NewAccess, _ := j.CreateToken(*aclaim)
-		NewRefresh, _ := j.CreateToken(*rclaim)
-		return NewAccess, NewRefresh, nil
-	}
+	// access token 没有过期，不需要刷新
+	zap.S().Info("access token 未过期，无需刷新")
 	return
 }
 

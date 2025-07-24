@@ -2,6 +2,7 @@ package router
 
 import (
 	"lushopapi/api/user"
+	"lushopapi/global"
 	"lushopapi/middlewares"
 
 	"github.com/gin-gonic/gin"
@@ -9,7 +10,9 @@ import (
 )
 
 func InitUserRouter(Router *gin.Engine) {
-	UserRouer := Router.Group("user")
+	ApiGroup := Router.Group("u")
+	ApiGroup = ApiGroup.Group(global.ServerConfig.Version)
+	UserRouer := ApiGroup.Group("user")
 	zap.S().Info("配置用户相关的url")
 	// 双token方案
 	{

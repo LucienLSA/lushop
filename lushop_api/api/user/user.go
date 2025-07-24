@@ -72,14 +72,34 @@ func PassWorldLogin(c *gin.Context) {
 		base.HandleValidatorError(c, err)
 		return
 	}
-	if !store.Verify(passwordLoginForm.CaptchaId, passwordLoginForm.CaptchaAns, true) {
+	// 校验验证码时从 Redis 取出
+	realAns, err := global.RedisClient.Get(c, "captcha:"+passwordLoginForm.CaptchaId).Result()
+	if err != nil {
+		// 过期或不存在
 		c.JSON(http.StatusBadRequest, gin.H{
-			"captcha": "验证码错误",
+			"message": "验证码过期或不存在",
 		})
 		return
 	}
+	if realAns != passwordLoginForm.CaptchaAns {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "验证码错误",
+		})
+		return
+	}
+	// 校验通过后删除，防止重放
+	global.RedisClient.Del(c, "captcha:"+passwordLoginForm.CaptchaId)
 
-	if rsp, err := global.UserSrvClient.GetUserByMobile(context.Background(), &v2userproto.MobileRequest{
+	// 直接通过Captcha自带的store进行检验
+	// if !store.Verify(passwordLoginForm.CaptchaId, passwordLoginForm.CaptchaAns, true) {
+	// 	c.JSON(http.StatusBadRequest, gin.H{
+	// 		"captcha": "验证码错误",
+	// 	})
+	// 	return
+	// }
+	fmt.Printf("输入的手机号为:%s", passwordLoginForm.Mobile)
+	// fmt.Printf("上下文保存的手机号为:%v", c)
+	if rsp, err := global.UserSrvClient.GetUserByMobile(context.WithValue(context.Background(), "ginContext", c), &v2userproto.MobileRequest{
 		Mobile: passwordLoginForm.Mobile,
 	}); err != nil {
 		if e, ok := status.FromError(err); ok {

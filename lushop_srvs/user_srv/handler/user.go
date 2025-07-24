@@ -103,9 +103,9 @@ func (s *UserServer) GetUserList(ctx context.Context, req *proto.PageInfo) (*pro
 
 func (s *UserServer) GetUserByMobile(ctx context.Context, req *proto.MobileRequest) (*proto.UserInfoResponse, error) {
 	// 手机号码查询用户
-	var user model.User
+	user := model.User{} // 每次都新建
 	// db := global.NewDBClient(ctx)
-	// fmt.Println(req.Mobile)
+	fmt.Println(req.Mobile)
 	result := global.DB.Where(&model.User{Mobile: req.Mobile}).First(&user)
 	if result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "用户不存在")
@@ -119,7 +119,7 @@ func (s *UserServer) GetUserByMobile(ctx context.Context, req *proto.MobileReque
 
 func (s *UserServer) GetUserById(ctx context.Context, req *proto.IdRequest) (*proto.UserInfoResponse, error) {
 	// id查询用户
-	var user model.User
+	user := model.User{} // 每次都新建
 	// db := global.DB
 	// db := global.NewDBClient(ctx)
 	result := global.DB.First(&user, req.Id)
@@ -135,7 +135,7 @@ func (s *UserServer) GetUserById(ctx context.Context, req *proto.IdRequest) (*pr
 
 func (s *UserServer) CreateUser(ctx context.Context, req *proto.CreateUserInfo) (*proto.UserInfoResponse, error) {
 	// 新建用户
-	var user model.User
+	user := model.User{} // 每次都新建
 	var count int64
 	err := global.DB.Model(&model.User{}).Where("mobile=?", req.Mobile).Count(&count).Error
 	if err != nil {
@@ -167,7 +167,7 @@ func (s *UserServer) CreateUser(ctx context.Context, req *proto.CreateUserInfo) 
 }
 
 func (s *UserServer) UpdateUser(ctx context.Context, req *proto.UpdateUserInfo) (*emptypb.Empty, error) {
-	var user model.User
+	user := model.User{} // 每次都新建
 	// db := global.NewDBClient(ctx)
 	// db := global.DB
 	result := global.DB.First(&user, req.Id)
@@ -187,7 +187,7 @@ func (s *UserServer) UpdateUser(ctx context.Context, req *proto.UpdateUserInfo) 
 
 // 检验密码，传入的是请求中的原密码
 func (s *UserServer) CheckPassWord(ctx context.Context, req *proto.PasswordCheckInfo) (*proto.CheckResponse, error) {
-	var user model.User
+	user := model.User{} // 每次都新建
 	// 将请求中输入用户的密码代入user模型中对比
 	user.Password = req.EncryptedPassWord
 	// fmt.Println(user.Password)

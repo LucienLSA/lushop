@@ -1,6 +1,6 @@
 name: 'goods_srv'
-host: '10.99.195.125'
-# host: '10.101.178.90'
+# host: '10.99.195.125'
+host: '10.101.178.90'
 tags: ['goods_srv','grpc','lushop_srv','lucien']
 
 mysql:

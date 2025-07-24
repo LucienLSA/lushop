@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"errors"
+	"fmt"
 	"lushopapi/global"
 	"lushopapi/utils/jwtClaims"
 
@@ -27,15 +28,24 @@ func JWTAuth() gin.HandlerFunc {
 		j := NewJWT()
 		// parseToken 解析token包含的信息
 		claims, err := j.ParseToken(AccessToken)
+		fmt.Println(claims)
 		if err != nil {
 			if err == TokenExpired {
+				zap.S().Errorf("登录授权已过期,:", err.Error())
 				c.JSON(http.StatusUnauthorized, map[string]string{
 					"msg": "登录授权已过期",
 				})
 				c.Abort()
 				return
 			}
-			c.JSON(http.StatusUnauthorized, "未登陆")
+			zap.S().Errorf("登录错误,:", err.Error())
+			c.JSON(http.StatusUnauthorized, "登录错误")
+			c.Abort()
+			return
+		}
+		exist, _ := global.RedisClient.Exists(c, "jwt_blacklist:"+AccessToken).Result()
+		if exist == 1 {
+			c.JSON(http.StatusUnauthorized, gin.H{"msg": "token已失效"})
 			c.Abort()
 			return
 		}

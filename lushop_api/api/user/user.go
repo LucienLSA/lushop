@@ -26,7 +26,6 @@ import (
 
 // 获取用户列表
 func GetUserList(ctx *gin.Context) {
-
 	pn := ctx.DefaultQuery("pn", "0")
 	pnInt, _ := strconv.Atoi(pn)
 	pSize := ctx.DefaultQuery("psize", "10")
@@ -178,6 +177,26 @@ func PassWorldLogin(c *gin.Context) {
 	}
 }
 
+// 登出
+func Logout(c *gin.Context) {
+	token := c.GetHeader("x-token")
+	if token == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "未携带token"})
+		return
+	}
+	// 解析token获取过期时间
+	j := middlewares.NewJWT()
+	claims, err := j.ParseToken(token)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "token无效"})
+		return
+	}
+	expire := time.Unix(claims.ExpiresAt, 0).Sub(time.Now())
+	// 加入黑名单
+	global.RedisClient.Set(c, "jwt_blacklist:"+token, 1, expire)
+	c.JSON(http.StatusOK, gin.H{"msg": "注销成功"})
+}
+
 // RefreshTokenHandler 刷新accessToken
 func RefreshToken(c *gin.Context) {
 	refreshFroms := forms.RefreshTokenForm{}
@@ -274,23 +293,7 @@ func Register(c *gin.Context) {
 	})
 }
 
-// 注销用户
-// func DeleteUser(c *gin.Context) {
-// 	claims, _ := c.Get("claims")
-// 	currentUser := claims.(*jwtClaims.CustomClaims)
-// 	_, err := global.UserSrvClient.DeleteUser(context.Background(), &v2userproto.IdRequest{
-// 		Id: int32(currentUser.ID),
-// 	})
-// 	if err != nil {
-// 		base.HandleGrpcErrorToHttp(err, c)
-// 		return
-// 	}
-// 	c.JSON(http.StatusOK, gin.H{
-// 		"msg": "注销成功",
-// 	})
-// }
-
-func GetUserDetail(c *gin.Context) {
+func GetUserDetailOAuth(c *gin.Context) {
 	// claims, _ := c.Get("claims")
 	// currentUser := claims.(*jwtClaims.CustomClaims)
 	// zap.S().Infof("访问用户：%d", currentUser)
@@ -325,8 +328,40 @@ func GetUserDetail(c *gin.Context) {
 	})
 }
 
+func GetUserDetail(c *gin.Context) {
+	claims, exists := c.Get("claims")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "未登录"})
+		return
+	}
+	currentUser := claims.(*jwtClaims.CustomClaims)
+	zap.S().Infof("访问用户：%d", currentUser)
+
+	// 这里才去找用户的实际id
+	// user, err := global.UserSrvClient.GetUserByMobile(context.Background(), &v2userproto.MobileRequest{
+	// 	Mobile: mobile,
+	// })
+	// if err != nil {
+	// 	base.HandleGrpcErrorToHttp(err, c)
+	// 	return
+	// }
+	rsp, err := global.UserSrvClient.GetUserById(context.Background(), &v2userproto.IdRequest{
+		Id: int32(currentUser.ID),
+	})
+	if err != nil {
+		base.HandleGrpcErrorToHttp(err, c)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"name":     rsp.NickName,
+		"birthday": time.Unix(int64(rsp.BirthDay), 0).Format("2006-01-02"),
+		"gender":   rsp.Gender,
+		"mobile":   rsp.Mobile,
+	})
+}
+
 // 更新用户
-func UpdateUser(ctx *gin.Context) {
+func UpdateUserOAuth(ctx *gin.Context) {
 	updateUserForm := forms.UpdateUserForm{}
 	if err := ctx.ShouldBind(&updateUserForm); err != nil {
 		base.HandleValidatorError(ctx, err)
@@ -364,6 +399,55 @@ func UpdateUser(ctx *gin.Context) {
 	_, err = global.UserSrvClient.UpdateUser(context.Background(), &v2userproto.UpdateUserInfo{
 		// Id:       int32(currentUser.ID),
 		Id:       user.Id,
+		NickName: updateUserForm.Name,
+		Gender:   updateUserForm.Gender,
+		BirthDay: uint64(birthDay.Unix()),
+	})
+	if err != nil {
+		base.HandleGrpcErrorToHttp(err, ctx)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"msg": "更新用户信息成功",
+	})
+}
+
+func UpdateUser(ctx *gin.Context) {
+	updateUserForm := forms.UpdateUserForm{}
+	if err := ctx.ShouldBind(&updateUserForm); err != nil {
+		base.HandleValidatorError(ctx, err)
+		return
+	}
+	claims, exists := ctx.Get("claims")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "未登录"})
+		return
+	}
+	currentUser := claims.(*jwtClaims.CustomClaims)
+	zap.S().Infof("访问用户：%d", currentUser)
+
+	// // 这里才去找用户的实际id
+	// user, err := global.UserSrvClient.GetUserByMobile(context.Background(), &v2userproto.MobileRequest{
+	// 	Mobile: mobile,
+	// })
+	// if err != nil {
+	// 	base.HandleGrpcErrorToHttp(err, ctx)
+	// 	return
+	// }
+
+	rsp, err := global.UserSrvClient.GetUserById(context.Background(), &v2userproto.IdRequest{
+		Id: int32(currentUser.ID),
+	})
+	if err != nil {
+		base.HandleGrpcErrorToHttp(err, ctx)
+		return
+	}
+	//将前端传递过来的日期格式转换成int类型
+	loc, _ := time.LoadLocation("Local")                                            // L必须大写
+	birthDay, _ := time.ParseInLocation("2006-01-02", updateUserForm.Birthday, loc) //必须是2006-01-02
+	_, err = global.UserSrvClient.UpdateUser(context.Background(), &v2userproto.UpdateUserInfo{
+		Id: rsp.Id,
+		// Id:       user.Id,
 		NickName: updateUserForm.Name,
 		Gender:   updateUserForm.Gender,
 		BirthDay: uint64(birthDay.Unix()),

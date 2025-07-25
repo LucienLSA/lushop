@@ -1,6 +1,6 @@
 name: 'user_srv'
-# host: '10.99.195.125'
-host: '10.101.178.90'
+host: '10.99.195.125' # 实验室
+# host: '10.101.178.90' # 宿舍
 tags: ['user_srv','grpc','lushop_srv','lucien']
 
 mysql:

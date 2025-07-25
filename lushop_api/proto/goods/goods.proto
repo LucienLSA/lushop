@@ -8,6 +8,7 @@ option go_package = ".;v2goodsproto";
 service Goods{
   //商品接口
   rpc GoodsList(GoodsFilterRequest) returns(GoodsListResponse);
+  rpc GoodsListES(GoodsFilterRequest) returns(GoodsListResponse);
   //现在用户提交订单有多个商品，批量查询商品的信息
   rpc BatchGetGoods(BatchGoodsIdInfo) returns(GoodsListResponse); //批量获取商品信息
   rpc CreateGoods(CreateGoodsInfo) returns (GoodsInfoResponse);

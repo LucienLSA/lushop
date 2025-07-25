@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	Goods_GoodsList_FullMethodName            = "/Goods/GoodsList"
+	Goods_GoodsListES_FullMethodName          = "/Goods/GoodsListES"
 	Goods_BatchGetGoods_FullMethodName        = "/Goods/BatchGetGoods"
 	Goods_CreateGoods_FullMethodName          = "/Goods/CreateGoods"
 	Goods_DeleteGoods_FullMethodName          = "/Goods/DeleteGoods"
@@ -52,6 +53,7 @@ const (
 type GoodsClient interface {
 	// 商品接口
 	GoodsList(ctx context.Context, in *GoodsFilterRequest, opts ...grpc.CallOption) (*GoodsListResponse, error)
+	GoodsListES(ctx context.Context, in *GoodsFilterRequest, opts ...grpc.CallOption) (*GoodsListResponse, error)
 	// 现在用户提交订单有多个商品，批量查询商品的信息
 	BatchGetGoods(ctx context.Context, in *BatchGoodsIdInfo, opts ...grpc.CallOption) (*GoodsListResponse, error)
 	CreateGoods(ctx context.Context, in *CreateGoodsInfo, opts ...grpc.CallOption) (*GoodsInfoResponse, error)
@@ -96,6 +98,16 @@ func (c *goodsClient) GoodsList(ctx context.Context, in *GoodsFilterRequest, opt
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GoodsListResponse)
 	err := c.cc.Invoke(ctx, Goods_GoodsList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *goodsClient) GoodsListES(ctx context.Context, in *GoodsFilterRequest, opts ...grpc.CallOption) (*GoodsListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GoodsListResponse)
+	err := c.cc.Invoke(ctx, Goods_GoodsListES_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -338,6 +350,7 @@ func (c *goodsClient) UpdateCategoryBrand(ctx context.Context, in *CategoryBrand
 type GoodsServer interface {
 	// 商品接口
 	GoodsList(context.Context, *GoodsFilterRequest) (*GoodsListResponse, error)
+	GoodsListES(context.Context, *GoodsFilterRequest) (*GoodsListResponse, error)
 	// 现在用户提交订单有多个商品，批量查询商品的信息
 	BatchGetGoods(context.Context, *BatchGoodsIdInfo) (*GoodsListResponse, error)
 	CreateGoods(context.Context, *CreateGoodsInfo) (*GoodsInfoResponse, error)
@@ -380,6 +393,9 @@ type UnimplementedGoodsServer struct{}
 
 func (UnimplementedGoodsServer) GoodsList(context.Context, *GoodsFilterRequest) (*GoodsListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GoodsList not implemented")
+}
+func (UnimplementedGoodsServer) GoodsListES(context.Context, *GoodsFilterRequest) (*GoodsListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GoodsListES not implemented")
 }
 func (UnimplementedGoodsServer) BatchGetGoods(context.Context, *BatchGoodsIdInfo) (*GoodsListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BatchGetGoods not implemented")
@@ -485,6 +501,24 @@ func _Goods_GoodsList_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GoodsServer).GoodsList(ctx, req.(*GoodsFilterRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Goods_GoodsListES_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GoodsFilterRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GoodsServer).GoodsListES(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Goods_GoodsListES_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GoodsServer).GoodsListES(ctx, req.(*GoodsFilterRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -913,6 +947,10 @@ var Goods_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GoodsList",
 			Handler:    _Goods_GoodsList_Handler,
+		},
+		{
+			MethodName: "GoodsListES",
+			Handler:    _Goods_GoodsListES_Handler,
 		},
 		{
 			MethodName: "BatchGetGoods",

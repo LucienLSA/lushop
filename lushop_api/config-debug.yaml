@@ -1,6 +1,6 @@
 name: v2lushopapi   # 服务器名称
-host: '10.99.195.125'   # 服务器主机 实验室
-# host: '10.101.178.90' # 宿舍
+# host: '10.99.195.125'   # 服务器主机 实验室
+host: '10.101.178.90' # 宿舍
 port: 8101         # 服务器端口
 version: v2
 tags:
@@ -115,7 +115,7 @@ oss:
   api_key: 'OSS_ACCESS_KEY_ID'
   api_secrect: 'OSS_ACCESS_KEY_SECRET'
   host: 'http://lushop666.oss-cn-shanghai.aliyuncs.com'
-  callback_url: 'https://379430pt29xz.vicp.fun/oss/v1/oss/callback'
+  callback_url: 'http://lushop.luckyfrp.cn'
   upload_dir: 'lushop_images/'
   expired_time: 3000
 

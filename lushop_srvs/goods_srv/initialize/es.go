@@ -24,16 +24,16 @@ func Es() {
 		panic(err)
 	}
 
-	// 新建mapping和index
 	//查询index是否存在
 	exist, err := global.EsClient.IndexExists(model.EsGoods{}.GetIndexName()).Do(context.Background())
 	if err != nil {
 		panic(err)
 	}
+	// 不存在就新建mapping和index
 	if !exist {
 		_, err2 := global.EsClient.CreateIndex(model.EsGoods{}.GetIndexName()).BodyString(model.EsGoods{}.GetMapping()).Do(context.Background())
 		if err2 != nil {
-			zap.S().Fatalf("创建索引%s失败：%s", model.EsGoods{}.GetIndexName(), err2.Error())
+			zap.S().Fatalf("创建索引%s失败:%s", model.EsGoods{}.GetIndexName(), err2.Error())
 		}
 	}
 }

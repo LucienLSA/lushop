@@ -120,6 +120,8 @@ func (g *Goods) AfterUpdate(tx *gorm.DB) (err error) {
 	}
 	return nil
 }
+
+// 删除同步
 func (g *Goods) AfterDelete(tx *gorm.DB) (err error) {
 	_, err = global.EsClient.Delete().Index(EsGoods{}.GetIndexName()).Id(strconv.Itoa(int(g.ID))).Do(context.Background())
 	if err != nil {

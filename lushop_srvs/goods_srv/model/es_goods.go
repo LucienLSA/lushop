@@ -27,7 +27,7 @@ func (EsGoods) GetMapping() string {
 	{
 		"mappings" : {
 			"properties" : {
-				"brands_id" : {
+				"brand_id" : {
 					"type" : "integer"
 				},
 				"category_id" : {

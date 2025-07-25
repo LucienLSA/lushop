@@ -272,7 +272,9 @@ func (s *GoodsServer) GoodsListES(ctx context.Context, req *proto.GoodsFilterReq
 	}
 
 	goodsIds := make([]int32, 0)
+	// 总数
 	goodsListRsp.Total = int32(result.Hits.TotalHits.Value)
+	// 解析json数据
 	for _, value := range result.Hits.Hits {
 		goods := model.EsGoods{}
 		_ = json.Unmarshal(value.Source, &goods)
@@ -285,6 +287,7 @@ func (s *GoodsServer) GoodsListES(ctx context.Context, req *proto.GoodsFilterReq
 	if res.Error != nil {
 		return nil, res.Error
 	}
+	// 查询的结果保持到返回响应的结构体
 	for _, good := range goods {
 		goodsInfoRsp := ModelToResponse(good)
 		goodsListRsp.Data = append(goodsListRsp.Data, &goodsInfoRsp)

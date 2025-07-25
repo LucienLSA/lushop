@@ -71,6 +71,7 @@ type CallbackParam struct {
 	CallbackBodyType string `json:"callbackBodyType"`
 }
 
+// 生成一个包含 临时访问凭证、上传策略 和 回调参数 的 JSON 令牌，用于前端直接上传文件到 OSS
 func Get_policy_token() string {
 	now := time.Now().Unix()
 	expire_end := now + global.ServerConfig.OssInfo.ExpireTime

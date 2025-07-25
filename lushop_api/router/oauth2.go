@@ -7,7 +7,6 @@ import (
 )
 
 func InitOAuth2Router(Router *gin.Engine) {
-	Router.Static("/static", "./static")
 	oauth2Router := Router.Group("/oauth2")
 	{
 		oauth2Router.GET("/authorize", oauth2.AuthorizeHandler) // 授权

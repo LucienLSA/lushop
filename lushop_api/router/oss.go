@@ -15,5 +15,6 @@ func InitOssRouter(Router *gin.Engine) {
 		//OssRouter.GET("token", middlewares.JWTAuth(), middlewares.IsAdminAuth(), handler.Token)
 		OssRouter.GET("token", oss.Token)              // 获取上传策略令牌
 		OssRouter.POST("callback", oss.HandlerRequest) //回调验证
+		OssRouter.POST("upload", oss.PostPicture)
 	}
 }

@@ -33,6 +33,8 @@ type InventorySrvConfig struct {
 type OssConfig struct {
 	ApiKey      string `mapstructure:"api_key" json:"api_key"`
 	ApiSecrect  string `mapstructure:"api_secrect" json:"api_secrect"`
+	Endpoint    string `mapstructure:"endpoint" json:"endpoint"`
+	Bucket      string `mapstructure:"bucket" json:"bucket"`
 	Host        string `mapstructure:"host" json:"host"`
 	CallBackUrl string `mapstructure:"callback_url" json:"callback_url"`
 	UploadDir   string `mapstructure:"upload_dir" json:"upload_dir"`

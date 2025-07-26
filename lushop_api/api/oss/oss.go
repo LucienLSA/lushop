@@ -101,3 +101,35 @@ func HandlerRequest(ctx *gin.Context) {
 		"message": "Callback verified successfully",
 	})
 }
+
+func PostPicture(c *gin.Context) {
+	// 1. 获取上传的文件
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "文件获取失败", "error": err.Error()})
+		return
+	}
+
+	// 2. 保存到本地临时目录（可选，直接用 file.Open() 也可以）
+	localPath := "./tmp/" + file.Filename
+	if err := c.SaveUploadedFile(file, localPath); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"msg": "文件保存失败", "error": err.Error()})
+		return
+	}
+
+	// 3. 构造 OSS 对象名（可自定义路径/前缀）
+	objectName := global.ServerConfig.OssInfo.UploadDir + file.Filename
+	// 4. 上传到OSS
+	err = utils.UploadFileToOSS(objectName, localPath)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"msg": "OSS上传失败", "error": err.Error()})
+		return
+	}
+
+	// 5. 返回文件在OSS的访问路径
+	ossUrl := strings.TrimRight(global.ServerConfig.OssInfo.Host, "/") + "/" + objectName
+	c.JSON(http.StatusOK, gin.H{
+		"msg":    "上传成功",
+		"ossUrl": ossUrl,
+	})
+}

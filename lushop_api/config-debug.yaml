@@ -115,9 +115,11 @@ oss:
   api_key: 'OSS_ACCESS_KEY_ID'
   api_secrect: 'OSS_ACCESS_KEY_SECRET'
   host: 'http://lushop666.oss-cn-shanghai.aliyuncs.com'
-  callback_url: 'https://cdf93f19d596.ngrok-free.app/g/v2/oss/callback'
+  callback_url: 'https://3e69ee01b766.ngrok-free.app/g/v2/oss/callback'
   upload_dir: 'lushop_images/'
   expired_time: 3000
+  bucket: lushop666
+  endpoint: oss-cn-shanghai.aliyuncs.com
 
 alipay:
   app_id: 'AliPay_Id'

@@ -22,6 +22,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -71,6 +72,38 @@ type CallbackParam struct {
 	CallbackUrl      string `json:"callbackUrl"`
 	CallbackBody     string `json:"callbackBody"`
 	CallbackBodyType string `json:"callbackBodyType"`
+}
+
+// UploadFileToOSS 上传本地文件到OSS
+func UploadFileToOSS(objectName, localFileName string) error {
+	endpoint := global.ServerConfig.OssInfo.Endpoint
+	accessKeyId := global.GetEnvInfoStr(global.ServerConfig.OssInfo.ApiKey)
+	accessKeySecret := global.GetEnvInfoStr(global.ServerConfig.OssInfo.ApiSecrect)
+	bucketName := global.ServerConfig.OssInfo.Bucket
+
+	// 创建OSSClient实例
+	client, err := oss.New(endpoint, accessKeyId, accessKeySecret)
+	if err != nil {
+		zap.S().Errorf("创建OSS客户端失败: %v", err)
+		return err
+	}
+
+	// 获取存储空间
+	bucket, err := client.Bucket(bucketName)
+	if err != nil {
+		zap.S().Errorf("获取Bucket失败: %v", err)
+		return err
+	}
+
+	// 上传文件
+	err = bucket.PutObjectFromFile(objectName, localFileName)
+	if err != nil {
+		zap.S().Errorf("上传文件失败: %v", err)
+		return err
+	}
+
+	zap.S().Errorf("文件上传成功: %s/%s", bucketName, objectName)
+	return nil
 }
 
 // 生成一个包含 临时访问凭证、上传策略 和 回调参数 的 JSON 令牌，用于前端直接上传文件到 OSS

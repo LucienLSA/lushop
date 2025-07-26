@@ -6,6 +6,7 @@ import (
 	"crypto/md5"
 	"crypto/rsa"
 	"crypto/sha1"
+	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
@@ -22,6 +23,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 // 请填写您的AccessKeyId。
@@ -121,7 +123,7 @@ func Get_policy_token() string {
 // getPublicKey : Get PublicKey bytes from Request.URL
 func GetPublicKey(r *gin.Context) ([]byte, error) {
 	var bytePublicKey []byte
-	// get PublicKey URL
+	// get PublicKey URL // 1. 获取并解码公钥URL
 	publicKeyURLBase64 := r.GetHeader("x-oss-pub-key-url")
 	if publicKeyURLBase64 == "" {
 		fmt.Println("GetPublicKey from Request header failed :  No x-oss-pub-key-url field. ")
@@ -129,18 +131,23 @@ func GetPublicKey(r *gin.Context) ([]byte, error) {
 	}
 	publicKeyURL, _ := base64.StdEncoding.DecodeString(publicKeyURLBase64)
 	// fmt.Printf("publicKeyURL={%s}\n", publicKeyURL)
-	// get PublicKey Content from URL
+	// get PublicKey Content from URL 2. 下载公钥内容
 	responsePublicKeyURL, err := http.Get(string(publicKeyURL))
 	if err != nil {
-		fmt.Printf("Get PublicKey Content from URL failed : %s \n", err.Error())
-		return bytePublicKey, err
+		// fmt.Printf("Get PublicKey Content from URL failed : %s \n", err.Error())
+		// return bytePublicKey, err
+		return nil, fmt.Errorf("failed to fetch public key: %v", err)
+	}
+	defer responsePublicKeyURL.Body.Close()
+	if responsePublicKeyURL.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected HTTP status when fetching key: %d", responsePublicKeyURL.StatusCode)
 	}
 	bytePublicKey, err = ioutil.ReadAll(responsePublicKeyURL.Body)
 	if err != nil {
-		fmt.Printf("Read PublicKey Content from URL failed : %s \n", err.Error())
-		return bytePublicKey, err
+		// fmt.Printf("Read PublicKey Content from URL failed : %s \n", err.Error())
+		// return bytePublicKey, err
+		return nil, fmt.Errorf("failed to read public key: %v", err)
 	}
-	defer responsePublicKeyURL.Body.Close()
 	// fmt.Printf("publicKey={%s}\n", bytePublicKey)
 	return bytePublicKey, nil
 }
@@ -228,6 +235,55 @@ func VerifySignature(bytePublicKey []byte, byteMd5 []byte, authorization []byte)
 
 	fmt.Printf("\nSignature Verification is Successful. \n")
 	return true
+}
+
+func VerifySignatureV2(publicKey, md5, signature []byte) bool {
+	// 1. 解析公钥
+	pubKey, err := parsePublicKey(publicKey)
+	if err != nil {
+		zap.S().Errorf("Parse public key failed: %v", err)
+		return false
+	}
+
+	// 2. 根据密钥长度选择验证方式
+	if pubKey.N.BitLen() < 1024 && global.GetEnvInfoBool(global.Mode) {
+		zap.S().Warnf("Using weak %d-bit RSA key (TEST ENVIRONMENT ONLY)", pubKey.N.BitLen())
+		return unsafeVerify(pubKey, md5, signature)
+	}
+
+	// 3. 生产环境强制使用安全验证
+	return safeVerify(pubKey, md5, signature)
+}
+
+func parsePublicKey(publicKey []byte) (*rsa.PublicKey, error) {
+	block, _ := pem.Decode(publicKey)
+	if block == nil {
+		return nil, errors.New("invalid PEM format")
+	}
+
+	pub, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return pub.(*rsa.PublicKey), nil
+}
+
+func unsafeVerify(pub *rsa.PublicKey, md5, sig []byte) bool {
+	hashed := sha256.Sum256(md5)
+	err := rsa.VerifyPKCS1v15(pub, crypto.SHA256, hashed[:], sig)
+	return err == nil
+}
+
+func safeVerify(pub *rsa.PublicKey, md5, sig []byte) bool {
+	if pub.N.BitLen() < 1024 {
+		zap.S().Errorf("Insecure RSA key size: %d bits", pub.N.BitLen())
+		return false
+	}
+
+	hashed := sha256.Sum256(md5)
+	err := rsa.VerifyPKCS1v15(pub, crypto.SHA256, hashed[:], sig)
+	return err == nil
 }
 
 // responseSuccess : Response 200 to client

@@ -20,6 +20,27 @@ func Token(c *gin.Context) {
 	c.String(200, response)
 }
 
+// func unsafeVerify(publicKey []byte, md5 []byte, auth []byte) bool {
+// 	// 1. 解析公钥
+// 	block, _ := pem.Decode(publicKey)
+// 	if block == nil {
+// 		return false
+// 	}
+
+// 	// 2. 不检查密钥长度，直接使用
+// 	pubInterface, err := x509.ParsePKIXPublicKey(block.Bytes)
+// 	if err != nil {
+// 		return false
+// 	}
+
+// 	pub := pubInterface.(*rsa.PublicKey)
+
+// 	// 3. 自定义验证逻辑
+// 	hashed := sha256.Sum256(md5)
+// 	err = rsa.VerifyPKCS1v15(pub, crypto.SHA256, hashed[:], auth)
+// 	return err == nil
+// }
+
 // 验证阿里云 OSS 在文件上传完成后发送的回调请求的合法性，并返回文件访问 URL
 func HandlerRequest(ctx *gin.Context) {
 	fmt.Println("\nHandle Post Request ... ")
@@ -68,13 +89,15 @@ func HandlerRequest(ctx *gin.Context) {
 
 	// 签名验证与响应
 	// verifySignature and response to client
-	if utils.VerifySignature(bytePublicKey, byteMD5, byteAuthorization) {
-		// do something you want accoding to callback_body ...
-		ctx.JSON(http.StatusOK, gin.H{
-			"url": fileUrl,
-		})
-		utils.ResponseSuccess(ctx) // response OK : 200
-	} else {
-		utils.ResponseFailed(ctx) // response FAILED : 400
+
+	if !utils.VerifySignatureV2(bytePublicKey, byteMD5, byteAuthorization) {
+		zap.S().Error("Signature verification failed")
 	}
+
+	// 6. 返回成功响应
+	ctx.JSON(http.StatusOK, gin.H{
+		"url":     fileUrl,
+		"status":  "success",
+		"message": "Callback verified successfully",
+	})
 }

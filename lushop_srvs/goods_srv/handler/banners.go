@@ -38,7 +38,12 @@ func (s *GoodsServer) CreateBanner(ctx context.Context, req *proto.BannerRequest
 	if result := global.DB.Save(&banner); result.Error != nil {
 		return nil, status.Errorf(codes.Internal, "创建轮播图失败")
 	}
-	return &proto.BannerResponse{Id: banner.ID}, nil
+	return &proto.BannerResponse{
+		Index: req.Index,
+		Id:    req.Id,
+		Image: req.Image,
+		Url:   req.Url,
+	}, nil
 }
 func (s *GoodsServer) DeleteBanner(ctx context.Context, req *proto.BannerRequest) (*emptypb.Empty, error) {
 	result := global.DB.Delete(&model.Banner{}, req.Id)

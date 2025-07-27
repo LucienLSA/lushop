@@ -2,14 +2,14 @@ import request from '@/utils/request'
 let userUrl = "http://b.frp.nilszhai.top:8021"
 export function login(params) {
   return request({
-    url:userUrl+'/u/v1/user/pwd_login',
+    url:userUrl+'/u/v2/user/pwd_login',
     method:'post',
     data:params
   })
 }
 export function getCaptcha(params) {
   return request({
-    url:userUrl+'/u/v1/base/captcha',
+    url:userUrl+'/u/v2/base/captcha',
     method:'get'
   })
 }

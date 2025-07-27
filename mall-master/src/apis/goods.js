@@ -10,47 +10,47 @@ export let ossUrl = "http://a.frp.nilszhai.top:8021"
 // 分类
 export function getCategorys(params) {
   return request({
-    url:goodsUrl+'/g/v1/categorys',
+    url:goodsUrl+'/g/v2/categorys',
     method:'get',
     params:params
   })
 }
 export function login(params) {
   return request({
-    url:userUrl+'/u/v1/user/pwd_login',
+    url:userUrl+'/u/v2/user/pwd_login',
     method:'post',
     data:params
   })
 }
 export function getCaptcha(params) {
   return request({
-    url:userUrl+'/u/v1/base/captcha',
+    url:userUrl+'/u/v2/base/captcha',
     method:'get'
   })
 }
 export function getCategoryDetail(id) {
   return request({
-    url:goodsUrl+'/g/v1/categorys/'+id,
+    url:goodsUrl+'/g/v2/categorys/'+id,
     method:'get'
   })
 }
 export function postCategorys(params) {
   return request({
-    url:goodsUrl+'/g/v1/categorys',
+    url:goodsUrl+'/g/v2/categorys',
     method:'post',
     data:params
   })
 }
 export function putCategorys(id,params) {
   return request({
-    url:goodsUrl+'/g/v1/categorys/'+id,
+    url:goodsUrl+'/g/v2/categorys/'+id,
     method:'put',
     data:params
   })
 }
 export function deleteCategorys(id,params) {
   return request({
-    url:goodsUrl+'/g/v1/categorys/'+id,
+    url:goodsUrl+'/g/v2/categorys/'+id,
     method:'delete',
     data:params
   })
@@ -58,21 +58,21 @@ export function deleteCategorys(id,params) {
 // 品牌
 export function getBrands(params) {
   return request({
-    url:goodsUrl+'/g/v1/brands',
+    url:goodsUrl+'/g/v2/brands',
     method:'get',
     params:params
   })
 }
 export function getBrandsByCate(id,params) {
   return request({
-    url:goodsUrl+'/g/v1/categorybrands/'+id,
+    url:goodsUrl+'/g/v2/categorybrands/'+id,
     method:'get',
     params:params
   })
 }
 export function createBrand(data) {
   return request({
-    url:goodsUrl+'/g/v1/brands',
+    url:goodsUrl+'/g/v2/brands',
     method:'post',
     data:data
   })
@@ -86,7 +86,7 @@ export function putBrands(id,params) {
 }
 export function deleteBrands(id,params) {
   return request({
-    url:goodsUrl+'/g/v1/brands/'+id,
+    url:goodsUrl+'/g/v2/brands/'+id,
     method:'delete',
     data:params
   })
@@ -94,7 +94,7 @@ export function deleteBrands(id,params) {
 // 品牌+分类关系
 export function getBrandToCate(params) {
   return request({
-    url:goodsUrl+'/g/v1/categorybrands',
+    url:goodsUrl+'/g/v2/categorybrands',
     method:'get',
     params:params
   })

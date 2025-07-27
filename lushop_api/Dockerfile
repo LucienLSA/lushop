@@ -22,7 +22,7 @@ COPY --from=builder /build/app .
 WORKDIR /
 COPY config-pro.yaml /config-pro.yaml
 
-ENV JZIN_PRO true
+ENV LUSHOP_DEBUG true
 
 #EXPOSE 20015
 

@@ -92,7 +92,9 @@ func FavCreate(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{})
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "添加收藏记录成功",
+	})
 }
 
 // 删除收藏
@@ -129,7 +131,9 @@ func FavDetail(ctx *gin.Context) {
 		return
 	}
 	userId, _ := ctx.Get("userId")
-	_, err = global.UserOpSrvClient.GetUserFavDetail(context.Background(), &v2useropproto.UserFavRequest{
+
+	// 查询收藏状态
+	favRsp, err := global.UserOpSrvClient.GetUserFavDetail(context.Background(), &v2useropproto.UserFavRequest{
 		UserId:  int32(userId.(uint)),
 		GoodsId: int32(goodsIdInt),
 	})
@@ -139,5 +143,50 @@ func FavDetail(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	// 查询商品详情
+	goodsRsp, err := global.GoodsSrvClient.GetGoodsDetail(context.Background(), &v2goodsproto.GoodInfoRequest{
+		Id: int32(goodsIdInt),
+	})
+	if err != nil {
+		zap.S().Errorw("查询商品详情失败")
+		base.HandleGrpcErrorToHttp(err, ctx)
+		return
+	}
+
+	// 组合返回数据
+	result := gin.H{
+		"favorite": gin.H{
+			"user_id":  favRsp.UserId,
+			"goods_id": favRsp.GoodsId,
+		},
+		"goods": gin.H{
+			"id":                goodsRsp.Id,
+			"name":              goodsRsp.Name,
+			"goods_sn":          goodsRsp.GoodsSn,
+			"click_num":         goodsRsp.ClickNum,
+			"sold_num":          goodsRsp.SoldNum,
+			"fav_num":           goodsRsp.FavNum,
+			"market_price":      goodsRsp.MarketPrice,
+			"shop_price":        goodsRsp.ShopPrice,
+			"goods_brief":       goodsRsp.GoodsBrief,
+			"ship_free":         goodsRsp.ShipFree,
+			"images":            goodsRsp.Images,
+			"desc_images":       goodsRsp.DescImages,
+			"goods_front_image": goodsRsp.GoodsFrontImage,
+			"is_new":            goodsRsp.IsNew,
+			"is_hot":            goodsRsp.IsHot,
+			"on_sale":           goodsRsp.OnSale,
+			"category": gin.H{
+				"id":   goodsRsp.Category.Id,
+				"name": goodsRsp.Category.Name,
+			},
+			"brand": gin.H{
+				"id":   goodsRsp.Brand.Id,
+				"name": goodsRsp.Brand.Name,
+				"logo": goodsRsp.Brand.Logo,
+			},
+		},
+	}
+
+	ctx.JSON(http.StatusOK, result)
 }

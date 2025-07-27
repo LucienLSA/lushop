@@ -67,7 +67,7 @@ func BannerCreate(ctx *gin.Context) {
 // 轮播图更新
 func BannerUpdate(ctx *gin.Context) {
 	bannerForm := forms.BannerForm{}
-	if err := ctx.ShouldBindJSON(&bannerForm); err != nil {
+	if err := ctx.ShouldBind(&bannerForm); err != nil {
 		base.HandleValidatorError(ctx, err)
 		return
 	}
@@ -90,7 +90,9 @@ func BannerUpdate(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, gin.H{
+		"msg": "修改成功",
+	})
 }
 
 // 轮播图删除
@@ -107,5 +109,7 @@ func BannerDelete(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, "")
+	ctx.JSON(http.StatusOK, gin.H{
+		"msg": "删除成功",
+	})
 }

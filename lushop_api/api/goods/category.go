@@ -3,6 +3,7 @@ package goods
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"lushopapi/api/base"
 	"net/http"
 	"strconv"
@@ -69,7 +70,6 @@ func CateDetail(ctx *gin.Context) {
 
 		ctx.JSON(http.StatusOK, reMap)
 	}
-	return
 }
 
 // 新建分类
@@ -90,7 +90,7 @@ func CateCreate(ctx *gin.Context) {
 		base.HandleGrpcErrorToHttp(err, ctx)
 		return
 	}
-
+	fmt.Println(rsp)
 	request := make(map[string]interface{})
 	request["id"] = rsp.Id
 	request["name"] = rsp.Name

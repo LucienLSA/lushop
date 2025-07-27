@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"lushopapi/global"
 	"lushopapi/utils/jwtClaims"
+	"strings"
 
 	"net/http"
 
@@ -25,6 +26,7 @@ func JWTAuth() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		AccessToken = strings.Split(AccessToken, " ")[1]
 		j := NewJWT()
 		// parseToken 解析token包含的信息
 		claims, err := j.ParseToken(AccessToken)

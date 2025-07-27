@@ -26,10 +26,12 @@ var (
 	OrderSrvClient     v2orderproto.OrderClient
 	InventorySrvClient v2inventoryproto.InventoryClient
 	//NacosConfig   *config.NacosConfig = &config.NacosConfig{}
+	// redis
 	RedisClient *redis.Client
 	RedisSync   *redsync.Redsync
 	Redistore   *redistore.RediStore
 
+	// OAuth2相关
 	Srv *server.Server
 	Mgr *manage.Manager
 )

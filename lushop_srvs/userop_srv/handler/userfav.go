@@ -51,10 +51,13 @@ func (*UserOpServer) DeleteUserFav(ctx context.Context, req *proto.UserFavReques
 	return &emptypb.Empty{}, nil
 }
 
-func (*UserOpServer) GetUserFavDetail(ctx context.Context, req *proto.UserFavRequest) (*emptypb.Empty, error) {
+func (*UserOpServer) GetUserFavDetail(ctx context.Context, req *proto.UserFavRequest) (*proto.UserFavResponse, error) {
 	var userfav model.UserFav
-	if result := global.DB.Where("goods=? and user=?", req.GoodsId, req.UserId).Find(&userfav); result.RowsAffected == 0 {
+	if result := global.DB.Where("goods=? and user=?", req.GoodsId, req.UserId).First(&userfav); result.RowsAffected == 0 {
 		return nil, status.Errorf(codes.NotFound, "收藏记录不存在")
 	}
-	return &emptypb.Empty{}, nil
+	return &proto.UserFavResponse{
+		UserId:  userfav.User,
+		GoodsId: userfav.Goods,
+	}, nil
 }

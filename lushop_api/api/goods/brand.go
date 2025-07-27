@@ -32,7 +32,7 @@ func BrandList(ctx *gin.Context) {
 	result := make([]interface{}, 0)
 	reMap := make(map[string]interface{})
 	reMap["total"] = rsp.Total
-	for _, value := range rsp.Data[pnInt : pnInt*pSizeInt+pSizeInt] {
+	for _, value := range rsp.Data {
 		reMap := make(map[string]interface{})
 		reMap["id"] = value.Id
 		reMap["name"] = value.Name
@@ -151,7 +151,7 @@ func CateBrandUpdate(ctx *gin.Context) {
 		return
 	}
 
-	id := ctx.Param("id")
+	id := ctx.Param("id") // 商品品牌id
 	i, err := strconv.ParseInt(id, 10, 32)
 	if err != nil {
 		ctx.Status(http.StatusNotFound)
@@ -184,7 +184,9 @@ func CateBrandDelete(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, "")
+	ctx.JSON(http.StatusOK, gin.H{
+		"msg": "删除成功",
+	})
 }
 
 // 新建品牌分类

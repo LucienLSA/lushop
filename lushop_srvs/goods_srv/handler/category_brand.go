@@ -20,8 +20,7 @@ func (s *GoodsServer) CategoryBrandList(ctx context.Context, req *proto.Category
 	global.DB.Model(&model.GoodsCategoryBrand{}).Count(&total)
 	categoryBrandListRsp.Total = int32(total)
 
-	global.DB.Preload("Category").Preload("Brands").Scopes(Paginate(int(req.Pages), int(req.PagePerNums))).Find(&categoryBrands)
-	// global.DB.Scopes(Paginate(int(req.Pages), int(req.PagePerNums))).Find(&categoryBrands)
+	global.DB.Preload("Category").Preload("Brand").Scopes(Paginate(int(req.Pages), int(req.PagePerNums))).Find(&categoryBrands)
 
 	var categoryBrandRsp []*proto.CategoryBrandResponse
 	for _, categoryBrand := range categoryBrands {
@@ -65,7 +64,7 @@ func (s *GoodsServer) GetCategoryBrandList(ctx context.Context, req *proto.Categ
 	// if result.RowsAffected > 0 {
 	// 	brandListRsp.Total = int32(result.RowsAffected)
 	// }
-	if result := global.DB.Preload("Brands").Where(&model.GoodsCategoryBrand{CategoryID: req.Id}).Find(&categoryBrands); result.RowsAffected > 0 {
+	if result := global.DB.Preload("Brand").Where(&model.GoodsCategoryBrand{CategoryID: req.Id}).Find(&categoryBrands); result.RowsAffected > 0 {
 		brandListRsp.Total = int32(result.RowsAffected)
 	}
 	// 查询到的品牌结果与响应返回绑定
@@ -116,7 +115,7 @@ func (s *GoodsServer) UpdateCategoryBrand(ctx context.Context, req *proto.Catego
 	var categoryBrand model.GoodsCategoryBrand
 	result := global.DB.First(&categoryBrand, req.Id)
 	if result.RowsAffected == 0 {
-		return nil, status.Errorf(codes.NotFound, "商品分类品牌不存在")
+		return nil, status.Errorf(codes.NotFound, "分类品牌不存在")
 	}
 
 	var category model.Category
@@ -133,7 +132,7 @@ func (s *GoodsServer) UpdateCategoryBrand(ctx context.Context, req *proto.Catego
 	categoryBrand.CategoryID = req.CategoryId
 	categoryBrand.BrandID = req.BrandId
 	if result := global.DB.Save(&categoryBrand); result.Error != nil {
-		return nil, status.Errorf(codes.NotFound, "更新商品分类品牌失败")
+		return nil, status.Errorf(codes.Internal, "更新商品分类品牌失败")
 	}
 	return &emptypb.Empty{}, nil
 }

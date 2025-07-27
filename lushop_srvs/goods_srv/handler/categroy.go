@@ -7,7 +7,6 @@ import (
 	"goodssrv/global"
 	"goodssrv/model"
 	proto "goodssrv/proto"
-	"time"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
@@ -140,28 +139,36 @@ func (s *GoodsServer) CreateCategory1(ctx context.Context, req *proto.CategoryIn
 
 // 新建商品分类
 func (s *GoodsServer) CreateCategory(ctx context.Context, req *proto.CategoryInfoRequest) (*proto.CategoryInfoResponse, error) {
-	category := model.Category{}
-	cMap := map[string]interface{}{}
-	cMap["add_time"] = time.Now()
-	cMap["name"] = req.Name
-	cMap["level"] = req.Level
-	cMap["is_tab"] = req.IsTab
+	// 验证父分类是否存在
 	if req.Level != 1 {
-		//去查询父类目是否存在
-		cMap["parent_category_id"] = req.ParentCategory
+		var parentCategory model.Category
+		result := global.DB.First(&parentCategory, req.ParentCategory)
+		if result.RowsAffected == 0 {
+			return nil, status.Errorf(codes.NotFound, "父分类不存在")
+		}
 	}
-	if result := global.DB.Model(&category).Create(cMap); result.Error != nil {
+
+	category := model.Category{
+		Name:  req.Name,
+		Level: req.Level,
+		IsTab: req.IsTab,
+	}
+	if req.Level != 1 {
+		category.ParentCategoryID = req.ParentCategory
+	}
+
+	if result := global.DB.Create(&category); result.Error != nil {
 		zap.S().Error("新建商品分类失败！")
+		return nil, status.Errorf(codes.Internal, "创建商品分类失败")
 	}
-	//fmt.Println(tx)
-	rsp := proto.CategoryInfoResponse{
-		Id:             category.ID,
+	zap.S().Infof("category ID:%d", category.ID)
+	return &proto.CategoryInfoResponse{
+		Id:             int32(category.ID),
 		Name:           category.Name,
-		Level:          category.Level,
 		IsTab:          category.IsTab,
 		ParentCategory: category.ParentCategoryID,
-	}
-	return &rsp, nil
+		Level:          category.Level,
+	}, nil
 }
 
 // 删除商品分类

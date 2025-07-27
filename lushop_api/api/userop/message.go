@@ -69,7 +69,7 @@ func MsgCreate(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		zap.S().Errorw("添加留言失败")
+		zap.S().Errorf("添加留言失败,err:%s", err.Error())
 		v2base.HandleGrpcErrorToHttp(err, ctx)
 		return
 	}

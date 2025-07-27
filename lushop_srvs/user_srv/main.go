@@ -35,7 +35,7 @@ func main() {
 	zap.S().Info("init Logger sucess")
 	zap.S().Info(global.ServerConfig)
 	// IP := flag.String("ip", "0.0.0.0", "ip地址")
-	Port := flag.Int("port", 0, "端口号")
+	Port := flag.Int("port", 50054, "端口号")
 	flag.Parse()
 	// zap.S().Info("ip:", *IP)
 	if *Port == 0 {

@@ -136,7 +136,7 @@ func PassWorldLogin(c *gin.Context) {
 					StandardClaims: &jwt.StandardClaims{
 						NotBefore: time.Now().Unix(),                                                //签名的生效时间
 						ExpiresAt: time.Now().Unix() + global.ServerConfig.JwtInfo.AccessExpireTime, //30天过期
-						Issuer:    "lucien",
+						Issuer:    global.ServerConfig.JwtInfo.Key,
 					},
 				}
 				AccessToken, err := j.CreateToken(aclaims)
@@ -151,7 +151,7 @@ func PassWorldLogin(c *gin.Context) {
 					StandardClaims: &jwt.StandardClaims{
 						NotBefore: time.Now().Unix(),                                                 //签名的生效时间
 						ExpiresAt: time.Now().Unix() + global.ServerConfig.JwtInfo.RefreshExpireTime, //30天过期
-						Issuer:    "lucien",
+						Issuer:    global.ServerConfig.JwtInfo.Key,
 					},
 				}
 				RefreshToken, err := j.CreateToken(rclaims)

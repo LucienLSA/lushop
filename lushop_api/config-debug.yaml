@@ -60,7 +60,8 @@ session:
   max_age: 1200
 
 jwt:
-  key: 's7DRD35xGlStUOFjsjSS4sbqg0azszYg'
+  key: 'lucien'
+  secret: 's7DRD35xGlStUOFjsjSS4sbqg0azszYg'
   access_expired_time: 2592000 #30天
   refresh_expired_time: 5184000 # 60天
 

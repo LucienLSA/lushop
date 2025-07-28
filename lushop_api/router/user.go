@@ -22,7 +22,7 @@ func InitUserRouter(Router *gin.Engine) {
 		UserRouer.GET("refresh", user.RefreshToken)
 		UserRouer.GET("detail", middlewares.JWTAuth(), user.GetUserDetail)
 		UserRouer.PATCH("update", middlewares.JWTAuth(), user.UpdateUser)
-		UserRouer.GET("list", middlewares.JWTAuth(), user.GetUserList)
+		UserRouer.GET("list", middlewares.JWTAuth(), middlewares.IsAdminAuth(), user.GetUserList)
 	}
 
 	// OAuth2方案

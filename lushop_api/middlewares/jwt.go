@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"errors"
-	"fmt"
 	"lushopapi/global"
 	"lushopapi/utils/jwtClaims"
 	"strings"
@@ -16,41 +15,94 @@ import (
 
 func JWTAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// 我们这里jwt鉴权取头部信息 x-token 登录时回返回token信息
-		// 这里前端需要把token存储到cookie或者本地localSstorage中 不过需要跟后端协商过期时间 可以约定刷新令牌或者重新登录
-		AccessToken := c.Request.Header.Get("x-token")
-		if AccessToken == "" {
-			c.JSON(http.StatusUnauthorized, map[string]string{
-				"msg": "请登录",
+		// 我们这里jwt鉴权取头部信息 Authorization: Bearer <token>
+		// 这里前端需要把token存储到cookie或者本地localStorage中 不过需要跟后端协商过期时间 可以约定刷新令牌或者重新登录
+		authHeader := c.Request.Header.Get("Authorization")
+		if authHeader == "" {
+			zap.S().Errorf("Authorization header is empty")
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"code": 401,
+				"msg":  "请登录",
 			})
 			c.Abort()
 			return
 		}
-		AccessToken = strings.Split(AccessToken, " ")[1]
+
+		// 添加调试信息
+		zap.S().Infof("收到Authorization Header: %s", authHeader)
+
+		// 按空格分割，检查Bearer格式
+		parts := strings.SplitN(authHeader, " ", 2)
+		zap.S().Infof("分割后的部分: %v, 长度: %d", parts, len(parts))
+
+		if !(len(parts) == 2 && parts[0] == "Bearer") {
+			zap.S().Errorf("Authorization header format error: %s", authHeader)
+			zap.S().Errorf("期望格式: Bearer <token>, 实际格式: %s", authHeader)
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"code": 401,
+				"msg":  "Authorization格式错误, 应为: Bearer <token>",
+			})
+			c.Abort()
+			return
+		}
+
+		tokenString := parts[1]
+		if tokenString == "" {
+			zap.S().Errorf("Token string is empty")
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"code": 401,
+				"msg":  "Token不能为空",
+			})
+			c.Abort()
+			return
+		}
+
 		j := NewJWT()
-		// parseToken 解析token包含的信息
-		claims, err := j.ParseToken(AccessToken)
-		fmt.Println(claims)
+		// 解析token
+		claims, err := j.ParseToken(tokenString)
 		if err != nil {
-			if err == TokenExpired {
-				zap.S().Errorf("登录授权已过期,:", err.Error())
-				c.JSON(http.StatusUnauthorized, map[string]string{
-					"msg": "登录授权已过期",
+			switch err {
+			case TokenExpired:
+				zap.S().Errorf("Token expired: %s", err.Error())
+				c.JSON(http.StatusUnauthorized, gin.H{
+					"code": 401,
+					"msg":  "登录授权已过期",
 				})
-				c.Abort()
-				return
+			case TokenMalformed:
+				zap.S().Errorf("Token malformed: %s", err.Error())
+				c.JSON(http.StatusUnauthorized, gin.H{
+					"code": 401,
+					"msg":  "Token格式错误",
+				})
+			case TokenNotValidYet:
+				zap.S().Errorf("Token not valid yet: %s", err.Error())
+				c.JSON(http.StatusUnauthorized, gin.H{
+					"code": 401,
+					"msg":  "Token尚未生效",
+				})
+			default:
+				zap.S().Errorf("Token validation error: %s", err.Error())
+				c.JSON(http.StatusUnauthorized, gin.H{
+					"code": 401,
+					"msg":  "Token验证失败",
+				})
 			}
-			zap.S().Errorf("登录错误,:", err.Error())
-			c.JSON(http.StatusUnauthorized, "登录错误")
 			c.Abort()
 			return
 		}
-		exist, _ := global.RedisClient.Exists(c, "jwt_blacklist:"+AccessToken).Result()
+
+		// 检查token是否在黑名单中
+		exist, _ := global.RedisClient.Exists(c, "jwt_blacklist:"+authHeader).Result()
 		if exist == 1 {
-			c.JSON(http.StatusUnauthorized, gin.H{"msg": "token已失效"})
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"code": 401,
+				"msg":  "token已失效",
+			})
 			c.Abort()
 			return
 		}
+
+		// 设置用户信息到上下文
 		c.Set("claims", claims)
 		c.Set("userId", claims.ID)
 		c.Next()
@@ -70,7 +122,7 @@ var (
 
 func NewJWT() *JWT {
 	return &JWT{
-		[]byte(global.ServerConfig.JwtInfo.SigningKey), //可以设置过期时间
+		[]byte(global.ServerConfig.JwtInfo.Secret),
 	}
 }
 
@@ -98,18 +150,17 @@ func (j *JWT) ParseToken(tokenString string) (*jwtClaims.CustomClaims, error) {
 				return nil, TokenInvalid
 			}
 		}
+		// 如果不是ValidationError，直接返回TokenInvalid
+		return nil, TokenInvalid
 	}
 	if token != nil {
 		if claims, ok := token.Claims.(*jwtClaims.CustomClaims); ok && token.Valid {
 			return claims, nil
 		}
 		return nil, TokenInvalid
-
 	} else {
 		return nil, TokenInvalid
-
 	}
-
 }
 
 // RefreshToken 通过 refresh token 刷新 atoken

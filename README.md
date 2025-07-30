@@ -17,3 +17,16 @@
 用户接口服务： 为用户提供操作接口其中实现了简单的地址，留言, 收藏等。
 
 基于Jaeger做微服务间链路追踪，使用Sentinel实现限流。
+
+HTTP API层 端口
+ 8101
+
+
+GRPC SRV层 端口 
+goods_srv 50051
+inventory_srv 50052
+order_srv 50053
+user_srv 50054
+user_op 50055
+
+ik 分词器版本 elasticsearch-analysis-ik-7.10.1

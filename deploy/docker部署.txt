@@ -24,7 +24,7 @@ ip: 118.178.171.184
 port: 50055
 
 # consul
-docker run --name consul -d -p 8500:8500 -p 8300:8300 -p 8301:8301 -p 8302:8302 -p 8600:8600 hashicorp/consul agent -server -bootstrap-expect=1 -ui -bind=0.0.0.0 -client=0.0.0.0
+docker run --name consul -d -p 8500:8500 -p 8300:8300 -p 8301:8301 -p 8302:8302 -p 8600:8600 ccr.ccs.tencentyun.com/lucien/consul:v2 agent -server -bootstrap-expect=1 -ui -bind=0.0.0.0 -client=0.0.0.0
 
 # nacos
 docker run --name nacos-standalone -e MODE=standalone -e JVM_XMS=512m -e JVM_XMX=512m -e JVM_XMN=256m -p 8848:8848 -d ccr.ccs.tencentyun.com/lucien/my-nacos-standalone:v2

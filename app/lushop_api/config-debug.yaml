@@ -1,7 +1,7 @@
 name: v2lushopapi   # 服务器名称
 # host: '10.99.195.125'   # 服务器主机 实验室
-host: '10.101.178.90' # 宿舍
-# host: '118.178.171.184' # esc
+# host: '10.101.178.90' # 宿舍
+host: '172.25.6.248' # esc
 port: 8101         # 服务器端口
 version: v2
 tags:
@@ -32,7 +32,7 @@ oauth2:
       name: 测试应用1
       # 客户端 domain
       # !!注意 http/https 不要写错!!
-      domain: http://10.99.195.125:8101
+      domain: http://118.178.171.184:8101
       # 权限范围
       # 数组类型
       # 可以配置多个权限 
@@ -47,7 +47,7 @@ oauth2:
     - id: test_client_2
       secret: test_secret_2
       name: 测试应用2 
-      domain: http://10.99.195.125:8101
+      domain: http://118.178.171.184:8101
       scope:
         - id: all
           title: 用户账号, 手机, 权限, 角色等信息
@@ -83,12 +83,12 @@ redis:
   pool_size: 10
 
 consul:
-  host: '192.168.226.140'
+  host: '127.0.0.1'
   port: '8500'
 
 jaeger:
   service_name: 'goods_web'
-  jaeger_gin_endpoint: '192.168.226.140:4318'
+  jaeger_gin_endpoint: '127.0.0.1:4318'
 
 sentinel:
   app:

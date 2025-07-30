@@ -25,15 +25,15 @@ type InventorySrvConfig struct {
 }
 
 type ServerConfig struct {
-	Name           string         `mapstructure:"name" json:"name"`
-	Host           string         `mapstructure:"host" json:"host"`
-	Tags           []string       `mapstructure:"tags" json:"tags"`
-	Port           int            `mapstructure:"port" json:"port"`
-	MySQLInfo      MySQLConfig    `mapstructure:"mysql" json:"mysql"`
-	ConsulInfo     ConsulConfig   `mapstructure:"consul" json:"consul"`
-	RedisInfo      RedisConfig    `mapstructure:"redis" json:"redis"`
-	JaegerInfo     JaegerConfig   `mapstructure:"jaeger" json:"jaeger"`
-	RocketMQConfig RocketMQConfig `mapstructure:"rocketmq" json:"rocketmq"`
+	Name         string         `mapstructure:"name" json:"name"`
+	Host         string         `mapstructure:"host" json:"host"`
+	Tags         []string       `mapstructure:"tags" json:"tags"`
+	Port         int            `mapstructure:"port" json:"port"`
+	MySQLInfo    MySQLConfig    `mapstructure:"mysql" json:"mysql"`
+	ConsulInfo   ConsulConfig   `mapstructure:"consul" json:"consul"`
+	RedisInfo    RedisConfig    `mapstructure:"redis" json:"redis"`
+	JaegerInfo   JaegerConfig   `mapstructure:"jaeger" json:"jaeger"`
+	RocketMQInfo RocketMQConfig `mapstructure:"rocketmq" json:"rocketmq"`
 
 	GoodsSrvInfo     GoodsSrvConfig     `mapstructure:"goods_srv" json:"goods_srv"`
 	InventorySrvInfo InventorySrvConfig `mapstructure:"inventory_srv" json:"inventory_srv"`
@@ -59,9 +59,9 @@ type RocketMQConfig struct {
 	Port               string `mapstructure:"port" json:"port"`
 	TopicReback        string `mapstructure:"topic_reback" json:"topic_reback"`
 	TopicTimeOut       string `mapstructure:"topic_timeout" json:"topic_timeout"`
-	ConsumerGroup      string `mapstructure:"consumer_group" json:"consumer_group"`
-	ProducerGroupDelay string `mapstructure:"producer_group_delay" json:"producer_group_delay"`
-	ProducerGroupTran  string `mapstructure:"producer_group_tran" json:"producer_group_tran"`
+	ConsumerGroup          string `mapstructure:"consumer_group" json:"consumer_group"`
+	ProducerGroupOrder string `mapstructure:"producer_group_order" json:"producer_group_order"`
+	ProducerGroupInventory  string `mapstructure:"producer_group_inventory" json:"producer_group_inventory"`
 }
 
 type NacosInfo struct {

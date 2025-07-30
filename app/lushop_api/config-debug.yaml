@@ -1,7 +1,7 @@
 name: v2lushopapi   # 服务器名称
 # host: '10.99.195.125'   # 服务器主机 实验室
-# host: '10.101.178.90' # 宿舍
-host: '118.178.171.184' # esc
+host: '10.101.178.90' # 宿舍
+# host: '118.178.171.184' # esc
 port: 8101         # 服务器端口
 version: v2
 tags:
@@ -127,7 +127,7 @@ alipay:
   app_id: 'AliPay_Id' # 支付宝应用ID
   private_key: 'Lushop_Private_Key' # 应用私钥
   ali_public_key: 'AliPay_Public_Key' # 支付宝公钥
-  notify_url: ''
+  notify_url: 'https://3e69ee01b766.ngrok-free.app/g/v2/oss/callback'
   return_url: ''
   product_code: 'FAST_INSTANT_TRADE_PAY'
 

@@ -2,11 +2,11 @@ import os
 import asyncio
 
 services = [
-    r"E:\Study\Proj\lushop\lushop_srvs\user_srv\main.exe",
-    r"E:\Study\Proj\lushop\lushop_srvs\userop_srv\main.exe",
-    r"E:\Study\Proj\lushop\lushop_srvs\goods_srv\main.exe",
-    r"E:\Study\Proj\lushop\lushop_srvs\order_srv\main.exe",
-    r"E:\Study\Proj\lushop\lushop_srvs\inventory_srv\main.exe",
+    r"E:\Study\Proj\lushop\app\lushop_srvs\user_srv\main.exe",
+    r"E:\Study\Proj\lushop\app\lushop_srvs\userop_srv\main.exe",
+    r"E:\Study\Proj\lushop\app\lushop_srvs\goods_srv\main.exe",
+    r"E:\Study\Proj\lushop\app\lushop_srvs\order_srv\main.exe",
+    r"E:\Study\Proj\lushop\app\lushop_srvs\inventory_srv\main.exe",
 ]
 
 # user_web = "E:\\zhuomian\\project\\mxshop\\web_golang\\order-web\\main.go"

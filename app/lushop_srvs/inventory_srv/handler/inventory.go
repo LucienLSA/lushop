@@ -327,7 +327,7 @@ func AutoReback(ctx context.Context, me ...*primitive.MessageExt) (consumer.Cons
 		}
 		// 如果查询到逐个归还库存
 		for _, orderGood := range sellDetail.Detail {
-			// 先查询Inventory表，但是使用update会有锁冲突，并发情况下
+			// 先查询Inventory表，使用update会有锁冲突，当多个并发进入mysql会自动锁住
 			result := tx.Model(&model.Inventory{}).Where(&model.Inventory{Goods: orderGood.Goods}).
 				Update("stocks", gorm.Expr("stock+?", orderGood.Num))
 			if result.RowsAffected == 0 {
@@ -336,8 +336,8 @@ func AutoReback(ctx context.Context, me ...*primitive.MessageExt) (consumer.Cons
 				return consumer.ConsumeRetryLater, nil
 			}
 		}
-		// 将该订单的扣减明细状态设为2（已归还）。
-		// 如果更新失败，回滚事务，下次重试。
+		// 将该订单的扣减明细状态设为2（已归还）
+		// 如果更新失败，回滚事务，下次重试
 		sellDetail.Status = 2
 		result := tx.Model(&model.StockSellDetail{}).Where(&model.StockSellDetail{OrderSn: orderInfo.OrderSn}).
 			Update("status", 2)

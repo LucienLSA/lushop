@@ -17,14 +17,14 @@ type RedisConfig struct {
 }
 
 type ServerConfig struct {
-	Name           string         `mapstructure:"name" json:"name"`
-	Host           string         `mapstructure:"host" json:"host"`
-	Tags           []string       `mapstructure:"tags" json:"tags"`
-	Port           int            `mapstructure:"port" json:"port"`
-	MySQLInfo      MySQLConfig    `mapstructure:"mysql" json:"mysql"`
-	ConsulInfo     ConsulConfig   `mapstructure:"consul" json:"consul"`
-	RedisInfo      RedisConfig    `mapstructure:"redis" json:"redis"`
-	RocketMQConfig RocketMQConfig `mapstructure:"rocketmq" json:"rocketmq"`
+	Name         string         `mapstructure:"name" json:"name"`
+	Host         string         `mapstructure:"host" json:"host"`
+	Tags         []string       `mapstructure:"tags" json:"tags"`
+	Port         int            `mapstructure:"port" json:"port"`
+	MySQLInfo    MySQLConfig    `mapstructure:"mysql" json:"mysql"`
+	ConsulInfo   ConsulConfig   `mapstructure:"consul" json:"consul"`
+	RedisInfo    RedisConfig    `mapstructure:"redis" json:"redis"`
+	RocketMQInfo RocketMQConfig `mapstructure:"rocketmq" json:"rocketmq"`
 }
 
 type ConsulConfig struct {
@@ -40,7 +40,7 @@ type RocketMQConfig struct {
 	Host        string `mapstructure:"host" json:"host"`
 	Port        string `mapstructure:"port" json:"port"`
 	Name        string `mapstructure:"name" json:"name"`
-	GroupName   string `mapstructure:"consumer_group" json:"consumer_group"`
+	ConsumerGroup   string `mapstructure:"consumer_group" json:"consumer_group"`
 	TopicReback string `mapstructure:"topic_reback" json:"topic_reback"`
 }
 

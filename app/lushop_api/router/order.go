@@ -17,7 +17,7 @@ func InitOrderRouter(Router *gin.Engine) {
 		OrderRouter.POST("", order.OrderCreate)    //新建订单
 		OrderRouter.GET("/:id", order.OrderDetail) //订单详情
 	}
-	PayRouter := ApiGroup.Group("pay")
+	PayRouter := ApiGroup.Group("pay").Use(middlewares.JWTAuth())
 	{
 		PayRouter.POST("/notify", order.Notify) //支付回调通知
 	}

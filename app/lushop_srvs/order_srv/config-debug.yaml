@@ -1,7 +1,7 @@
 name: 'order_srv'
 # host: '10.99.195.125' # 实验室
-# host: '10.101.178.90' # 宿舍
-host: '118.178.171.184' # esc
+host: '10.101.178.90' # 宿舍
+# host: '118.178.171.184' # esc
 tags: ['order_srv','grpc','lushop_srv','lucien','order']
 port: 50053
 
@@ -27,8 +27,8 @@ rocketmq:
  host: '192.168.226.140'
  port: '9876'
  consumer_group: lushop_order
- producer_group_delay: lushop_order_delay
- producer_group_tran: lushop_order_transaction
+ producer_group_order: lushop_order
+ producer_group_inventory: lushop_inventory
  topic_reback: order_reback
  topic_timeout: order_timeout
 

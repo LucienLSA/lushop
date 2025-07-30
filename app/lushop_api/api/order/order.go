@@ -2,7 +2,7 @@ package order
 
 import (
 	"context"
-	"lushopapi/api/base"
+	v2base "lushopapi/api/base"
 	"lushopapi/forms"
 	"lushopapi/global"
 	v2orderproto "lushopapi/proto/order"
@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"strconv"
 
+	sentinel "github.com/alibaba/sentinel-golang/api"
+	"github.com/alibaba/sentinel-golang/core/base"
 	"github.com/gin-gonic/gin"
 	"github.com/smartwalle/alipay/v3"
 	"go.uber.org/zap"
@@ -23,15 +25,15 @@ func OrderList(ctx *gin.Context) {
 	request := v2orderproto.OrderFilterRequest{}
 	//如果是管理员用户则返回所有的订单
 	model := claims.(*jwtClaims.CustomClaims)
-	if model.AuthorityId == 1 {
+	if model.AuthorityId != 1 {
 		request.UserId = int32(userId.(uint))
 	}
 
-	pages := ctx.DefaultQuery("p", "0")
+	pages := ctx.DefaultQuery("p", "1")
 	pagesInt, _ := strconv.Atoi(pages)
 	//request.Pages = int32(pagesInt)
 
-	perNums := ctx.DefaultQuery("pnum", "0")
+	perNums := ctx.DefaultQuery("pnum", "10")
 	perNumsInt, _ := strconv.Atoi(perNums)
 	//request.PagePerNums = int32(perNumsInt)
 
@@ -41,7 +43,7 @@ func OrderList(ctx *gin.Context) {
 	rsp, err := global.OrderSrvClient.OrderList(context.Background(), &request)
 	if err != nil {
 		zap.S().Errorw("[OrderList] 获取【订单列表】失败")
-		base.HandleGrpcErrorToHttp(err, ctx)
+		v2base.HandleGrpcErrorToHttp(err, ctx)
 		return
 	}
 	/*
@@ -84,10 +86,21 @@ func OrderList(ctx *gin.Context) {
 func OrderCreate(ctx *gin.Context) {
 	orderForm := forms.CreateOrderForm{}
 	if err := ctx.ShouldBindJSON(&orderForm); err != nil {
-		base.HandleValidatorError(ctx, err)
+		v2base.HandleValidatorError(ctx, err)
 		return
 	}
 	userId, _ := ctx.Get("userId")
+
+	e, b := sentinel.Entry("create_order", sentinel.WithTrafficType(base.Inbound))
+	if b != nil {
+		zap.S().Errorw("[CreateOrder] 被限流了")
+		ctx.JSON(http.StatusTooManyRequests, gin.H{
+			"msg": "请求过于繁忙，请稍后重试",
+		})
+		return
+	}
+
+	zap.S().Debug("执行grpc层CreateOrder")
 	rsp, err := global.OrderSrvClient.CreateOrder(context.WithValue(context.Background(), "ginContext", ctx), &v2orderproto.OrderRequest{
 		UserId:  int32(userId.(uint)),
 		Name:    orderForm.Name,
@@ -97,9 +110,13 @@ func OrderCreate(ctx *gin.Context) {
 	})
 	if err != nil {
 		zap.S().Errorw("[CreateOrder] 新建【订单】失败")
-		base.HandleGrpcErrorToHttp(err, ctx)
+		v2base.HandleGrpcErrorToHttp(err, ctx)
 		return
 	}
+	zap.S().Debug("grpc层CreateOrder执行结束")
+	//退出限流
+	e.Exit()
+
 	//生成支付宝的支付url
 	appID := global.GetEnvInfoStr(global.ServerConfig.AliPayInfo.AppID)
 	privateKey := global.GetEnvInfoStr(global.ServerConfig.AliPayInfo.PrivateKey)
@@ -171,7 +188,7 @@ func OrderDetail(ctx *gin.Context) {
 	rsp, err := global.OrderSrvClient.OrderDetail(context.Background(), &request)
 	if err != nil {
 		zap.S().Errorw("[OrderDeteil] 获取【订单详情】失败")
-		base.HandleGrpcErrorToHttp(err, ctx)
+		v2base.HandleGrpcErrorToHttp(err, ctx)
 		return
 	}
 	reMap := gin.H{}

@@ -11,8 +11,10 @@ import (
 	v2orderproto "ordersrv/proto/order"
 	"time"
 
+	"github.com/apache/rocketmq-client-go/v2"
 	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
+	"github.com/apache/rocketmq-client-go/v2/producer"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/propagation"
@@ -153,21 +155,25 @@ type OrderListener struct {
 	OrderAmount float32
 }
 
-// 实例
-var orderInfo = OrderListener{}
-
 // 用于trace上下文传递的消息结构体
 // 注意：model.OrderInfo需可序列化
 // 实现了 trace 上下文的跨进程传递：
 // handler 层用 otel.GetTextMapPropagator().Inject 把 trace 上下文写入消息体。
 // 事务监听器用 otel.GetTextMapPropagator().Extract 恢复上下文，再创建父 span 和子 span。
 // 这样 Jaeger UI 里能看到 handler 和事务监听器的 trace 在同一条链路下，trace 串联完整。
+
+// 订单的消息结构体 订单表+trace的map
 type OrderMessage struct {
 	OrderInfo model.OrderInfo   `json:"order_info"`
 	TraceMap  map[string]string `json:"trace_map"`
 }
 
-// 执行本地事务的监听器
+// 执行本地事务
+// 1. 从购物车获取商品信息
+// 2. 去查询商品服务(跨服务)
+// 3. 调用库存服务扣减库存(跨服务)
+// 4.订单的基本信息表 和订单的商品信息表
+// 5.从购物车中删除已购买记录
 func (o *OrderListener) ExecuteLocalTransaction(msg *primitive.Message) primitive.LocalTransactionState {
 	// 解析消息体，恢复trace上下文
 	var orderMsg OrderMessage
@@ -182,17 +188,30 @@ func (o *OrderListener) ExecuteLocalTransaction(msg *primitive.Message) primitiv
 	)
 	defer parentSpan.End()
 
-	// 购物车清单检查
+	// 检查订单是否存在，保证幂等性
+	var existOrder model.OrderInfo
+	if err := global.DB.Where("order_sn = ?", orderMsg.OrderInfo.OrderSn).First(&existOrder).Error; err == nil {
+		// 记录失败的状态码
+		o.Code = codes.Internal
+		o.Detail = "订单已存在"
+		return primitive.RollbackMessageState
+	}
+
+	// 从购物车获取商品信息
+	// 与用户勾选的商品信息
 	var goodsIds []int32
 	var shopCarts []model.ShoppingCart
 	goodsNumsMap := make(map[int32]int32)
 	result := global.DB.Where(&model.ShoppingCart{User: orderMsg.OrderInfo.User, Checked: true}).Find(&shopCarts)
 	if result.RowsAffected == 0 {
+		// 记录失败的状态码
 		o.Code = codes.InvalidArgument
 		o.Detail = "未选中结算的商品"
+		// 说明归还库存的事务消息回滚
 		return primitive.RollbackMessageState
 	}
 
+	// 记录购物车中商品
 	for _, shopCart := range shopCarts {
 		goodsIds = append(goodsIds, shopCart.Goods)
 		goodsNumsMap[shopCart.Goods] = shopCart.Nums
@@ -200,16 +219,20 @@ func (o *OrderListener) ExecuteLocalTransaction(msg *primitive.Message) primitiv
 
 	// 子span
 	goodsSpanCtx, goodsSpan := Tracer.Start(ctx, "BatchGetGoods")
+
 	// 批量商品查询
 	goods, err := global.GoodsSrvClient.BatchGetGoods(goodsSpanCtx, &v2goodsproto.BatchGoodsIdInfo{
 		Id: goodsIds,
 	})
 	goodsSpan.End()
 	if err != nil {
+		// 记录失败的状态码
 		o.Code = codes.Internal
 		o.Detail = "批量查询商品信息失败"
+		// 查询商品失败，表示事务消息回滚
 		return primitive.RollbackMessageState
 	}
+	// 商品总价，订单所有商品信息，商品库存信息
 	var orderAmount float32
 	var orderGoods []*model.OrderGoods
 	var goodsInvInfo []*v2inventoryproto.GoodsInvInfo
@@ -230,13 +253,15 @@ func (o *OrderListener) ExecuteLocalTransaction(msg *primitive.Message) primitiv
 
 	// 子Span
 	invSpanCtx, invSpan := Tracer.Start(ctx, "InventorySell")
-	// 库存扣减
+	// 执行库存扣减
 	_, err = global.InventorySrvClient.Sell(invSpanCtx,
 		&v2inventoryproto.SellInfo{OrderSn: orderMsg.OrderInfo.OrderSn, GoodsInfo: goodsInvInfo})
 	invSpan.End()
 	if err != nil {
+		// 记录失败的状态码
 		o.Code = codes.ResourceExhausted
 		o.Detail = "扣减库存失败"
+		// 库存扣减失败回滚事务消息，即不扣减库存
 		return primitive.RollbackMessageState
 	}
 	// 事务保存订单信息
@@ -245,26 +270,33 @@ func (o *OrderListener) ExecuteLocalTransaction(msg *primitive.Message) primitiv
 	result = tx.Save(&orderMsg.OrderInfo)
 	if result.RowsAffected == 0 {
 		tx.Rollback()
+		// 记录失败的状态码
 		o.Code = codes.Internal
 		o.Detail = "创建订单失败"
+		// 创建订单失败，但实际已经执行了库存扣减，库存归还的消息成功提交
 		return primitive.CommitMessageState
 	}
 
 	o.OrderAmount = orderAmount
 	o.ID = orderMsg.OrderInfo.ID
+	//将订单id放入商品信息
 	for _, orderGood := range orderGoods {
 		orderGood.Order = orderMsg.OrderInfo.ID
 	}
 	if result := tx.CreateInBatches(orderGoods, 100); result.RowsAffected == 0 {
 		tx.Rollback()
+		// 记录失败的状态码
 		o.Code = codes.Internal
 		o.Detail = "批量插入订单商品失败"
+		// 但实际已经执行了库存扣减，库存归还的消息成功提交
 		return primitive.CommitMessageState
 	}
 	if result := tx.Where(&model.ShoppingCart{User: orderMsg.OrderInfo.User, Checked: true}).Delete(&model.ShoppingCart{}); result.RowsAffected == 0 {
 		tx.Rollback()
+		// 记录失败的状态码
 		o.Code = codes.Internal
 		o.Detail = "删除购物车记录失败"
+		// 但实际已经执行了库存扣减，库存归还的消息成功提交
 		return primitive.CommitMessageState
 	}
 
@@ -276,32 +308,39 @@ func (o *OrderListener) ExecuteLocalTransaction(msg *primitive.Message) primitiv
 	// 	panic(err)
 	// }
 
+	// 创建订单完成 假设订单30分钟后超时，那么创建一个订单30分钟后，就该对此订单进行检查，
+	// 判断此订单是否已支付，防止用户下单后一直不支付占用库存
 	// 生产者发出延时消息order_timeout
-	msg = primitive.NewMessage(global.ServerConfig.RocketMQConfig.TopicTimeOut, msg.Body)
+	msg = primitive.NewMessage(global.ServerConfig.RocketMQInfo.TopicTimeOut, msg.Body)
 	msg.WithDelayTimeLevel(3)
-	_, err = global.MQSendClient.SendSync(context.Background(), msg)
+	_, err = global.MQOrder.SendSync(context.Background(), msg)
 	if err != nil {
 		zap.S().Errorf("发送延迟消息失败:%s\n", err)
 		tx.Rollback()
+		// 记录失败的状态码
 		o.Code = codes.Internal
 		o.Detail = "发送延迟消息失败"
+		// 但实际已经执行了库存扣减，库存归还的消息成功提交
 		return primitive.CommitMessageState
 	}
 	tx.Commit()
 	o.Code = codes.OK
+	zap.S().Infof("本地事务执行成功，不需要向mq提交消息")
 	return primitive.RollbackMessageState
 }
 
 // 事务消息回查
+// 检查执行的本地事务是否完成
 func (o *OrderListener) CheckLocalTransaction(msg *primitive.MessageExt) primitive.LocalTransactionState {
 	var orderInfo model.OrderInfo
 	_ = json.Unmarshal(msg.Body, &orderInfo)
 	result := global.DB.Where(model.OrderInfo{OrderSn: orderInfo.OrderSn}).First(&orderInfo)
 	if result.RowsAffected == 0 {
-		// 这里并不能确定库存是否扣减，所以需要在库存服务中保证幂等性，扣减库存成功
+		// 未查询到订单，说明本地事务执行失败	 消息提交，库存归还
+		// 但是这里并不能确定库存是否扣减，所以需要在库存服务中保证幂等性，扣减库存成功
 		return primitive.CommitMessageState
 	}
-	// 查询到了库存，逻辑就不用归还
+	// 查询到了订单，本地事务执行成功，消息回滚，不需要消息归还
 	return primitive.RollbackMessageState
 }
 
@@ -317,6 +356,11 @@ func (s *OrderServer) CreateOrder(ctx context.Context, req *v2orderproto.OrderRe
 	)
 	defer span.End()
 
+	// 提取trace上下文
+	traceMap := make(map[string]string)
+	otel.GetTextMapPropagator().Inject(ctx, propagation.MapCarrier(traceMap))
+
+	// 订单的基本信息表
 	order := model.OrderInfo{
 		OrderSn:      GenerateOrderSn(req.UserId),
 		Address:      req.Address,
@@ -326,30 +370,51 @@ func (s *OrderServer) CreateOrder(ctx context.Context, req *v2orderproto.OrderRe
 		User:         req.UserId,
 	}
 
-	// 提取trace上下文
-	traceMap := make(map[string]string)
-	otel.GetTextMapPropagator().Inject(ctx, propagation.MapCarrier(traceMap))
-
-	// 封装消息体
 	msgBody, _ := json.Marshal(OrderMessage{
 		OrderInfo: order,
 		TraceMap:  traceMap,
 	})
 
-	// 生产者发送一个事务消息 库存回归reback的 topic中
-	_, err := global.MQSendTranClient.SendMessageInTransaction(context.Background(),
-		primitive.NewMessage(global.ServerConfig.RocketMQConfig.TopicReback, msgBody))
+	orderListener := OrderListener{}
+	q, err := rocketmq.NewTransactionProducer(&orderListener,
+		producer.WithNameServer([]string{fmt.Sprintf("%s:%s", global.ServerConfig.RocketMQInfo.Host, global.ServerConfig.RocketMQInfo.Port)}))
 	if err != nil {
-		fmt.Printf("发送失败:%s\n", err)
-		return nil, status.Error(codes.Internal, "发送消息失败")
+		zap.S().Errorf("生成生产者失败：%s", err.Error())
+		return nil, err
 	}
-	if orderInfo.Code != codes.OK {
-		return nil, status.Error(orderInfo.Code, orderInfo.Detail)
+	//启动生产者
+	if err = q.Start(); err != nil {
+		zap.S().Errorf("启动生产者失败：%s", err.Error())
+		return nil, err
+	}
+	// 生产者发送一个事务消息 库存回归reback的 topic中
+	// _, err := global.MQSendTranClient.SendMessageInTransaction(ctx,
+	// 	primitive.NewMessage(global.ServerConfig.RocketMQConfig.TopicReback, msgBody))
+	// if err != nil {
+	// 	zap.S().Errorf("发送失败:%s\n", err)
+	// 	return nil, status.Error(codes.Internal, "发送消息失败")
+	// }
+	msg := primitive.NewMessage(global.ServerConfig.RocketMQInfo.TopicReback, msgBody)
+	_, err = q.SendMessageInTransaction(context.Background(), msg)
+	if err != nil {
+		zap.S().Errorf("发送事务half消息失败%s", err)
+		return nil, status.Errorf(codes.Internal, "发送消息half消息失败")
+	}
+	// 发送消息后，RocketMQ会自动调用事务监听器的方法，执行本地事务
+
+	err = q.Shutdown()
+	if err != nil {
+		panic("shutdown failed")
+	}
+
+	// 当本地事务执行的结果状态码返回不为OK时
+	if orderListener.Code != codes.OK {
+		return nil, status.Error(orderListener.Code, orderListener.Detail)
 	}
 	return &v2orderproto.OrderInfoResponse{
-		// Id:      orderInfo.ID,
+		Id:      orderListener.ID,
 		OrderSn: order.OrderSn,
-		Total:   orderInfo.OrderAmount,
+		Total:   orderListener.OrderAmount,
 	}, nil
 }
 
@@ -358,17 +423,20 @@ func OrderTimeout(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.
 	for i := range msgs {
 		var orderInfo model.OrderInfo
 		_ = json.Unmarshal(msgs[i].Body, &orderInfo)
-		fmt.Printf("获取到订单的超时消息:%v", time.Now())
+		zap.S().Debugf("获取到订单的超时消息:%v", time.Now())
 		// 查询订单的支付状态
-		// 如果已支付什么都不做，如果未支付，应该归还库存
 		var order model.OrderInfo
 		result := global.DB.Model(model.OrderInfo{}).
 			Where(model.OrderInfo{OrderSn: orderInfo.OrderSn}).
 			First(&order)
+			// 订单支付成功
 		if result.RowsAffected == 0 {
 			return consumer.ConsumeSuccess, nil
 		}
+		zap.S().Infof("订单状态:%v", order.Status)
+
 		// 订单超时，自动归还库存
+		// 如果已支付什么都不做，如果未支付，应该归还库存
 		if order.Status != "TRADE_SUCCESS" {
 			tx := global.DB.Begin()
 			// p, err := rocketmq.NewProducer(producer.WithNameServer([]string{"192.168.226.140:9876"}))
@@ -378,10 +446,10 @@ func OrderTimeout(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.
 			// if err = p.Start(); err != nil {
 			// 	panic(err)
 			// }
-			// 归还库存，生产者发送一个普通消息到 reback的 topic中
+			// 归还库存，生产者发送一个普通消息到归还 reback的 topic中
 			// 通知库存服务把这笔订单占用的库存释放回去
-			_, err := global.MQSendClient.SendSync(context.Background(),
-				primitive.NewMessage(global.ServerConfig.RocketMQConfig.TopicReback, msgs[i].Body))
+			_, err := global.MQInventory.SendSync(context.Background(),
+				primitive.NewMessage(global.ServerConfig.RocketMQInfo.TopicReback, msgs[i].Body))
 			if err != nil {
 				tx.Rollback()
 				zap.S().Errorf("【超时归还】发送失败: %s\n", err)
@@ -392,7 +460,7 @@ func OrderTimeout(ctx context.Context, msgs ...*primitive.MessageExt) (consumer.
 			// }
 			// 修改订单的状态为已支付
 			order.Status = "TRADE_CLOSED"
-			if result := tx.Save(&order); result.Error != nil {
+			if err := tx.Save(&order); err.Error != nil {
 				tx.Rollback()
 				zap.S().Errorf("【超时归还】修改支付失败: %s\n", err)
 				return consumer.ConsumeRetryLater, nil

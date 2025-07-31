@@ -1,4 +1,4 @@
-<template> 
+<template> 
   <div class="app-container">
     <el-card class="operate-container" shadow="never">
       <i class="el-icon-tickets"></i>
@@ -59,8 +59,7 @@
   </div>
 </template>
 <script>
-  import {fetchList, updateShowStatus, updateFactoryStatus, deleteBrand} from '@/api/brand'
-  import {getBrands,deleteBrands} from '@/apis/goods'
+  import {fetchList, deleteBrand} from '@/api/lushop/brand'
 
   export default {
     name: 'brandList',
@@ -94,83 +93,24 @@
     methods: {
       getList() {
         this.listLoading = true;
-        getBrands(this.listQuery).then(response => {
+        fetchList(this.listQuery).then(response => {
           this.listLoading = false;
-          this.list = this.list.concat(response.data||[]);
-          this.total = response.total;
-          this.totalPage = response.data.totalPage;
-          this.pageSize = response.data.pageSize;
-          this.pageNum  = this.listQuery.pn
-          this.listQuery.pn = response.data.length==this.listQuery.pnum?this.listQuery.pn+2:this.listQuery.pn
+          // 适配lushop_api的响应格式
+          if (response.code === 200) {
+            this.list = response.data.list || [];
+            this.total = response.data.total || 0;
+          } else {
+            this.$message.error(response.msg || '获取品牌列表失败');
+          }
+        }).catch(error => {
+          this.listLoading = false;
+          this.$message.error('获取品牌列表失败');
         });
       },
       handleSelectionChange(val) {
         this.multipleSelection = val;
       },
-      handleUpdate(index, row) {
-        this.$router.push({path: '/updateBrand', query: {id: row.id}})
-      },
-      handleDelete(index, row) {
-        this.$confirm('是否要删除该品牌', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          deleteBrands(row.id).then(response => {
-            this.$message({
-              message: '删除成功',
-              type: 'success',
-              duration: 1000
-            });
-            this.getList();
-          });
-        });
-      },
-      getProductList(index, row) {
-        console.log(index, row);
-      },
-      getProductCommentList(index, row) {
-        console.log(index, row);
-      },
-      handleFactoryStatusChange(index, row) {
-        var data = new URLSearchParams();
-        data.append("ids", row.id);
-        data.append("factoryStatus", row.factoryStatus);
-        updateFactoryStatus(data).then(response => {
-          this.$message({
-            message: '修改成功',
-            type: 'success',
-            duration: 1000
-          });
-        }).catch(error => {
-          if (row.factoryStatus === 0) {
-            row.factoryStatus = 1;
-          } else {
-            row.factoryStatus = 0;
-          }
-        });
-      },
-      handleShowStatusChange(index, row) {
-        let data = new URLSearchParams();
-        ;
-        data.append("ids", row.id);
-        data.append("showStatus", row.showStatus);
-        updateShowStatus(data).then(response => {
-          this.$message({
-            message: '修改成功',
-            type: 'success',
-            duration: 1000
-          });
-        }).catch(error => {
-          if (row.showStatus === 0) {
-            row.showStatus = 1;
-          } else {
-            row.showStatus = 0;
-          }
-        });
-      },
       handleSizeChange(val) {
-        this.listQuery.pn = 1;
         this.listQuery.pnum = val;
         this.getList();
       },
@@ -178,61 +118,51 @@
         this.listQuery.pn = val;
         this.getList();
       },
-      searchBrandList() {
-        this.listQuery.pageNum = 1;
-        this.getList();
+      addBrand() {
+        this.$router.push({path: '/pms/addBrand'})
       },
-      handleBatchOperate() {
-        console.log(this.multipleSelection);
-        if (this.multipleSelection < 1) {
-          this.$message({
-            message: '请选择一条记录',
-            type: 'warning',
-            duration: 1000
-          });
-          return;
-        }
-        let showStatus = 0;
-        if (this.operateType === 'showBrand') {
-          showStatus = 1;
-        } else if (this.operateType === 'hideBrand') {
-          showStatus = 0;
-        } else {
-          this.$message({
-            message: '请选择批量操作类型',
-            type: 'warning',
-            duration: 1000
-          });
-          return;
-        }
-        let ids = [];
-        for (let i = 0; i < this.multipleSelection.length; i++) {
-          ids.push(this.multipleSelection[i].id);
-        }
-        let data = new URLSearchParams();
-        data.append("ids", ids);
-        data.append("showStatus", showStatus);
-        updateShowStatus(data).then(response => {
-          this.getList();
-          this.$message({
-            message: '修改成功',
-            type: 'success',
-            duration: 1000
+      handleUpdate(index, row) {
+        this.$router.push({path: '/pms/updateBrand', query: {id: row.id}})
+      },
+      handleDelete(index, row) {
+        this.$confirm('是否要删除该品牌?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteBrand(row.id).then(response => {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            });
+            this.getList();
+          }).catch(error => {
+            this.$message.error('删除失败');
           });
         });
-      },
-      addBrand() {
-        this.$router.push({path: '/addBrand'})
       }
     }
   }
 </script>
-<style rel="stylesheet/scss" lang="scss" scoped>
-
-.imgs{
-  width: 50px;
-  height: 50px;
-}
+<style scoped>
+  .operate-container {
+    margin-top: 0;
+  }
+  .operate-container .btn-add {
+    float: right;
+  }
+  .table-container {
+    margin-top: 20px;
+  }
+  .pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  .imgs {
+    height: 40px;
+    width: 40px;
+  }
 </style>
 
 

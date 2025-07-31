@@ -5,15 +5,16 @@ import { getToken } from '@/utils/auth'
 
 // 创建axios实例
 const service = axios.create({
-  // baseURL: process.env.BASE_API, // api的base_url
+  baseURL: process.env.BASE_API, // api的base_url
   timeout: 30000 // 请求超时时间
 })
 
 // request拦截器
 service.interceptors.request.use(config => {
-  // if (store.getters.token) {
-    config.headers['x-token'] = getToken()||'' // 让每个请求携带自定义token 请根据实际情况自行修改
-  // }
+  // 添加JWT认证头
+  if (store.getters.token) {
+    config.headers['Authorization'] = 'Bearer ' + getToken()
+  }
   return config
 }, error => {
   // Do something with request error
@@ -27,17 +28,19 @@ service.interceptors.response.use(
   /**
   * code为非200是抛错 可结合自己业务进行修改
   */
-    const res = response
+    const res = response.data
     console.log('结果',res)
-    if (res.status != 200) {
+    
+    // lushop_api的响应格式
+    if (res.code !== 200) {
       Message({
-        message: res.msg,
+        message: res.msg || '请求失败',
         type: 'error',
         duration: 3 * 1000
       })
 
       // 401:未登录;
-      if (res.status === 401) {
+      if (res.code === 401) {
         MessageBox.confirm('你已被登出，可以取消继续留在该页面，或者重新登录', '确定登出', {
           confirmButtonText: '重新登录',
           cancelButtonText: '取消',
@@ -51,14 +54,18 @@ service.interceptors.response.use(
       }
       return Promise.reject('error')
     } 
-    // else {
-      return response.data
-    // }
+    return res
   },
   error => {
     console.log('err' + error)// for debug
+    let errorMsg = '网络错误'
+    if (error.response && error.response.data && error.response.data.msg) {
+      errorMsg = error.response.data.msg
+    } else if (error.message) {
+      errorMsg = error.message
+    }
     Message({
-      message: error.msg,
+      message: errorMsg,
       type: 'error',
       duration: 3 * 1000
     })

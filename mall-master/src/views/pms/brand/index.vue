@@ -1,4 +1,4 @@
-<template> 
+<template>
   <div class="app-container">
     <el-card class="operate-container" shadow="never">
       <i class="el-icon-tickets"></i>
@@ -163,6 +163,7 @@
     height: 40px;
     width: 40px;
   }
+</style>
 </style>
 
 

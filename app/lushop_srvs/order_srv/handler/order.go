@@ -340,7 +340,7 @@ func (o *OrderListener) CheckLocalTransaction(msg *primitive.MessageExt) primiti
 		// 但是这里并不能确定库存是否扣减，所以需要在库存服务中保证幂等性，扣减库存成功
 		return primitive.CommitMessageState
 	}
-	// 查询到了订单，本地事务执行成功，消息回滚，不需要消息归还
+	// 查询到了订单，本地事务执行成功，消息回滚，不需要库存归还
 	return primitive.RollbackMessageState
 }
 

@@ -1,6 +1,6 @@
 这是来自慕课网的电商系统微服务实战，仅供个人学习
 
-技术栈：Go、Grpc、Gin、Mysql、Redis、Elasticsearch、RocketMQ、Nacos、Consul、Jaeger、Sentinel
+技术栈：Go、Grpc、Gin、Mysql、Redis、Elasticsearch、RocketMQ、Nacos、Consul、Jaeger、Sentinel、Kong
 
 基于JWT做访问鉴权token，Gin做路由分发、表单验证、解决跨域等。
 
@@ -17,6 +17,9 @@
 用户接口服务： 为用户提供操作接口其中实现了简单的地址，留言, 收藏等。
 
 基于Jaeger做微服务间链路追踪，使用Sentinel实现限流。
+
+Kong配置服务和路由进行分发，并配置防爬和机器人、限流等
+
 HTTP API层 端口
  8101
 

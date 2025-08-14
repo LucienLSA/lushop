@@ -13,6 +13,7 @@ import (
 	sentinel "github.com/alibaba/sentinel-golang/api"
 	"github.com/alibaba/sentinel-golang/core/base"
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 )
 
@@ -237,6 +238,9 @@ func GoodsCreate(ctx *gin.Context) {
 	}
 	//如何设置库存
 	//TODO 商品库存
+	// 写入商品详情缓存
+	cacheKey := "goods_detail_" + strconv.Itoa(int(rsp.Id))
+	global.RedisClient.Set(ctx, cacheKey, rsp, 0)
 	ctx.JSON(http.StatusOK, rsp)
 }
 
@@ -248,37 +252,57 @@ func GoodsDetail(ctx *gin.Context) {
 		ctx.Status(http.StatusNotFound)
 		return
 	}
-	r, err := global.GoodsSrvClient.GetGoodsDetail(context.Background(), &v2goodsproto.GoodInfoRequest{
-		Id: int32(i),
-	})
-	if err != nil {
+	// 商品详情
+	var r *v2goodsproto.GoodsInfoResponse
+	// 读取商品信息时，使用缓存回溯
+	cacheKey := "goods_detail_" + id
+	cachedGoods, err := global.RedisClient.Get(ctx, cacheKey).Result()
+	if err == redis.Nil {
+		// 如果缓存不存在，调用商品服务查询数据库
+		r, err = global.GoodsSrvClient.GetGoodsDetail(context.Background(), &v2goodsproto.GoodInfoRequest{
+			Id: int32(i),
+		})
+		if err != nil {
+			v2base.HandleGrpcErrorToHttp(err, ctx)
+			return
+		}
+		global.RedisClient.Set(ctx, cacheKey, r, 0) // 缓存商品详情
+		ctx.JSON(http.StatusOK, cachedGoods)
+		return
+	} else if err != nil {
+		zap.S().Errorw("[Detail] 查询 【商品详情】失败", "error", err)
 		v2base.HandleGrpcErrorToHttp(err, ctx)
+		return
+	} else {
+		// 如果缓存存在，直接返回缓存数据
+		ctx.JSON(http.StatusOK, cachedGoods)
+		return
 	}
 
-	rsp := map[string]interface{}{
-		"id":          r.Id,
-		"name":        r.Name,
-		"goods_brief": r.GoodsBrief,
-		"desc":        r.GoodsDesc,
-		"ship_free":   r.ShipFree,
-		"images":      r.Images,
-		"desc_images": r.DescImages,
-		"front_image": r.GoodsFrontImage,
-		"shop_price":  r.ShopPrice,
-		"ctegory": map[string]interface{}{
-			"id":   r.Category.Id,
-			"name": r.Category.Name,
-		},
-		"brand": map[string]interface{}{
-			"id":   r.Brand.Id,
-			"name": r.Brand.Name,
-			"logo": r.Brand.Logo,
-		},
-		"is_hot":  r.IsHot,
-		"is_new":  r.IsNew,
-		"on_sale": r.OnSale,
-	}
-	ctx.JSON(http.StatusOK, rsp)
+	// rsp := map[string]interface{}{
+	// 	"id":          r.Id,
+	// 	"name":        r.Name,
+	// 	"goods_brief": r.GoodsBrief,
+	// 	"desc":        r.GoodsDesc,
+	// 	"ship_free":   r.ShipFree,
+	// 	"images":      r.Images,
+	// 	"desc_images": r.DescImages,
+	// 	"front_image": r.GoodsFrontImage,
+	// 	"shop_price":  r.ShopPrice,
+	// 	"ctegory": map[string]interface{}{
+	// 		"id":   r.Category.Id,
+	// 		"name": r.Category.Name,
+	// 	},
+	// 	"brand": map[string]interface{}{
+	// 		"id":   r.Brand.Id,
+	// 		"name": r.Brand.Name,
+	// 		"logo": r.Brand.Logo,
+	// 	},
+	// 	"is_hot":  r.IsHot,
+	// 	"is_new":  r.IsNew,
+	// 	"on_sale": r.OnSale,
+	// }
+	// ctx.JSON(http.StatusOK, rsp)
 }
 
 // 删除商品
@@ -295,6 +319,9 @@ func GoodsDelete(ctx *gin.Context) {
 	if err != nil {
 		v2base.HandleGrpcErrorToHttp(err, ctx)
 	}
+	// 删除商品详情缓存
+	cacheKey := "goods_detail_" + id
+	global.RedisClient.Del(ctx, cacheKey)
 	ctx.Status(http.StatusOK)
 }
 
@@ -370,6 +397,9 @@ func GoodsUpdate(ctx *gin.Context) {
 		v2base.HandleGrpcErrorToHttp(err, ctx)
 		return
 	}
+	// 更新商品详情缓存（删除旧缓存）
+	cacheKey := "goods_detail_" + id
+	global.RedisClient.Del(ctx, cacheKey)
 	ctx.JSON(http.StatusOK, gin.H{
 		"msg": "修改成功",
 	})

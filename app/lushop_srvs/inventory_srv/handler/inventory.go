@@ -122,6 +122,7 @@ func (v *InventoryServer) Sell(ctx context.Context, req *proto.SellInfo) (*empty
 			Num:   goodInfo.Num,
 		})
 		var inv model.Inventory
+		// 对商品的ID进行上锁
 		mutex := rs.NewMutex(fmt.Sprintf("goods_%d", goodInfo.GoodsId))
 		if err := mutex.Lock(); err != nil {
 			return nil, status.Errorf(codes.Internal, "获取redis分布式锁异常")

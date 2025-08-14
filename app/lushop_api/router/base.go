@@ -10,7 +10,7 @@ import (
 func InitBaseRouter(Router *gin.Engine) {
 	ApiGroup := Router.Group(global.ServerConfig.Version)
 	// ApiGroup = ApiGroup.Group("u")
-	BaseRouter := ApiGroup.Group("num")
+	BaseRouter := ApiGroup.Group("user")
 	{
 		BaseRouter.GET("captcha", v2user.GetCaptcha)
 		BaseRouter.POST("send_sms", v2user.SendSmsAli)

@@ -34,4 +34,13 @@ func InitUserRouter(Router *gin.Engine) {
 		UserRouerV2.GET("detail", middlewares.AuthMiddleware(), user.GetUserDetail)
 		UserRouerV2.PATCH("update", middlewares.AuthMiddleware(), user.UpdateUser)
 	}
+
+	// 验证码路由
+	CaptchaRouter := ApiGroup.Group("captcha")
+	{
+		CaptchaRouter.GET("picture/get", user.GetCaptcha)         // 获取图形验证码
+		CaptchaRouter.GET("picture/refresh", user.RefreshCaptcha) // 刷新图形验证码
+		CaptchaRouter.GET("picture/verify", user.VerifyCaptcha)   // 验证图形验证码
+		CaptchaRouter.POST("sms/send", user.SendSmsAli)           // 发送手机验证码
+	}
 }

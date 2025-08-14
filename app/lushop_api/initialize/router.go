@@ -32,7 +32,7 @@ func Routers() *gin.Engine {
 
 	router.InitUserRouter(Router)   //用户相关
 	router.InitUserOpRouter(Router) //用户操作相关
-	router.InitBaseRouter(Router)   //验证码相关
+	// router.InitBaseRouter(Router)   //验证码相关
 	router.InitGoodsRouter(Router)  //商品相关
 	router.InitOrderRouter(Router)  //订单相关
 	router.InitOssRouter(Router)    //oss相关

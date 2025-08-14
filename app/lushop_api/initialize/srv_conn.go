@@ -3,6 +3,7 @@ package initialize
 import (
 	"fmt"
 	"lushopapi/global"
+	"sync"
 
 	v2goodsproto "lushopapi/proto/goods"
 	v2inventoryproto "lushopapi/proto/inventory"
@@ -13,6 +14,7 @@ import (
 	_ "github.com/mbobakov/grpc-consul-resolver"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
@@ -24,74 +26,133 @@ func SrvConn() {
 	InitInvSrv()    //库存srv
 }
 
+func NewGrpcPool(addr string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
+	pool := &myConnPool{
+		addr: addr,
+		opts: opts,
+	}
+	return pool.Get()
+}
+
+type myConnPool struct {
+	addr string
+	opts []grpc.DialOption
+}
+
+var (
+	connCache = make(map[string]*grpc.ClientConn)
+	connMutex sync.Mutex
+)
+
+func (p *myConnPool) Get() (*grpc.ClientConn, error) {
+	connMutex.Lock()
+	defer connMutex.Unlock()
+
+	// 检查缓存中是否有可用连接
+	if conn, ok := connCache[p.addr]; ok {
+		// 检查连接状态
+		if conn.GetState() != connectivity.Shutdown && conn.GetState() != connectivity.TransientFailure {
+			return conn, nil
+		}
+		// 关闭无效连接
+		conn.Close()
+		delete(connCache, p.addr)
+	}
+
+	// 创建新连接
+	conn, err := grpc.Dial(p.addr, p.opts...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to dial gRPC server: %v", err)
+	}
+
+	// 缓存新连接
+	connCache[p.addr] = conn
+	return conn, nil
+}
+
 func InitUserSrv() {
 	consulInfo := global.ServerConfig.ConsulInfo
-	userConn, err := grpc.Dial(
-		fmt.Sprintf("consul://%s:%s/%s?wait=14s", consulInfo.Host, consulInfo.Port, global.ServerConfig.UserSrvInfo.Name),
+	addr := fmt.Sprintf("consul://%s:%s/%s?wait=14s", consulInfo.Host, consulInfo.Port, global.ServerConfig.UserSrvInfo.Name)
+	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`),
-	)
+	}
+
+	conn, err := NewGrpcPool(addr, opts...)
 	if err != nil {
-		zap.S().Fatal("[InitUserSrv] 连接 【用户服务失败】")
+		zap.S().Fatal("[InitUserSrv] 连接 【用户服务失败】", zap.Error(err))
 		return
 	}
-	userSrcClient := v2userproto.NewUserClient(userConn)
+
+	userSrcClient := v2userproto.NewUserClient(conn)
 	global.UserSrvClient = userSrcClient
 }
 func InitUserOpSrv() {
 	consulInfo := global.ServerConfig.ConsulInfo
-	userOpConn, err := grpc.Dial(
-		fmt.Sprintf("consul://%s:%s/%s?wait=14s", consulInfo.Host, consulInfo.Port, global.ServerConfig.UserOpSrvInfo.Name),
+	addr := fmt.Sprintf("consul://%s:%s/%s?wait=14s", consulInfo.Host, consulInfo.Port, global.ServerConfig.UserOpSrvInfo.Name)
+	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`),
-	)
+	}
+	
+	conn, err := NewGrpcPool(addr, opts...)
 	if err != nil {
-		zap.S().Fatal("[InitUserOpSrv] 连接 【用户op服务失败】")
+		zap.S().Fatal("[InitUserOpSrv] 连接 【用户op服务失败】", zap.Error(err))
 		return
 	}
-	userOpSrcClient := v2useropproto.NewUserOpClient(userOpConn)
+	
+	userOpSrcClient := v2useropproto.NewUserOpClient(conn)
 	global.UserOpSrvClient = userOpSrcClient
 }
 func InitGoodsSrv() {
 	consulInfo := global.ServerConfig.ConsulInfo
-	goodsConn, err := grpc.Dial(
-		fmt.Sprintf("consul://%s:%s/%s?wait=14s", consulInfo.Host, consulInfo.Port, global.ServerConfig.GoodsSrvInfo.Name),
+	addr := fmt.Sprintf("consul://%s:%s/%s?wait=14s", consulInfo.Host, consulInfo.Port, global.ServerConfig.GoodsSrvInfo.Name)
+	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`),
-	)
+	}
+	
+	conn, err := NewGrpcPool(addr, opts...)
 	if err != nil {
-		zap.S().Fatal("[InitGoodsSrv] 连接 【商品服务失败】")
+		zap.S().Fatal("[InitGoodsSrv] 连接 【商品服务失败】", zap.Error(err))
 		return
 	}
-	goodsSrcClient := v2goodsproto.NewGoodsClient(goodsConn)
+	
+	goodsSrcClient := v2goodsproto.NewGoodsClient(conn)
 	global.GoodsSrvClient = goodsSrcClient
 }
 func InitOrderSrv() {
 	consulInfo := global.ServerConfig.ConsulInfo
-	orderConn, err := grpc.Dial(
-		fmt.Sprintf("consul://%s:%s/%s?wait=14s", consulInfo.Host, consulInfo.Port, global.ServerConfig.OrderSrvInfo.Name),
+	addr := fmt.Sprintf("consul://%s:%s/%s?wait=14s", consulInfo.Host, consulInfo.Port, global.ServerConfig.OrderSrvInfo.Name)
+	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`),
-	)
+	}
+	
+	conn, err := NewGrpcPool(addr, opts...)
 	if err != nil {
-		zap.S().Fatal("[InitOrderSrv] 连接 【订单服务失败】")
+		zap.S().Fatal("[InitOrderSrv] 连接 【订单服务失败】", zap.Error(err))
 		return
 	}
-	orderSrcClient := v2orderproto.NewOrderClient(orderConn)
+	
+	orderSrcClient := v2orderproto.NewOrderClient(conn)
 	global.OrderSrvClient = orderSrcClient
 }
 func InitInvSrv() {
 	consulInfo := global.ServerConfig.ConsulInfo
-	invConn, err := grpc.Dial(
-		fmt.Sprintf("consul://%s:%s/%s?wait=14s", consulInfo.Host, consulInfo.Port, global.ServerConfig.InventorySrvInfo.Name),
+	addr := fmt.Sprintf("consul://%s:%s/%s?wait=14s", consulInfo.Host, consulInfo.Port, global.ServerConfig.InventorySrvInfo.Name)
+	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`),
-	)
+	}
+	
+	conn, err := NewGrpcPool(addr, opts...)
 	if err != nil {
-		zap.S().Fatal("[InitInvSrv] 连接 【库存服务失败】")
+		zap.S().Fatal("[InitInvSrv] 连接 【库存服务失败】", zap.Error(err))
 		return
 	}
-	invSrcClient := v2inventoryproto.NewInventoryClient(invConn)
+	
+	invSrcClient := v2inventoryproto.NewInventoryClient(conn)
 	global.InventorySrvClient = invSrcClient
 }
 

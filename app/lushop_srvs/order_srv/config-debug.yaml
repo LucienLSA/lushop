@@ -1,6 +1,6 @@
 name: 'order_srv'
 # host: '10.99.195.125' # 实验室
-host: '10.101.178.90' # 宿舍
+host: '10.101.171.193' # 宿舍
 # host: '172.25.6.248' # esc
 tags: ['order_srv','grpc','lushop_srv','lucien','order']
 port: 50053

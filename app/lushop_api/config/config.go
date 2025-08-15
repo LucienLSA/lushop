@@ -60,6 +60,7 @@ type AliSmsConfig struct {
 	TemplateCode string `mapstructure:"template_code" json:"template_code"`
 	RegionId     string `mapstructure:"region_id" json:"region_id"`
 	Expire       int    `mapstructure:"expire" json:"expire"`
+	CoolDown     int    `mapstructure:"cooldown" json:"cooldown"`
 }
 
 type ConsulConfig struct {

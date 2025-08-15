@@ -38,9 +38,12 @@ func InitUserRouter(Router *gin.Engine) {
 	// 验证码路由
 	CaptchaRouter := ApiGroup.Group("captcha")
 	{
-		CaptchaRouter.GET("picture/get", user.GetCaptcha)         // 获取图形验证码
-		CaptchaRouter.GET("picture/refresh", user.RefreshCaptcha) // 刷新图形验证码
-		CaptchaRouter.GET("picture/verify", user.VerifyCaptcha)   // 验证图形验证码
-		CaptchaRouter.POST("sms/send", user.SendSmsAli)           // 发送手机验证码
+		CaptchaRouter.GET("picture/get", user.GetCaptchaV2) // 获取图形验证码
+		// CaptchaRouter.GET("picture/refresh", user.RefreshCaptcha) // 刷新图形验证码
+		CaptchaRouter.GET("picture/verify", user.VerifyCaptcha) // 验证图形验证码
+
+		CaptchaRouter.POST("sms/send", user.SendSmsAli) // 发送手机验证码
+		// CaptchaRouter.GET("sms/refresh", user.RefreshSmsAli) // 刷新手机验证码
+		CaptchaRouter.GET("sms/verify", user.VerifySmsAli) // 刷新手机验证码
 	}
 }

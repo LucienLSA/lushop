@@ -1,6 +1,6 @@
 name: v2lushopapi   # 服务器名称
 # host: '10.99.195.125'   # 服务器主机 实验室
-host: '10.101.178.90' # 宿舍
+host: '10.101.171.193' # 宿舍
 # host: '172.25.6.248' # esc
 port: 8101         # 服务器端口
 version: v2
@@ -74,6 +74,7 @@ ali_sms:
   phone_number: '19821216806'
   region_id: 'cn-hangzhou'
   expire: 600
+  cooldown : 60
 
 redis:
   host: '127.0.0.1'

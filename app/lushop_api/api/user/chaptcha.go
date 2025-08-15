@@ -33,9 +33,8 @@ func GetCaptcha(ctx *gin.Context) {
 			})
 			return
 		}
-		// 设置冷却时间60秒
-		//
-		global.RedisClient.Set(ctx, coolKey, 1, 60*time.Second)
+		// 不设置冷却时间
+		global.RedisClient.Set(ctx, coolKey, 1, 1*time.Millisecond)
 	}
 	driver := base64Captcha.NewDriverDigit(80, 240, 5, 0.7, 80)
 	//通过设置的driver放到自带的store
@@ -78,7 +77,7 @@ func GetCaptchaV2(ctx *gin.Context) {
 	}
 
 	// 存储到Redis（5分钟过期）这里存入captcha_id作为key，ans作为value
-	if err := global.RedisClient.Set(ctx, "captcha:"+id, ans, 5*time.Minute).Err(); err != nil {
+	if err := global.RedisClient.SetNX(ctx, "captcha:"+id, ans, 5*time.Minute).Err(); err != nil {
 		zap.S().Errorf("验证码存入Redis失败: %s", err.Error())
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"msg": "验证码存储失败",
@@ -93,44 +92,45 @@ func GetCaptchaV2(ctx *gin.Context) {
 	})
 }
 
-// 刷新验证码
-func RefreshCaptcha(ctx *gin.Context) {
-	captchaId := ctx.Query("captcha_id")
-	if captchaId == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": "验证码ID不能为空",
-		})
-		return
-	}
+// // 刷新验证码
+// func RefreshCaptcha(ctx *gin.Context) {
+// 	captchaId := ctx.Query("captcha_id")
+// 	if captchaId == "" {
+// 		ctx.JSON(http.StatusBadRequest, gin.H{
+// 			"msg": "验证码ID不能为空",
+// 		})
+// 		return
+// 	}
 
-	// 生成新的图形验证码
-	id, b64s, ans, err := captcha.Generate()
-	if err != nil {
-		zap.S().Errorf("生成验证码错误,:", err.Error())
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"msg": "验证码错误",
-		})
-		return
-	}
+// 	// 生成新的图形验证码
+// 	id, b64s, ans, err := captcha.Generate()
+// 	if err != nil {
+// 		zap.S().Errorf("生成验证码错误,:", err.Error())
+// 		ctx.JSON(http.StatusInternalServerError, gin.H{
+// 			"msg": "验证码错误",
+// 		})
+// 		return
+// 	}
 
-	// 删除旧的验证码
-	global.RedisClient.Del(ctx, "captcha:"+captchaId)
+// 	// 删除旧的验证码
+// 	global.RedisClient.Del(ctx, "captcha:"+captchaId)
 
-	// 存储新的验证码到Redis，设置5分钟过期
-	err = global.RedisClient.Set(ctx, "captcha:"+id, ans, 5*time.Minute).Err()
-	if err != nil {
-		zap.S().Errorf("验证码存入Redis失败: %s", err.Error())
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"msg": "验证码存储失败",
-		})
-		return
-	}
+// 	// 存储新的验证码到Redis，设置5分钟过期
+// 	err = global.RedisClient.Set(ctx, "captcha:"+id, ans, 5*time.Minute).Err()
+// 	if err != nil {
+// 		zap.S().Errorf("验证码存入Redis失败: %s", err.Error())
+// 		ctx.JSON(http.StatusInternalServerError, gin.H{
+// 			"msg": "验证码存储失败",
+// 		})
+// 		return
+// 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"captcha_id":   id,
-		"picture_path": b64s,
-	})
-}
+// 	ctx.JSON(http.StatusOK, gin.H{
+// 		"captcha_id":   id,
+// 		"picture_path": b64s,
+// 		"captcha_ans":  ans,
+// 	})
+// }
 
 // 验证验证码
 func VerifyCaptcha(ctx *gin.Context) {

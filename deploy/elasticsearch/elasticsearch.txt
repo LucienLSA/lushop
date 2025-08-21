@@ -1,0 +1,16 @@
+mkdir -p /data/elasticsearch/config
+mkdir -p /data/elasticsearch/data
+mkdir -p /data/elasticsearch/plugins
+chmod 777 -R /data/elasticsearch
+echo "http.host: 0.0.0.0" >> /data/elasticsearch/config/elasticsearch.yml
+
+docker run \
+--name elasticsearch \
+-p 9200:9200 \
+-p 9300:9300 \
+-v /data/elasticsearch/data:/usr/share/elasticsearch/data \
+-v /data/elasticsearch/plugins:/usr/share/elasticsearch/plugins \
+-v /data/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
+-e ES_JAVA_OPTS="-Xms128m -Xmx256m" \
+-e "discovery.type=single-node" \
+-d ccr.ccs.tencentyun.com/lucien/elasticsearch:v2

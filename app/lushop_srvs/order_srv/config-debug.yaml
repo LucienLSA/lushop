@@ -1,0 +1,54 @@
+name: 'order_srv'
+# host: '10.99.195.125' # 实验室
+host: '10.101.171.193' # 宿舍
+# host: '172.25.6.248' # esc
+tags: ['order_srv','grpc','lushop_srv','lucien','order']
+port: 50053
+
+mysql:
+  host: '127.0.0.1'
+  port: '3306'
+  user: "root"
+  password: "123456"
+  db_name: 'lushop_order_srv'
+
+consul:
+  host: '192.168.226.140'
+  port: '8500'
+
+redis:
+  host: '127.0.0.1'
+  port: '6379'
+  db: 4
+  password: ''
+  pool_size: 10
+
+rocketmq:
+ host: '192.168.226.140'
+ port: '9876'
+ consumer_group: lushop_order
+ producer_group_order: lushop_order
+ producer_group_inventory: lushop_inventory
+ topic_reback: order_reback
+ topic_timeout: order_timeout
+
+jaeger:
+ host: '192.168.226.140'
+ port: '4317'
+ service_name: order_srv
+ tracer_name: order_grpc_server
+
+goods_srv:
+  name: 'goods_srv'
+
+inventory_srv:
+  name: 'inventory_srv'
+
+# nacos:
+#   host: '192.168.226.140'
+#   port: '8848'
+#   namespace: '41c209c8-0ef0-4df1-b1b2-0641b78ca428'
+#   user: 'nacos'
+#   password: 'nacos'
+#   dataid: 'order_srv.json'
+#   group: 'dev'

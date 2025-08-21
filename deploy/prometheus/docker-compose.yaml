@@ -1,0 +1,44 @@
+version: '3.8'
+
+networks:
+  monitor-net:  # 监控专用网络
+    driver: bridge
+
+volumes:
+  prometheus-data:  # Prometheus数据持久化
+  grafana-data:     # Grafana数据持久化
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: prometheus
+    restart: always
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml  # 挂载配置文件
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - monitor-net
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'  # 支持热加载配置
+
+  grafana:
+    image: grafana/grafana:10.1.2
+    container_name: grafana
+    restart: always
+    volumes:
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - monitor-net
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin  # 默认管理员密码
+      - GF_USERS_ALLOW_SIGN_UP=false      # 禁用注册
+    depends_on:
+      - prometheus

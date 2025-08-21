@@ -1,0 +1,12 @@
+flask==2.3.3
+flask-cors==4.0.0
+flask-jwt-extended==4.5.2
+flask-redis==0.4.0
+redis==4.6.0
+python-consul==1.1.0
+pyjwt==2.8.0
+oss2==2.17.0  # 阿里云OSS SDK
+python-dotenv==1.0.0  # 环境变量管理
+requests==2.31.0  # HTTP请求
+pydantic==2.5.2  # 数据验证（替代原 forms）
+jaeger-client==4.8.0  # 链路追踪

@@ -1,0 +1,39 @@
+name: 'inventory_srv'
+# host: '10.99.195.125' # 实验室
+host: '10.101.171.193' # 宿舍
+# host: '172.25.6.248' # esc
+tags: ['inventory_srv','grpc','lushop_srv','lucien','inventory']
+port: 50052
+
+mysql:
+  host: '127.0.0.1'
+  port: '3306'
+  user: "root"
+  password: "123456"
+  db_name: 'lushop_inventory_srv'
+
+rocketmq:
+ host: '192.168.226.140'
+ port: '9876'
+ consumer_group: lushop_inventory
+ topic_reback: order_reback
+
+consul:
+  host: '192.168.226.140'
+  port: '8500'
+
+redis:
+  host: '127.0.0.1'
+  port: '6379'
+  db: 4
+  password: ''
+  pool_size: 10
+
+# nacos:
+#   host: '192.168.226.140'
+#   port: '8848'
+#   namespace: '882378fb-1b26-49d4-90c4-51db79108f34'
+#   user: 'nacos'
+#   password: 'nacos'
+#   dataid: 'inventory_srv.json'
+#   group: 'dev'

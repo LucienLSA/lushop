@@ -1,0 +1,25 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'grpc_services'
+    consul_sd_configs:
+      - server: 'host.docker.internal:8500'  # Consul地址
+        services: []  # 发现所有服务
+    relabel_configs:
+      # 仅保留带有metrics=true标签的服务
+      - source_labels: [__meta_consul_tag_metrics]
+        regex: true
+        action: keep
+      # 从元数据获取metrics端口
+      - source_labels: [__meta_consul_service_meta_metrics_port]
+        target_label: __metrics_path__
+        regex: (.*)
+      # 构建metrics URL
+      - source_labels: [__address__, __meta_consul_service_meta_metrics_port]
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        target_label: __address__
+      # 添加服务名称标签
+      - source_labels: [__meta_consul_service_name]
+        target_label: service

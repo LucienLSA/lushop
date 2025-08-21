@@ -1,0 +1,33 @@
+name: 'goods_srv'
+# host: '10.99.195.125' # 实验室
+host: '10.101.171.193' # 宿舍
+# host: '172.25.6.248' # esc
+tags: ['goods_srv','grpc','lushop_srv','lucien']
+port: 50051
+
+
+metrics_port: 9091
+
+mysql:
+  host: '127.0.0.1'
+  port: '3306'
+  user: "root"
+  password: "123456"
+  db_name: 'lushop_goods_srv'
+
+consul:
+  host: '192.168.226.140'
+  port: '8500'
+
+es:
+  host: '192.168.226.140'
+  port: '9200'
+
+# nacos:
+#   host: '192.168.226.140'
+#   port: '8848'
+#   namespace: 'd44bc5b3-42e3-4aa1-9ea7-14d6a747880c'
+#   user: 'nacos'
+#   password: 'nacos'
+#   dataid: 'goods_srv.json'
+#   group: 'dev'

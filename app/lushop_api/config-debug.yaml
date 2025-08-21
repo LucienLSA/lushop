@@ -1,0 +1,159 @@
+name: v2lushopapi   # 服务器名称
+# host: '10.99.195.125'   # 服务器主机 实验室
+host: '10.101.171.193' # 宿舍
+# host: '172.25.6.248' # esc
+port: 8101         # 服务器端口
+version: v2
+tags:
+  - gin
+  - lushop
+  - api
+
+oauth2:
+  # access_token 过期时间
+  # refresh_token 刷新token的refresh过期事件
+  # 单位小时
+  # 默认2小时
+  access_token_exp: 2
+  refresh_token_exp: 12
+  # 签名 jwt access_token 时所用 key
+  jwt_signed_key: "k2bjI75JJHolp0i"
+  
+  # oauth2 客户端配置
+  # 数组类型
+  # 可配置多客户端
+  client:
+
+      # 客户端id 必须全局唯一
+    - id: '15383660176'
+      # 客户端 secret
+      secret: '123456'
+      # 应用名 在页面上必要时进行显示
+      name: 测试应用1
+      # 客户端 domain
+      # !!注意 http/https 不要写错!!
+      domain: http://10.101.178.90:8101
+      # 权限范围
+      # 数组类型
+      # 可以配置多个权限 
+      # 颁发的 access_token 中会包含该值 资源方可以对该值进行验证
+      scope:
+          # 权限范围 id 唯一
+        - id: all
+          # 权限范围名称
+          # 会在页面（登录页面）进行展示
+          title: "用户账号、手机、权限、角色等信息"
+
+    - id: test_client_2
+      secret: test_secret_2
+      name: 测试应用2 
+      domain: http://10.101.178.90:8101
+      scope:
+        - id: all
+          title: 用户账号, 手机, 权限, 角色等信息
+
+session:
+  name: session_id
+  secret_key: "kkoiybh1ah6rbh0"
+  # 过期时间
+  # 单位秒
+  # 默认20分钟
+  max_age: 1200
+
+jwt:
+  key: 'lucien'
+  secret: 's7DRD35xGlStUOFjsjSS4sbqg0azszYg'
+  access_expired_time: 900 # 15分钟
+  refresh_expired_time: 604800 # 7天
+
+ali_sms:
+  api_key: 'Ali_ApiKey'
+  api_secret: 'Ali_ApiSecret'
+  sign_name: '阿里云短信测试'
+  template_code: 'SMS_154950909'
+  phone_number: '19821216806'
+  region_id: 'cn-hangzhou'
+  expire: 600
+  cooldown : 60
+
+redis:
+  host: '127.0.0.1'
+  port: '6379'
+  db: 4
+  password: ''
+  pool_size: 10
+
+consul:
+  host: '192.168.226.140'
+  port: '8500'
+
+jaeger:
+  service_name: 'goods_web'
+  jaeger_gin_endpoint: '192.168.226.140:4318'
+
+sentinel:
+  app:
+    name: v2lushop_api
+    type: 0
+  log:
+    dir: "./temp/csp"
+    pid: false
+    metric:
+      maxFileCount: 14
+      flushIntervalSec: 1
+  stat:
+    globalStatisticIntervalMsTotal: 6000
+    system:
+      collectIntervalMs: 1000
+
+log:
+  level: "debug"
+  filepath: "./temp/logs/"
+  filename: "v2lushopapi.log"
+  max_size: 200
+  max_age: 30
+  max_backups: 7
+
+oss: 
+  api_key: 'OSS_ACCESS_KEY_ID'
+  api_secrect: 'OSS_ACCESS_KEY_SECRET'
+  host: 'http://lushop666.oss-cn-shanghai.aliyuncs.com'
+  callback_url: 'https://3e69ee01b766.ngrok-free.app/g/v2/oss/callback'
+  upload_dir: 'lushop_images/'
+  expired_time: 3000
+  bucket: lushop666
+  endpoint: oss-cn-shanghai.aliyuncs.com
+
+alipay:
+  app_id: 'AliPay_Id' # 支付宝应用ID
+  private_key: 'Lushop_Private_Key' # 应用私钥
+  ali_public_key: 'AliPay_Public_Key' # 支付宝公钥
+  notify_url: 'https://3e69ee01b766.ngrok-free.app/g/v2/oss/callback'
+  return_url: ''
+  product_code: 'FAST_INSTANT_TRADE_PAY'
+
+user_srv:
+  #    host: 127.0.0.1   # 用户服务主机 直连使用
+  #    port: 9090         # 用户服务端口 直连使用
+  name: user_srv   # 用户服务名称
+
+userop_srv:
+  #    host: 127.0.0.1  
+  #    port: 9090        
+  name: userop_srv   # 用户操作服务名称
+
+goods_srv:
+  #    host: 127.0.0.1   
+  #    port: 9090         
+  name: goods_srv   # 商品服务名称
+
+order_srv:
+  #    host: 127.0.0.1   # 
+  #    port: 9090        
+  name: order_srv   # 订单服务名称
+
+inventory_srv:
+  #    host: 127.0.0.1  
+  #    port: 9090        
+  name: inventory_srv   # 库存服务名称
+

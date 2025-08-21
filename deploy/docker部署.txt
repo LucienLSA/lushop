@@ -1,0 +1,46 @@
+# 云部署环境配置
+# lushop-api
+ip: 118.178.171.184
+port: 8101
+
+# goods_srv
+ip: 118.178.171.184
+port: 50051
+
+# inventory_srv
+ip: 118.178.171.184
+port: 50052
+
+# order_srv
+ip: 118.178.171.184
+port: 50053
+
+# user_srv
+ip: 118.178.171.184
+port: 50054
+
+# userop_srv
+ip: 118.178.171.184
+port: 50055
+
+# consul
+docker run --name consul -d -p 8500:8500 -p 8300:8300 -p 8301:8301 -p 8302:8302 -p 8600:8600 ccr.ccs.tencentyun.com/lucien/consul:v2 agent -server -bootstrap-expect=1 -ui -bind=0.0.0.0 -client=0.0.0.0
+
+# nacos
+docker run --name nacos-standalone -e MODE=standalone -e JVM_XMS=512m -e JVM_XMX=512m -e JVM_XMN=256m -p 8848:8848 -d ccr.ccs.tencentyun.com/lucien/my-nacos-standalone:v2
+
+# kibana
+docker run -d --name kibana -e ELASTICSEARCH_HOSTS="http://118.178.171.184:9200" -p 5601:5601 ccr.ccs.tencentyun.com/lucien/kibana:v2
+
+# jaeger
+docker run \
+  --restart=always\
+  --name jaeger \
+  -d\
+  -p6831:6831/udp \
+  -p16686:16686 \
+  -p14268:14268 \
+  -p 4317:4317 \
+  -p 4318:4318 \
+  -p 14250:14250 \
+  ccr.ccs.tencentyun.com/lucien/jaegertracing-all-in-one:v2

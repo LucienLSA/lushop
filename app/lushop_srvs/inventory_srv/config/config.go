@@ -1,0 +1,55 @@
+package config
+
+type MySQLConfig struct {
+	Host     string `mapstructure:"host" json:"host"`
+	Port     string `mapstructure:"port" json:"port"`
+	DbName   string `mapstructure:"db_name" json:"db_name"`
+	User     string `mapstructure:"user" json:"user"`
+	PassWord string `mapstructure:"password" json:"password"`
+}
+
+type RedisConfig struct {
+	Host     string `mapstructure:"host" json:"host"`
+	Port     string `mapstructure:"port" json:"port"`
+	Password string `mapstructure:"password" json:"password"`
+	PoolSize int    `mapstructure:"pool_size" json:"pool_size"`
+	DB       int    `mapstructure:"db" json:"db"`
+}
+
+type ServerConfig struct {
+	Name         string         `mapstructure:"name" json:"name"`
+	Host         string         `mapstructure:"host" json:"host"`
+	Tags         []string       `mapstructure:"tags" json:"tags"`
+	Port         int            `mapstructure:"port" json:"port"`
+	MySQLInfo    MySQLConfig    `mapstructure:"mysql" json:"mysql"`
+	ConsulInfo   ConsulConfig   `mapstructure:"consul" json:"consul"`
+	RedisInfo    RedisConfig    `mapstructure:"redis" json:"redis"`
+	RocketMQInfo RocketMQConfig `mapstructure:"rocketmq" json:"rocketmq"`
+}
+
+type ConsulConfig struct {
+	Host string `mapstructure:"host" json:"host"`
+	Port string `mapstructure:"port" json:"port"`
+}
+
+type NacosConfig struct {
+	NacosInfo NacosInfo `mapstructure:"nacos"`
+}
+
+type RocketMQConfig struct {
+	Host        string `mapstructure:"host" json:"host"`
+	Port        string `mapstructure:"port" json:"port"`
+	Name        string `mapstructure:"name" json:"name"`
+	ConsumerGroup   string `mapstructure:"consumer_group" json:"consumer_group"`
+	TopicReback string `mapstructure:"topic_reback" json:"topic_reback"`
+}
+
+type NacosInfo struct {
+	Host      string `mapstructure:"host"`
+	Port      uint64 `mapstructure:"port"`
+	Namespace string `mapstructure:"namespace"`
+	User      string `mapstructure:"user"`
+	Password  string `mapstructure:"password"`
+	DataId    string `mapstructure:"dataid"`
+	Group     string `mapstructure:"group"`
+}

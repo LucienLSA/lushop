@@ -1,0 +1,33 @@
+name: 'userop_srv'
+# host: '10.99.195.125' # 实验室
+host: '10.101.171.193' # 宿舍
+# host: '172.25.6.248' # esc
+tags: ['userop_srv','grpc','lushop_srv','lucien','userop','address','message','userfav']
+port: 50055
+
+mysql:
+  host: '127.0.0.1'
+  port: '3306'
+  user: "root"
+  password: "123456"
+  db_name: 'lushop_userop_srv'
+
+consul:
+  host: '192.168.226.140'
+  port: '8500'
+
+# redis:
+#   host: '127.0.0.1'
+#   port: '6379'
+#   db: 4
+#   password: ''
+#   pool_size: 10
+
+# nacos:
+#   host: '192.168.226.140'
+#   port: '8848'
+#   namespace: 'e01c6951-1f64-4078-b77b-6c4c4f13f332'
+#   user: 'nacos'
+#   password: 'nacos'
+#   dataid: 'userop_srv.json'
+#   group: 'dev'

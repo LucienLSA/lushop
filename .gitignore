@@ -52,3 +52,6 @@ vendor/
 
 # 忽略压缩包
 *.zip
+
+.yml
+.yaml

@@ -8,6 +8,7 @@ import (
 	"lushopapi/global"
 	v2goodsproto "lushopapi/proto/goods"
 	v2inventoryproto "lushopapi/proto/inventory"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
@@ -17,7 +18,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
+	"golang.org/x/sync/singleflight"
 )
+
+var goodsDetailGroup singleflight.Group
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 // 商品的列表 pmin=abc
 func GoodsList(ctx *gin.Context) {
@@ -250,14 +258,7 @@ func GoodsCreate(ctx *gin.Context) {
 		v2base.HandleGrpcErrorToHttp(err, ctx)
 		return
 	}
-	// 写入商品详情缓存
-	cacheKey := "goods_detail_" + strconv.Itoa(int(rsp.Id))
-	// 设置24小时过期时间，避免缓存永久有效
-	err = global.RedisClient.Set(ctx, cacheKey, rsp, 24*time.Hour).Err()
-	if err != nil {
-		zap.S().Warnf("商品缓存设置失败: %v", err)
-		// 缓存失败不影响主流程，但需记录日志
-	}
+	// 不在创建时预写详情缓存，交由详情接口统一处理缓存
 	ctx.JSON(http.StatusOK, rsp)
 }
 
@@ -269,38 +270,43 @@ func GoodsDetail(ctx *gin.Context) {
 		ctx.Status(http.StatusNotFound)
 		return
 	}
-	// 商品详情
-	var r *v2goodsproto.GoodsInfoResponse
-	// 读取商品信息时，使用缓存回溯
+	// 商品详情 - 热点缓存 + singleflight 请求合并
+	reqCtx := ctx.Request.Context()
 	cacheKey := "goods_detail_" + id
-	// 1. 尝试从缓存获取
-	cachedData, err := global.RedisClient.Get(ctx, cacheKey).Result()
-	if err == nil {
-		// 2. 缓存命中，反序列化
-		if err := json.Unmarshal([]byte(cachedData), &r); err != nil {
-			zap.S().Warnf("缓存反序列化失败: %v", err)
-		} else {
-			ctx.JSON(http.StatusOK, r)
+
+	// 1) 查缓存
+	if cachedBytes, err := global.RedisClient.Get(reqCtx, cacheKey).Bytes(); err == nil {
+		var cached v2goodsproto.GoodsInfoResponse
+		if err := json.Unmarshal(cachedBytes, &cached); err == nil {
+			ctx.JSON(http.StatusOK, &cached)
 			return
 		}
+		zap.S().Warnf("缓存反序列化失败: %v", err)
 	} else if err != redis.Nil {
 		zap.S().Warnf("缓存查询失败: %v", err)
 	}
 
-	// 3. 缓存未命中或反序列化失败，查询数据库
-	r, err = global.GoodsSrvClient.GetGoodsDetail(context.Background(), &v2goodsproto.GoodInfoRequest{
-		Id: int32(i),
+	// 2) singleflight 合并请求
+	v, err, _ := goodsDetailGroup.Do(cacheKey, func() (interface{}, error) {
+		r, err := global.GoodsSrvClient.GetGoodsDetail(context.Background(), &v2goodsproto.GoodInfoRequest{
+			Id: int32(i),
+		})
+		if err != nil {
+			return nil, err
+		}
+		data, _ := json.Marshal(r)
+		ttl := 24*time.Hour + time.Duration(rand.Intn(600))*time.Second
+		if err := global.RedisClient.Set(reqCtx, cacheKey, data, ttl).Err(); err != nil {
+			zap.S().Warnf("商品缓存设置失败: %v", err)
+		}
+		return r, nil
 	})
 	if err != nil {
 		v2base.HandleGrpcErrorToHttp(err, ctx)
 		return
 	}
-
-	// 4. 重建缓存（设置24小时过期）
-	data, _ := json.Marshal(r)
-	if err := global.RedisClient.Set(ctx, cacheKey, data, 24*time.Hour).Err(); err != nil {
-		zap.S().Warnf("商品缓存设置失败: %v", err)
-	}
+	resp := v.(*v2goodsproto.GoodsInfoResponse)
+	ctx.JSON(http.StatusOK, resp)
 
 	// rsp := map[string]interface{}{
 	// 	"id":          r.Id,
@@ -344,7 +350,7 @@ func GoodsDelete(ctx *gin.Context) {
 	}
 	// 删除商品详情缓存
 	cacheKey := "goods_detail_" + id
-	global.RedisClient.Del(ctx, cacheKey)
+	global.RedisClient.Del(ctx.Request.Context(), cacheKey)
 	ctx.Status(http.StatusOK)
 }
 
@@ -388,7 +394,7 @@ func GoodsUpdateStatus(ctx *gin.Context) {
 	}
 	// 添加缓存删除逻辑
 	cacheKey := "goods_detail_" + id
-	global.RedisClient.Del(ctx, cacheKey)
+	global.RedisClient.Del(ctx.Request.Context(), cacheKey)
 	ctx.JSON(http.StatusOK, gin.H{"msg": "修改成功"})
 }
 
@@ -422,7 +428,7 @@ func GoodsUpdate(ctx *gin.Context) {
 	}
 	// 更新商品详情缓存（删除旧缓存）
 	cacheKey := "goods_detail_" + id
-	global.RedisClient.Del(ctx, cacheKey)
+	global.RedisClient.Del(ctx.Request.Context(), cacheKey)
 	ctx.JSON(http.StatusOK, gin.H{
 		"msg": "修改成功",
 	})

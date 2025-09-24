@@ -40,7 +40,6 @@ func JWTAuth() gin.HandlerFunc {
 
 		if !(len(parts) == 2 && parts[0] == "Bearer") {
 			// zap.S().Errorf("Authorization header format error: %s", authHeader)
-			// zap.S().Errorf("期望格式: Bearer <token>, 实际格式: %s", authHeader)
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"code": 401,
 				"msg":  "Authorization格式错误, 应为: Bearer <token>",
@@ -71,7 +70,7 @@ func JWTAuth() gin.HandlerFunc {
 				c.Header("WWW-Authenticate", "Bearer realm=\"api\", error=\"invalid_token\", error_description=\"access token expired\"")
 				c.Header("X-Token-Expired", "true")
 				c.JSON(http.StatusUnauthorized, gin.H{
-					"code":   40101,
+					"code":   401,
 					"msg":    "登录授权已过期，请刷新token",
 					"action": "refresh_token",
 				})
@@ -121,10 +120,10 @@ type JWT struct {
 }
 
 var (
-	TokenExpired     = errors.New("Token is expired")
-	TokenNotValidYet = errors.New("Token not active yet")
-	TokenMalformed   = errors.New("That's not even a token")
-	TokenInvalid     = errors.New("Couldn't handle this token:")
+	TokenExpired     = errors.New("Token is expired")            // Token过期
+	TokenNotValidYet = errors.New("Token not active yet")        // Token未生效
+	TokenMalformed   = errors.New("That's not even a token")     // Token格式错误
+	TokenInvalid     = errors.New("Couldn't handle this token:") // Token验证失败
 )
 
 func NewJWT() *JWT {
